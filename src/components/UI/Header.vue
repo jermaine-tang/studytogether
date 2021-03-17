@@ -10,6 +10,7 @@
                 </ul>
             </nav>
         </header>
+        <br>
     </div> 
 </template>
 
@@ -21,7 +22,6 @@ export default {
 
 <style scoped>
 header {
-    position: absolute;
     display: block;
     top: 0;
     left: 0;
@@ -39,7 +39,7 @@ nav {
   width: 95%;
   margin: 0 auto;
   background: #fff;
-  padding: 10px 0;
+  padding: 5px 0;
   box-shadow: 0px 5px 0px #dedede;
 }
 
