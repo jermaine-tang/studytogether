@@ -5,7 +5,7 @@
                 <strong><h1>Study Together</h1></strong>
                 <ul>
                     <li><router-link to="/">Home</router-link></li>
-                    <li><a href="#">Listings</a></li>
+                    <li><a href="/listings">Listings</a></li>
                     <li><router-link to="/login">Login</router-link></li>
                 </ul>
             </nav>
