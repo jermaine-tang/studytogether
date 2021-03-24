@@ -3,8 +3,8 @@
     <app-header></app-header>
     <div class="listings-list">
       <ul class="listings-list">
-        <li v-for="listing in list" :key="listing.name">
-          <div class="name"> {{ listing.name }}</div>
+        <li v-for="listing in list" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
+          <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1">
           <br><br>
@@ -30,7 +30,7 @@
           <div class="price" v-bind:price="listing.price"> Price: {{ listing.price}}
             <span id="price-pics">
               <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-              <img v-if="listing.price >= 10 && listing.price < 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
+              <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
               <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
             </span>
           </div>
@@ -60,14 +60,20 @@ export default {
   methods: {
     fetchItems: function() {
       database.collection('listings').get().then((querySnapShot) => {
-        let item = {}
+      let item = {}
         querySnapShot.docs.forEach(doc => {
-          item=doc.data()
+          item= {...doc.data(), ['id']: doc.id}
           console.log(item)
           this.list.push(item)
           })
       })
-    }
+    },
+
+    route: function(event) {
+            let doc_id = event.target.getAttribute("id");
+            this.$router.push({path: "indiv", query: {id: doc_id}, params: { id: doc_id}})
+        }
+
   },
   created:function() {
     this.fetchItems()
