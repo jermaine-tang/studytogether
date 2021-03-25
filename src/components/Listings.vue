@@ -3,22 +3,11 @@
     <app-header></app-header>
     <div class="listings-list">
       <ul class="listings-list">
-        <li v-for="listing in list" :key="listing.name">
-          <div class="name"> {{ listing.name }}</div>
+        <li v-for="listing in list" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
+          <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1">
           <br><br>
-          <div class="location">
-          <img id="location-pin" src="https://img.icons8.com/pastel-glyph/64/000000/place-marker--v1.png"/>
-          {{ listing.loc_neighbourhood }}
-          </div>
-          <div class="noise">  Noise: {{ listing.noise }}  
-            <span id="noise-pics">
-              <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png"/>
-              <img v-if="listing.noise > 1" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png"/>
-              <img v-if="listing.noise > 2" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png"/>
-            </span>
-          </div>
           <div class="rating">
             <img v-if="listing.rating > 0" src="https://img.icons8.com/fluent/48/000000/star.png"/>
             <img v-if="listing.rating > 1" src="https://img.icons8.com/fluent/48/000000/star.png"/>
@@ -26,12 +15,32 @@
             <img v-if="listing.rating > 3" src="https://img.icons8.com/fluent/48/000000/star.png"/>
             <img v-if="listing.rating > 4" src="https://img.icons8.com/fluent/48/000000/star.png"/>
           </div>
+          <div class="location">
+          <img id="location-pin" src="https://img.icons8.com/pastel-glyph/64/000000/place-marker--v1.png" width="40px"/>
+          <span id="locationVal">{{ listing.loc_neighbourhood }}</span>
+          </div>
+          <br>
           
-          <div class="price" v-bind:price="listing.price"> Price: {{ listing.price}}
+          
+          <div class="price"> 
             <span id="price-pics">
+<<<<<<< Updated upstream
               <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-              <img v-if="listing.price >= 10 && listing.price < 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
+              <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
               <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
+=======
+              <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+              <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+              <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+            </span>
+          </div>
+          <br>
+          <div class="noise"> 
+            <span id="noise-pics">
+              <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+              <img v-if="listing.noise > 1" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+              <img v-if="listing.noise > 2" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+>>>>>>> Stashed changes
             </span>
           </div>
         </li>
@@ -60,14 +69,20 @@ export default {
   methods: {
     fetchItems: function() {
       database.collection('listings').get().then((querySnapShot) => {
-        let item = {}
+      let item = {}
         querySnapShot.docs.forEach(doc => {
-          item=doc.data()
+          item= {...doc.data(), ['id']: doc.id}
           console.log(item)
           this.list.push(item)
           })
       })
-    }
+    },
+
+    route: function(event) {
+            let doc_id = event.target.getAttribute("id");
+            this.$router.push({path: "indiv", query: {id: doc_id}, params: { id: doc_id}})
+        }
+
   },
   created:function() {
     this.fetchItems()
@@ -117,7 +132,7 @@ li {
   
 }
 
-
+/*
 .location, .noise, .price {
   float: left;
   
@@ -125,87 +140,32 @@ li {
   display: inline-block;
 }
 
-#location-pin, # {
+
+#location-pin {
   
   margin-left: 30px;
-}
+} */
 .details {
   float: left;
 
 
 }
 
-
-
-/*
-.box {
-  background-color: #ffffff;
-  width: 400px;
-  height: 350px;
-  margin: 7em auto;
-  border-radius: 40px;
-  box-shadow: 0px 0px 10px 10px lightgrey;
+.rating {
+  float: right;
+  margin-right: 50px;
 }
 
-.title {
-  padding-top: 40px;
-  color: #8c55aa;
-  font-family: "Ubuntu", sans-serif;
-  font-weight: bold;
-  font-size: 23px;
+.location, .noise, .price {
+    display: flex;  
+    flex-flow: row wrap;
+    margin-left: 50px;
+    font-size: 20px;
 }
 
-.user, .pass {
-  width: 75%;
-  color: darkgrey;
-  font-weight: bold;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: whitesmoke;
-  padding: 10px;
-  border-radius: 20px;
-  box-sizing: border-box;
-  border: 2px solid white;
-  text-align: center;
-  margin-bottom: 25px;
-  font-family: "Ubuntu", sans-serif;
+#locationVal, .noiseVal {
+    margin-top: 10px;
+    margin-left: 3px;
 }
 
-.user:focus, .pass:focus {
-  outline: none;
-  border-color: darkgrey;
-}
-
-.user:focus::-webkit-input-placeholder, .pass:focus::-webkit-input-placeholder {
-  opacity: 0;
-}
-
-.submit {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: linear-gradient(to right, #9c27b0, #e040fb);
-  border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: "Ubuntu", sans-serif;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-
-.forgot {
-  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #e1bee7;
-  padding-top: 15px;
-}
-
-a {
-  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #e1bee7;
-  text-decoration: none;
-}
-
-*/
 </style>
