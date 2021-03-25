@@ -2,6 +2,7 @@
   <div>
     <app-header></app-header>
     <div class="listings-list">
+      <button v-on:click="filter()">Filter</button>
       <ul class="listings-list">
         <li v-for="listing in list" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
@@ -24,11 +25,6 @@
           
           <div class="price"> 
             <span id="price-pics">
-<<<<<<< Updated upstream
-              <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-              <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-              <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-=======
               <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
               <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
               <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
@@ -40,7 +36,6 @@
               <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
               <img v-if="listing.noise > 1" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
               <img v-if="listing.noise > 2" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
->>>>>>> Stashed changes
             </span>
           </div>
         </li>
@@ -81,7 +76,11 @@ export default {
     route: function(event) {
             let doc_id = event.target.getAttribute("id");
             this.$router.push({path: "indiv", query: {id: doc_id}, params: { id: doc_id}})
-        }
+        },
+
+    filter: function() {
+        this.$router.push({name: 'filter'})
+    }
 
   },
   created:function() {
