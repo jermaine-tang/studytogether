@@ -2,9 +2,10 @@
   <div>
     <app-header></app-header>
     <div class="box">
-      <p class="title">Sign in</p>
+      <p class="title">Sign Up</p>
       <form class="form">
         <input class="user" type="text" align="center" placeholder="Username" />
+        <input class="email" type="email" align="center" placeholder="Email"/>
         <input
           class="pass"
           type="password"
@@ -12,10 +13,8 @@
           placeholder="Password"
         />
         <br>
-        <a class="submit" align="center">Sign in</a>
+        <a class="submit" align="center">Sign Up</a>
       </form>
-      <p class="forgot" align="center"><a href="#">Forgot Password?</a></p>
-      <p class="signup" align="center">Not yet Registered? <a href="/signup">Sign Up here!</a></p>
     </div>
   </div>
 </template>
@@ -56,7 +55,7 @@ export default {
   font-size: 23px;
 }
 
-.user, .pass {
+.user, .pass, .email {
   width: 75%;
   color: darkgrey;
   font-weight: bold;
@@ -68,11 +67,11 @@ export default {
   box-sizing: border-box;
   border: 2px solid white;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   font-family: "Ubuntu", sans-serif;
 }
 
-.user:focus, .pass:focus {
+.user:focus, .pass:focus, .email:focus {
   outline: none;
   border-color: darkgrey;
 }
@@ -82,38 +81,27 @@ export default {
 }
 
 .submit {
-  display: inline-block;
-  margin-top: 5px;
   cursor: pointer;
-  border-radius: 20px;
-  color: whitesmoke;
+  border-radius: 5em;
+  color: #fff;
   background: linear-gradient(to right, #9c27b0, #e040fb);
+  border: 10;
   padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 10px;
   padding-top: 10px;
   font-family: "Ubuntu", sans-serif;
-  font-weight: bold;
   font-size: 13px;
-  transition: 0.2s;
-}
-
-.forgot {
-  color: plum;
-  padding-top: 10px;
   font-weight: bold;
-}
-
-.signup {
-  font-weight: bold;
+  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
 
 a {
-  color: plum;
-  text-decoration: none;
+  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
+  color: #e1bee7;
 }
 
-.submit:hover {
-  border-color:darkgrey;
+a.submit:hover {
+    border-color: grey;
 }
 </style>
