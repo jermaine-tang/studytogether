@@ -1,38 +1,68 @@
 <template>
-    <div>
-        <header id="header" class="alt">
-            <nav class="stroke">
-                <strong><h1>Study Together</h1></strong>
-                <ul>
-                    <li><router-link to="/">Home</router-link></li>
-                    <li><a href="/listings">Listings</a></li>
-                    <li><router-link to="/login">Login</router-link></li>
-                </ul>
-            </nav>
-        </header>
-        <br>
-    </div> 
+  <div>
+    <header id="header" class="alt">
+      <nav class="stroke">
+        <strong><h1>Study Together</h1></strong>
+        <ul>
+          <li><router-link to="/">Home</router-link></li>
+          <li><router-link to="/listings">Listings</router-link></li>
+          <li v-if="loggedIn"><a v-on:click="signOut">Logout</a></li>
+          <li v-else><router-link to="/login">Login</router-link></li>
+        </ul>
+      </nav>
+    </header>
+    <br />
+  </div>
 </template>
 
 <script>
+import firebase from 'firebase';
+
 export default {
-    
-}
+  
+  data() {
+    return {
+      loggedIn: false,
+    };
+  },
+
+  methods: {
+    setupFirebase: function () {
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          console.log('loggedIn')
+          this.loggedIn = true;
+        } else {
+          console.log('not logged in')
+          this.loggedIn = false;
+        }
+      })
+    },
+
+    signOut: function() {
+      firebase.auth().signOut().then(() => this.$router.replace({ path: '/' }))
+    }
+  },
+  
+  mounted() {
+    this.setupFirebase();
+  }
+};
 </script>
 
 <style scoped>
 header {
-    display: block;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 h1 {
-    font-family: monospace;
-    font-size: 3em;
+  font-family: monospace;
+  font-size: 3em;
 }
 
 nav {
@@ -62,7 +92,7 @@ nav ul li a {
 nav ul li a,
 nav ul li a:after,
 nav ul li a:before {
-  transition: all .5s;
+  transition: all 0.5s;
 }
 nav ul li a:hover {
   color: #555;
@@ -80,7 +110,7 @@ nav.fill ul li a:after {
   right: 0;
   margin: auto;
   width: 0%;
-  content: '.';
+  content: ".";
   color: transparent;
   background: #333;
   height: 1px;
@@ -95,7 +125,7 @@ nav.fill ul li a {
 
 nav.fill ul li a:after {
   text-align: left;
-  content: '.';
+  content: ".";
   margin: 0;
   opacity: 0;
 }

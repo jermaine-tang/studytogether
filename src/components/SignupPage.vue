@@ -4,17 +4,19 @@
     <div class="box">
       <p class="title">Register</p>
       <form class="form">
-        <input class="email" type="email" align="center" placeholder="Email"/>
-        <input class="user" type="text" align="center" placeholder="Username" />
+        <input class="email" type="email" align="center" placeholder="Email" v-model="signup.email" required/>
+        <input class="user" type="text" align="center" placeholder="Name" v-model="signup.name" required/>
         <input
           class="pass"
           type="password"
           align="center"
           placeholder="Password"
+          v-model="signup.password"
+          required
         />
-        <input class="number" type="text" align="center" placeholder="Phone Number"/>
+        <input class="number" type="text" align="center" placeholder="Phone Number" v-model="signup.number" required/>
         <br>
-        <a class="submit" align="center"><span>Sign Up</span></a>
+        <a class="submit" type="submit" align="center" v-on:click="submit"><span>Sign Up</span></a>
       </form>
     </div>
   </div>
@@ -22,19 +24,40 @@
 
 <script>
 import Header from "./UI/Header.vue";
+import firebase from "firebase";
 
 export default {
   data() {
     return {
-      loginForm: {
+      signup: {
         email: "",
         password: "",
+        name: "",
+        number: "",
       },
     };
   },
   components: {
     "app-header": Header,
   },
+
+  methods: {
+    submit: async function() {
+      try {
+        firebase.auth().createUserWithEmailAndPassword(this.signup.email, this.signup.password)
+        // var user = firebase.auth().currentUser
+        // user.updateProfile({
+        //   displayName: this.signup.name,
+        //   phoneNumber: this.signup.number,
+        // }).then(() => {}).catch(err => console.log(err))
+        // console.log(user)
+        alert('Account created successfully!')
+        this.$router.replace({ path: "/login" })
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
 };
 </script>
 

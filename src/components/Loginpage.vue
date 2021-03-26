@@ -4,15 +4,17 @@
     <div class="box">
       <p class="title">Sign in</p>
       <form class="form">
-        <input class="user" type="text" align="center" placeholder="Username" />
+        <input class="email" type="email" align="center" placeholder="Email" v-model="loginform.email" required/>
         <input
           class="pass"
           type="password"
           align="center"
           placeholder="Password"
+          v-model="loginform.password"
+          required
         />
         <br>
-        <a class="submit" align="center"><span>Sign in</span></a>
+        <a class="submit" align="center" v-on:click="submit"><span>Sign in</span></a>
       </form>
       <p class="forgot" align="center"><a href="#">Forgot Password?</a></p>
       <p class="signup" align="center">Not yet Registered? <a href="/signup">Sign Up here!</a></p>
@@ -22,11 +24,12 @@
 
 <script>
 import Header from "./UI/Header.vue";
+import firebase from "firebase";
 
 export default {
   data() {
     return {
-      loginForm: {
+      loginform: {
         email: "",
         password: "",
       },
@@ -35,6 +38,20 @@ export default {
   components: {
     "app-header": Header,
   },
+
+  methods: {
+    submit: function() {
+      firebase.auth().signInWithEmailAndPassword(this.loginform.email, this.loginform.password)
+      .then(userCredential => {
+        var user = userCredential.user;
+        console.log(user)
+      })
+      .catch(err => {
+        console.log(err);
+      })
+
+    }
+  }
 };
 </script>
 
@@ -56,7 +73,7 @@ export default {
   font-size: 23px;
 }
 
-.user, .pass {
+.email, .pass {
   width: 75%;
   color: darkgrey;
   font-weight: bold;
@@ -72,12 +89,12 @@ export default {
   font-family: "Ubuntu", sans-serif;
 }
 
-.user:focus, .pass:focus {
+.email:focus, .pass:focus {
   outline: none;
   border-color: darkgrey;
 }
 
-.user:focus::-webkit-input-placeholder, .pass:focus::-webkit-input-placeholder {
+.email:focus::-webkit-input-placeholder, .pass:focus::-webkit-input-placeholder {
   opacity: 0;
 }
 
