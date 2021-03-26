@@ -2,8 +2,9 @@
   <div>
     <app-header></app-header>
     <div class="box">
-      <p class="title">Sign in</p>
+      <p class="title">Register</p>
       <form class="form">
+        <input class="email" type="email" align="center" placeholder="Email"/>
         <input class="user" type="text" align="center" placeholder="Username" />
         <input
           class="pass"
@@ -11,11 +12,10 @@
           align="center"
           placeholder="Password"
         />
+        <input class="number" type="text" align="center" placeholder="Phone Number"/>
         <br>
-        <a class="submit" align="center"><span>Sign in</span></a>
+        <a class="submit" align="center"><span>Sign Up</span></a>
       </form>
-      <p class="forgot" align="center"><a href="#">Forgot Password?</a></p>
-      <p class="signup" align="center">Not yet Registered? <a href="/signup">Sign Up here!</a></p>
     </div>
   </div>
 </template>
@@ -42,7 +42,7 @@ export default {
 .box {
   background-color: #ffffff;
   width: 400px;
-  height: 350px;
+  height: 410px;
   margin: 7em auto;
   border-radius: 40px;
   box-shadow: 0px 0px 10px 10px lightgrey;
@@ -56,7 +56,7 @@ export default {
   font-size: 23px;
 }
 
-.user, .pass {
+.user, .pass, .email, .number {
   width: 75%;
   color: darkgrey;
   font-weight: bold;
@@ -72,12 +72,12 @@ export default {
   font-family: "Ubuntu", sans-serif;
 }
 
-.user:focus, .pass:focus {
+.user:focus, .pass:focus, .email:focus, .number:focus {
   outline: none;
   border-color: darkgrey;
 }
 
-.user:focus::-webkit-input-placeholder, .pass:focus::-webkit-input-placeholder {
+.user:focus::-webkit-input-placeholder, .pass:focus::-webkit-input-placeholder, .email:focus::-webkit-input-placeholder, .number:focus::-webkit-input-placeholder {
   opacity: 0;
 }
 
@@ -95,6 +95,7 @@ export default {
   font-family: "Ubuntu", sans-serif;
   font-weight: bold;
   font-size: 13px;
+  transition: 0.2s;
 }
 
 .forgot {
