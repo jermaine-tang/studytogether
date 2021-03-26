@@ -12,7 +12,7 @@
           placeholder="Password"
         />
         <br>
-        <a class="submit" align="center">Sign in</a>
+        <a class="submit" align="center"><span>Sign in</span></a>
       </form>
       <p class="forgot" align="center"><a href="#">Forgot Password?</a></p>
       <p class="signup" align="center">Not yet Registered? <a href="/signup">Sign Up here!</a></p>
@@ -95,7 +95,6 @@ export default {
   font-family: "Ubuntu", sans-serif;
   font-weight: bold;
   font-size: 13px;
-  transition: 0.2s;
 }
 
 .forgot {
@@ -113,7 +112,27 @@ a {
   text-decoration: none;
 }
 
-.submit:hover {
-  border-color:darkgrey;
+.submit span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.submit span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  right: -40px;
+  transition: 0.5s;
+}
+
+.submit:hover span {
+  padding-right: 15px;
+}
+
+.submit:hover span:after {
+  opacity: 1;
+  right: -10px;
 }
 </style>
