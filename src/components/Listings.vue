@@ -1,11 +1,21 @@
 <template>
   <div>
     <app-header></app-header>
-    <search-bar></search-bar>
+
+    <div class="wrap">
+      <div class="search">
+          <input type="text" class="searchTerm" placeholder="What are you looking for?">
+          <button type="submit" class="searchButton">
+            <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filter">
+      <button v-on:click="filter()">Filter</button>
+    </div>
 
     <div class="listings-list">
-      <button v-on:click="filter()">Filter</button>
-
       <p v-if="filterList().length == 0 && this.$route.params.location != null"> No results found:( Please try another filter!</p>
       <ul class="listings-list">
         <li v-for="listing in filterList()" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
@@ -53,7 +63,6 @@
 
 <script>
 import Header from "./UI/Header.vue";
-import SearchBar from "./SearchBar.vue";
 import database from '../firebase.js';
 
 
@@ -64,8 +73,7 @@ export default {
     };
   },
   components: {
-    "app-header": Header,
-    "search-bar": SearchBar
+    "app-header": Header
   },
 //  props: ['list'],
   methods: {
@@ -203,6 +211,55 @@ li {
 #locationVal, .noiseVal {
     margin-top: 10px;
     margin-left: 3px;
+}
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body{
+  background: #f2f2f2;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.search {
+  width: 100%;
+  position: relative;
+  display: flex;
+}
+
+.searchTerm {
+  width: 100%;
+  border: 3px solid #c897cc;
+  border-right: none;
+  padding: 5px;
+  height: 20px;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+  color: #c897cc;
+}
+
+.searchTerm:focus{
+  color: #c897cc;
+}
+
+.searchButton {
+  width: 40px;
+  height: 36px;
+  border: 1px solid #c897cc;
+  background: #c897cc;
+  text-align: center;
+  color: #fff;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/*Resize the wrap to see the search bar change!*/
+.wrap{
+  width: 30%;
+  position: relative;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 </style>
