@@ -24,11 +24,6 @@
           
           <div class="price"> 
             <span id="price-pics">
-<<<<<<< Updated upstream
-              <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-              <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-              <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"/>
-=======
               <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
               <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
               <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
@@ -40,7 +35,6 @@
               <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
               <img v-if="listing.noise > 1" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
               <img v-if="listing.noise > 2" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
->>>>>>> Stashed changes
             </span>
           </div>
         </li>
