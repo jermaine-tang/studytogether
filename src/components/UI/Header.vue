@@ -6,6 +6,7 @@
                 <ul>
                     <li><router-link to="/">Home</router-link></li>
                     <li><a href="/listings">Listings</a></li>
+                    <li><router-link to="/bookings">Bookings</router-link></li>
                     <li><router-link to="/login">Login</router-link></li>
                 </ul>
             </nav>
