@@ -6,7 +6,7 @@ import Filter from './components/Filter.vue';
 
 export default[
     {path: '/', component: Homepage},
-    {path: '/listings', component: Listings},
+    {path: '/listings', name: 'listings', component: Listings},
     {path: '/login', component: Loginpage},
     {path: '/indiv', component: IndividualListings, props: true},
     { path: '/filter', name: 'filter', component: Filter, props: true },

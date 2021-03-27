@@ -3,8 +3,9 @@
     <app-header></app-header>
     <div class="listings-list">
       <button v-on:click="filter()">Filter</button>
+
       <ul class="listings-list">
-        <li v-for="listing in list" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
+        <li v-for="listing in filterList()" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1">
@@ -26,7 +27,7 @@
           <div class="price"> 
             <span id="price-pics">
               <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
-              <img v-if="listing.price >= 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+              <img v-if="listing.price > 10 && listing.price <= 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
               <img  v-if="listing.price > 20" src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
             </span>
           </div>
@@ -54,7 +55,8 @@ import database from '../firebase.js';
 export default {
   data() {
     return {
-      list: []
+      list: [],
+      filteredList: []
     };
   },
   components: {
@@ -68,9 +70,40 @@ export default {
         querySnapShot.docs.forEach(doc => {
           item= {...doc.data(), ['id']: doc.id}
           console.log(item)
+          if (item['price'] <= 10) {
+            item['price_filter'] = "cheap";
+          } else if (item['price'] > 20) {
+            item['price_filter'] = "expensive";
+          } else {
+            item['price_filter'] = "medium";
+          }
           this.list.push(item)
           })
       })
+    },
+
+    filterList: function() {
+      var result = [];
+      var location = ["North", "South", "East", "West", "Central"];
+      var price = ["cheap", "medium", "expensive"];
+      var noise = [1, 2, 3];
+      if (this.$route.params.location != null) {
+        if (this.$route.params.location.length != 0) {
+          location = this.$route.params.location;
+        }
+      }
+      if (this.$route.params.price != null) {
+        if (this.$route.params.price.length != 0) {
+          price = this.$route.params.price;
+        }
+      }
+      if (this.$route.params.noise != null) {
+        if (this.$route.params.noise.length != 0) {
+          noise = this.$route.params.noise;
+        }
+      }  
+      result = this.list.filter(x => (location.includes(x['loc_filter']) && price.includes(x['price_filter']) && noise.includes(x['noise'])));
+      return result;
     },
 
     route: function(event) {
