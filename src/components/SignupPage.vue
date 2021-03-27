@@ -2,14 +2,22 @@
   <div>
     <app-header></app-header>
     <div class="box">
-      <p class="title">Sign in</p>
+      <p class="title">Register</p>
       <form class="form">
         <input
           class="email"
           type="email"
           align="center"
           placeholder="Email"
-          v-model="loginform.email"
+          v-model="signup.email"
+          required
+        />
+        <input
+          class="user"
+          type="text"
+          align="center"
+          placeholder="Name"
+          v-model="signup.name"
           required
         />
         <input
@@ -17,18 +25,20 @@
           type="password"
           align="center"
           placeholder="Password"
-          v-model="loginform.password"
+          v-model="signup.password"
+          required
+        />
+        <input
+          class="number"
+          type="text"
+          align="center"
+          placeholder="Phone Number"
+          v-model="signup.number"
           required
         />
         <br />
-        <button class="submit" type="submit" align="center" v-on:click="submit"
-          ><span>Sign in</span></button
-        >
+        <button class="submit" type="submit" align="center" v-on:click="submit"><span>Sign Up</span></button>
       </form>
-      <p class="forgot" align="center"><a href="#">Forgot Password?</a></p>
-      <p class="signup" align="center">
-        Not yet Registered? <a href="/signup">Sign Up here!</a>
-      </p>
     </div>
   </div>
 </template>
@@ -36,13 +46,16 @@
 <script>
 import Header from "./UI/Header.vue";
 import firebase from "firebase";
+import database from '../firebase.js';
 
 export default {
   data() {
     return {
-      loginform: {
+      signup: {
         email: "",
         password: "",
+        name: "",
+        number: "",
       },
     };
   },
@@ -51,28 +64,41 @@ export default {
   },
 
   methods: {
-    submit: function (e) {
+    submit: async function (e) {
       e.preventDefault();
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(
-          this.loginform.email,
-          this.loginform.password
-        )
-        .then((userCredential) => {
-          var user = userCredential.user;
-          console.log(user);
-          
-          if (!user.emailVerified) {
-            alert('Verify your email to continue');
-            firebase.auth().signOut();
-          } else {
-            this.$router.push({ path: "/" });
-          }
+      try {
+        await firebase
+          .auth()
+          .createUserWithEmailAndPassword(
+            this.signup.email,
+            this.signup.password
+          );
+
+        var data = {
+          name: this.signup.name,
+          email: this.signup.email,
+          number: this.signup.number
+        }
+
+        var user = firebase.auth().currentUser
+
+        database.collection('users').doc(user.uid).set(data);
+
+        await user.updateProfile({
+          displayName: this.signup.name
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        console.log(user);
+        
+        await user.sendEmailVerification();
+
+        firebase.auth().signOut();
+
+        alert("Account created successfully! Verify your account with link sent to your email!");
+
+        this.$router.push({ path: "/login" })
+      } catch (err) {
+        console.log(err);
+      }
     },
   },
 };
@@ -82,7 +108,7 @@ export default {
 .box {
   background-color: #ffffff;
   width: 400px;
-  height: 350px;
+  height: 410px;
   margin: 7em auto;
   border-radius: 40px;
   box-shadow: 0px 0px 10px 10px lightgrey;
@@ -96,8 +122,10 @@ export default {
   font-size: 23px;
 }
 
+.user,
+.pass,
 .email,
-.pass {
+.number {
   width: 75%;
   color: darkgrey;
   font-weight: bold;
@@ -113,14 +141,18 @@ export default {
   font-family: "Ubuntu", sans-serif;
 }
 
+.user:focus,
+.pass:focus,
 .email:focus,
-.pass:focus {
+.number:focus {
   outline: none;
   border-color: darkgrey;
 }
 
+.user:focus::-webkit-input-placeholder,
+.pass:focus::-webkit-input-placeholder,
 .email:focus::-webkit-input-placeholder,
-.pass:focus::-webkit-input-placeholder {
+.number:focus::-webkit-input-placeholder {
   opacity: 0;
 }
 
@@ -131,7 +163,7 @@ export default {
   border-radius: 20px;
   color: whitesmoke;
   background: linear-gradient(to right, #9c27b0, #e040fb);
-  border: 0px;
+  border: 0;
   padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 10px;
@@ -139,6 +171,7 @@ export default {
   font-family: "Ubuntu", sans-serif;
   font-weight: bold;
   font-size: 13px;
+  transition: 0.2s;
 }
 
 .forgot {
