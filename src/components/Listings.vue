@@ -1,9 +1,12 @@
 <template>
   <div>
     <app-header></app-header>
+    <search-bar></search-bar>
+
     <div class="listings-list">
       <button v-on:click="filter()">Filter</button>
 
+      <p v-if="filterList().length == 0 && this.$route.params.location != null"> No results found:( Please try another filter!</p>
       <ul class="listings-list">
         <li v-for="listing in filterList()" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
@@ -50,17 +53,19 @@
 
 <script>
 import Header from "./UI/Header.vue";
+import SearchBar from "./SearchBar.vue";
 import database from '../firebase.js';
+
 
 export default {
   data() {
     return {
-      list: [],
-      filteredList: []
+      list: []
     };
   },
   components: {
     "app-header": Header,
+    "search-bar": SearchBar
   },
 //  props: ['list'],
   methods: {
