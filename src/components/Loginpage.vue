@@ -4,29 +4,43 @@
     <div class="box">
       <p class="title">Sign in</p>
       <form class="form">
-        <input class="user" type="text" align="center" placeholder="Username" />
+        <input
+          class="email"
+          type="email"
+          align="center"
+          placeholder="Email"
+          v-model="loginform.email"
+          required
+        />
         <input
           class="pass"
           type="password"
           align="center"
           placeholder="Password"
+          v-model="loginform.password"
+          required
         />
-        <br>
-        <a class="submit" align="center"><span>Sign in</span></a>
+        <br />
+        <button class="submit" type="submit" align="center" v-on:click="submit"
+          ><span>Sign in</span></button
+        >
       </form>
       <p class="forgot" align="center"><a href="#">Forgot Password?</a></p>
-      <p class="signup" align="center">Not yet Registered? <a href="/signup">Sign Up here!</a></p>
+      <p class="signup" align="center">
+        Not yet Registered? <a href="/signup">Sign Up here!</a>
+      </p>
     </div>
   </div>
 </template>
 
 <script>
 import Header from "./UI/Header.vue";
+import firebase from "firebase";
 
 export default {
   data() {
     return {
-      loginForm: {
+      loginform: {
         email: "",
         password: "",
       },
@@ -34,6 +48,32 @@ export default {
   },
   components: {
     "app-header": Header,
+  },
+
+  methods: {
+    submit: function (e) {
+      e.preventDefault();
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(
+          this.loginform.email,
+          this.loginform.password
+        )
+        .then((userCredential) => {
+          var user = userCredential.user;
+          console.log(user);
+          
+          if (!user.emailVerified) {
+            alert('Verify your email to continue');
+            firebase.auth().signOut();
+          } else {
+            this.$router.push({ path: "/" });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
 };
 </script>
@@ -56,7 +96,8 @@ export default {
   font-size: 23px;
 }
 
-.user, .pass {
+.email,
+.pass {
   width: 75%;
   color: darkgrey;
   font-weight: bold;
@@ -72,12 +113,14 @@ export default {
   font-family: "Ubuntu", sans-serif;
 }
 
-.user:focus, .pass:focus {
+.email:focus,
+.pass:focus {
   outline: none;
   border-color: darkgrey;
 }
 
-.user:focus::-webkit-input-placeholder, .pass:focus::-webkit-input-placeholder {
+.email:focus::-webkit-input-placeholder,
+.pass:focus::-webkit-input-placeholder {
   opacity: 0;
 }
 
@@ -88,6 +131,7 @@ export default {
   border-radius: 20px;
   color: whitesmoke;
   background: linear-gradient(to right, #9c27b0, #e040fb);
+  border: 0px;
   padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 10px;
@@ -120,7 +164,7 @@ a {
 }
 
 .submit span:after {
-  content: '\00bb';
+  content: "\00bb";
   position: absolute;
   opacity: 0;
   right: -40px;
@@ -134,5 +178,9 @@ a {
 .submit:hover span:after {
   opacity: 1;
   right: -10px;
+}
+
+.submit:focus {
+  outline: none;
 }
 </style>
