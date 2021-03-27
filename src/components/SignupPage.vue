@@ -4,8 +4,22 @@
     <div class="box">
       <p class="title">Register</p>
       <form class="form">
-        <input class="email" type="email" align="center" placeholder="Email" v-model="signup.email" required/>
-        <input class="user" type="text" align="center" placeholder="Name" v-model="signup.name" required/>
+        <input
+          class="email"
+          type="email"
+          align="center"
+          placeholder="Email"
+          v-model="signup.email"
+          required
+        />
+        <input
+          class="user"
+          type="text"
+          align="center"
+          placeholder="Name"
+          v-model="signup.name"
+          required
+        />
         <input
           class="pass"
           type="password"
@@ -14,9 +28,16 @@
           v-model="signup.password"
           required
         />
-        <input class="number" type="text" align="center" placeholder="Phone Number" v-model="signup.number" required/>
-        <br>
-        <a class="submit" type="submit" align="center" v-on:click="submit"><span>Sign Up</span></a>
+        <input
+          class="number"
+          type="text"
+          align="center"
+          placeholder="Phone Number"
+          v-model="signup.number"
+          required
+        />
+        <br />
+        <button class="submit" type="submit" align="center" v-on:click="submit"><span>Sign Up</span></button>
       </form>
     </div>
   </div>
@@ -25,6 +46,7 @@
 <script>
 import Header from "./UI/Header.vue";
 import firebase from "firebase";
+import database from '../firebase.js';
 
 export default {
   data() {
@@ -42,22 +64,43 @@ export default {
   },
 
   methods: {
-    submit: async function() {
+    submit: async function (e) {
+      e.preventDefault();
       try {
-        firebase.auth().createUserWithEmailAndPassword(this.signup.email, this.signup.password)
-        // var user = firebase.auth().currentUser
-        // user.updateProfile({
-        //   displayName: this.signup.name,
-        //   phoneNumber: this.signup.number,
-        // }).then(() => {}).catch(err => console.log(err))
-        // console.log(user)
-        alert('Account created successfully!')
-        this.$router.replace({ path: "/login" })
+        await firebase
+          .auth()
+          .createUserWithEmailAndPassword(
+            this.signup.email,
+            this.signup.password
+          );
+
+        var data = {
+          name: this.signup.name,
+          email: this.signup.email,
+          number: this.signup.number
+        }
+
+        var user = firebase.auth().currentUser
+
+        database.collection('users').doc(user.uid).set(data);
+
+        await user.updateProfile({
+          displayName: this.signup.name
+        })
+        console.log(user);
+        
+        await user.sendEmailVerification();
+
+        firebase.auth().signOut();
+
+        alert("Account created successfully! Verify your account with link sent to your email!");
+
+        this.$router.push({ path: "/login" })
       } catch (err) {
         console.log(err);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -79,7 +122,10 @@ export default {
   font-size: 23px;
 }
 
-.user, .pass, .email, .number {
+.user,
+.pass,
+.email,
+.number {
   width: 75%;
   color: darkgrey;
   font-weight: bold;
@@ -95,12 +141,18 @@ export default {
   font-family: "Ubuntu", sans-serif;
 }
 
-.user:focus, .pass:focus, .email:focus, .number:focus {
+.user:focus,
+.pass:focus,
+.email:focus,
+.number:focus {
   outline: none;
   border-color: darkgrey;
 }
 
-.user:focus::-webkit-input-placeholder, .pass:focus::-webkit-input-placeholder, .email:focus::-webkit-input-placeholder, .number:focus::-webkit-input-placeholder {
+.user:focus::-webkit-input-placeholder,
+.pass:focus::-webkit-input-placeholder,
+.email:focus::-webkit-input-placeholder,
+.number:focus::-webkit-input-placeholder {
   opacity: 0;
 }
 
@@ -111,6 +163,7 @@ export default {
   border-radius: 20px;
   color: whitesmoke;
   background: linear-gradient(to right, #9c27b0, #e040fb);
+  border: 0;
   padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 10px;
@@ -144,7 +197,7 @@ a {
 }
 
 .submit span:after {
-  content: '\00bb';
+  content: "\00bb";
   position: absolute;
   opacity: 0;
   right: -40px;
@@ -158,5 +211,9 @@ a {
 .submit:hover span:after {
   opacity: 1;
   right: -10px;
+}
+
+.submit:focus {
+  outline: none;
 }
 </style>

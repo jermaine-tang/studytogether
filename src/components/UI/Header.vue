@@ -6,7 +6,7 @@
         <ul>
           <li><router-link to="/">Home</router-link></li>
           <li><router-link to="/listings">Listings</router-link></li>
-          <li v-if="loggedIn"><a v-on:click="signOut">Logout</a></li>
+          <li v-if="loggedIn"><router-link v-on:click.native="signOut" to="/">Logout</router-link></li>
           <li v-else><router-link to="/login">Login</router-link></li>
         </ul>
       </nav>
@@ -40,7 +40,7 @@ export default {
     },
 
     signOut: function() {
-      firebase.auth().signOut().then(() => this.$router.replace({ path: '/' }))
+      firebase.auth().signOut().catch(err => console.log(err))
     }
   },
   
@@ -102,6 +102,7 @@ nav.stroke ul li a,
 nav.fill ul li a {
   position: relative;
 }
+
 nav.stroke ul li a:after,
 nav.fill ul li a:after {
   position: absolute;
@@ -115,12 +116,9 @@ nav.fill ul li a:after {
   background: #333;
   height: 1px;
 }
+
 nav.stroke ul li a:hover:after {
   width: 100%;
-}
-
-nav.fill ul li a {
-  transition: all 2s;
 }
 
 nav.fill ul li a:after {
@@ -141,4 +139,5 @@ nav.fill ul li a:hover:after {
   -moz-animation: fill 1s forwards;
   opacity: 1;
 }
+
 </style>
