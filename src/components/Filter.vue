@@ -46,7 +46,7 @@
                 <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
             </div>
         </div>
-        <button v-on:click="updateListing">Apply Filter</button>
+        <button v-on:click="goListing(); applyFilter()">Apply Filter</button>
     </div>
 </template>
 
@@ -61,12 +61,18 @@ export default {
         noise: []
     }
   },
+
+  props:{
+      applyFilter: {
+          type: Function
+      }
+  },
     components: {
     "app-header": Header,
   },
 
   methods: {
-      updateListing: function() {
+      goListing: function() {
           this.$router.push({name: 'listings', params: {location: this.location, price: this.price, noise: this.noise}})
       }
   }

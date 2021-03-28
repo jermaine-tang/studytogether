@@ -2,23 +2,24 @@
   <div>
     <app-header></app-header>
 
+    <div v-show="showFilter">
+      <page-filter :applyFilter="filterList"></page-filter>
+    </div>
+
     <div class="wrap">
       <div class="search">
-          <input type="text" class="searchTerm" placeholder="What are you looking for?">
-          <button type="submit" class="searchButton">
+        <p v-if="displayList.length == 0"> No results found:(</p>
+        <input v-model="searchString" type="text" class="searchTerm" placeholder="What are you looking for?"/>
+        <button type="submit" class="searchButton" v-on:click="searchText()">
             <i class="fa fa-search"></i>
         </button>
+        <button v-on:click="filter()">Filter</button>
       </div>
     </div>
 
-    <div class="filter">
-      <button v-on:click="filter()">Filter</button>
-    </div>
-
     <div class="listings-list">
-      <p v-if="filterList().length == 0 && this.$route.params.location != null"> No results found:( Please try another filter!</p>
       <ul class="listings-list">
-        <li v-for="listing in filterList()" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
+        <li v-for="listing in displayList" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1">
@@ -64,18 +65,24 @@
 <script>
 import Header from "./UI/Header.vue";
 import database from '../firebase.js';
+import filters from "./Filter.vue";
 
 
 export default {
   data() {
     return {
-      list: []
+      list: [],
+      displayList: [],
+      searchString: "",
+      showFilter: false
     };
   },
+
   components: {
-    "app-header": Header
+    "app-header": Header,
+    "page-filter": filters
   },
-//  props: ['list'],
+
   methods: {
     fetchItems: function() {
       database.collection('listings').get().then((querySnapShot) => {
@@ -95,8 +102,11 @@ export default {
       })
     },
 
+    searchText: function() {
+      this.displayList = this.list.filter(item => (item.name.toLowerCase().includes(this.searchString.toLowerCase())));
+    },
+
     filterList: function() {
-      var result = [];
       var location = ["North", "South", "East", "West", "Central"];
       var price = ["cheap", "medium", "expensive"];
       var noise = [1, 2, 3];
@@ -114,9 +124,8 @@ export default {
         if (this.$route.params.noise.length != 0) {
           noise = this.$route.params.noise;
         }
-      }  
-      result = this.list.filter(x => (location.includes(x['loc_filter']) && price.includes(x['price_filter']) && noise.includes(x['noise'])));
-      return result;
+      }
+      this.displayList = this.list.filter(x => (location.includes(x['loc_filter']) && price.includes(x['price_filter']) && noise.includes(x['noise'])));
     },
 
     route: function(event) {
@@ -125,13 +134,21 @@ export default {
         },
 
     filter: function() {
-        this.$router.push({name: 'filter'})
-    }
+        this.$router.push({path: 'filter'});
+    },
 
   },
+
   created:function() {
-    this.fetchItems()
+    this.fetchItems();
+    this.displayList = this.list;
+  },
+
+  /*
+  beforeUpdate: function() {
+    this.filterList();
   }
+  */
 };
 </script>
 
