@@ -41,6 +41,7 @@
                 <br><br>
                 <img v-bind:src = "listingDetails.menu">
             </div>
+            <button v-on:click="bookPage()">Book Now!</button>
         </div>
     </div>
 </template>
@@ -61,7 +62,7 @@ export default {
     },
     methods: {
         fetchItems: function() {
-            database.collection('listings').doc(this.$route.query.id).get().then(snapshot => {
+            database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
                 const toAdd = snapshot.data();
                 
                 this.listingDetails = toAdd;
@@ -69,6 +70,10 @@ export default {
                 console.log(this.listingDetails);
                 })     
             },
+
+        bookPage: function() {
+            this.$router.push({ name: "reservation" })
+        }
         
         /*
         updateOrder: function() {
