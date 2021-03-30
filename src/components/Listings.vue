@@ -4,7 +4,8 @@
 
     <div class="wrap">
       <div class="search">
-        <input @input="searchText()" v-model="searchString" type="text" class="searchTerm" placeholder="What are you looking for?"/>
+        <input v-model="searchString" type="text"  placeholder="What are you looking for?" class="searchTerm"/>
+            <i class="fa fa-search"></i>
 
         <button
           type="button"
@@ -15,17 +16,25 @@
         </button>
 
         <div>
-          <b-form-select @input="sortList()" v-model="sortBy" :options="options"/>
+        <select v-model="sortBy" id="select">
+          <option v-for="(option, index) in options" :key="index" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select>
         </div>
-      </div>
-    </div>
 
+        <button v-on:click="ascending = !ascending" class="sort-button">
+          <i v-if="ascending" class="fa fa-sort-up"></i>
+          <i v-else class="fa fa-sort-down"></i>
+          reverse
+        </button>
+    </div>
   <div>
 
     <modal
       v-show="isModalVisible"
       @close="closeModal"
-      @apply="closeModal(); filterList()"
+      @apply="closeModal"
     >
       <template v-slot:body>
         <div>
@@ -74,15 +83,15 @@
         </div>
   </template>
     </modal>
-
+    </div>
   </div>
 
-  <div v-if="displayList.length == 0"> No Results Found:(</div>
-  <div v-else> {{displayList.length}} Results Found</div>
+  <!-- <div v-if="displayedList().length == 0"> No Results Found:(</div>
+  <div v-else> {{displayedList().length}} Results Found</div> -->
 
     <div class="listings-list">
       <ul class="listings-list">
-        <li v-for="listing in displayList" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
+        <li v-for="(listing, index) in displayedList" :key="index" v-bind:id="listing.id" v-on:click="route($event)" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1">
@@ -144,11 +153,13 @@ export default {
       noise: [],
       options: [
         { value: null, text: "Sort By" },
-        { value: "a", text: "Ratings" },
-        { value: "b", text: "Price" },
-        { value: "c", text: "Noise" }
+        { value: "a", text: "Name" },
+        { value: "b", text: "Ratings" },
+        { value: "c", text: "Price" },
+        { value: "d", text: "Noise" },
       ],
-      sortBy: null
+      sortBy: null,
+      ascending: true
     };
   },
 
@@ -156,6 +167,57 @@ export default {
     "app-header": Header,
     "modal": modal
   },
+
+  computed: {//computed method to watch over search, filter and sort to update displayed list
+      displayedList: function() {
+        let tempList = this.list;
+
+        //search method
+        if (this.searchString != "" && this.searchString) {
+          tempList = tempList.filter(item => (item.name.toLowerCase().includes(this.searchString.toLowerCase())));
+        }
+
+        //filter method
+        var location = ["North", "South", "East", "West", "Central"];
+        var price = ["cheap", "medium", "expensive"];
+        var noise = [1, 2, 3];
+        if (this.location.length != 0) {
+            location = this.location;
+        }
+
+        if (this.price.length != 0) {
+            price = this.price;
+        }
+
+        if (this.noise.length != 0) {
+            noise = this.noise;
+        }
+        tempList = tempList.filter(x => (location.includes(x['loc_filter']) && price.includes(x['price_filter']) && noise.includes(x['noise'])));
+      
+        //sort method
+        if (this.sortBy == "a") {
+          tempList = tempList.sort((x, y) => {
+            let fx = x.name.toLowerCase(), fy = y.name.toLowerCase();
+            return (fx<fy) ? -1 : 1;
+          });
+      } else if (this.sortBy == "b") {
+        tempList = tempList.sort((x, y) => x.rating - y.rating);
+      } else if (this.sortBy == "c") {
+        tempList = tempList.sort((x, y) => x.orice - y.price);
+      } else {
+        tempList = tempList.sort((x, y) => x.noise - y.noise);
+      }
+
+
+      // Show sorted array in descending or ascending order
+      if (!this.ascending) {
+        tempList.reverse();
+      }
+
+      return tempList;
+
+      }
+    },
 
   methods: {
     showModal() {
@@ -181,42 +243,6 @@ export default {
           this.list.push(item)
           })
       })
-    },
-
-    searchText: function() {
-      this.displayList = this.list.filter(item => (item.name.toLowerCase().includes(this.searchString.toLowerCase())));
-    },
-
-    filterList: function() {
-      var location = ["North", "South", "East", "West", "Central"];
-      var price = ["cheap", "medium", "expensive"];
-      var noise = [1, 2, 3];
-      if (this.location.length != 0) {
-          location = this.location;
-      }
-
-      if (this.price.length != 0) {
-          price = this.price;
-      }
-
-      if (this.noise.length != 0) {
-          noise = this.noise;
-      }
-
-      this.displayList = this.list.filter(x => (location.includes(x['loc_filter']) && price.includes(x['price_filter']) && noise.includes(x['noise'])));
-      console.log(this.price);
-    
-    },
-  
-
-    sortList() {
-      if (this.sortBy == "Ratings") {
-        this.displayList.sort((x, y) => x.rating - y.rating);
-      } else if (this.sortBy == "Price") {
-
-      } else {
-        
-      }
     },
 
     route: function(event) {
@@ -350,5 +376,7 @@ body{
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+
 
 </style>
