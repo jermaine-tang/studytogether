@@ -1,41 +1,61 @@
 <template>
-    <div>
-        <app-header></app-header>
+  <div>
+    <app-header></app-header>
 
-        <div class="box">
-            <p class="title">Make A Reservation</p>
-            <form class="form">
-                <label for="">PAX: </label>
-                <select v-model="pax">
-                    <option v-for="num in 5" v-bind:key="num">{{num}}</option>
-                </select>
-                <label for="date">Date</label>
-                <input type="text" v-model="date">
-                <label for="time">Timeslot</label>
-                <input type="text" v-model="time">
-
-                <button type="submit" v-on:click="submit">Submit</button>
-                
-            </form>
+    <div class="box">
+      <p class="title">Make A Reservation</p>
+      <form class="form">
+        <div>
+          <label for="">PAX: </label>
+          <select v-model="pax">
+            <option v-for="num in 5" v-bind:key="num">{{ num }}</option>
+          </select>
         </div>
-    </div>    
+        <br />
+        <div v-if="paxSelected">
+          <label for="date">Date </label>
+          <br />
+          <v-date-picker v-model="date" :min-date='new Date()'></v-date-picker>
+        </div>
+        <br />
+        <div v-if="dateSelected && availableTime">
+          <label for="time">Timeslot: </label>
+          <br />
+          <label class="container" v-for="item in timeslot" :key="item"
+            >{{ item }}
+            <input type="checkbox" v-bind:value="item" v-model="selected" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <button type="submit" v-on:click="submit">Submit</button>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script>
 import Header from './UI/Header.vue';
 import database from '../firebase.js';
 import firebase from 'firebase';
+import DatePicker from 'v-calendar/lib/components/date-picker.umd';
 
 export default {
     data() {
         return {
-            pax: "",
-            date: "",
-            time: ""
+            pax: new Number(),
+            date: new Date(),
+            timeslot: new Array(),
+            selected: new Array(),
+            paxSelected: false,
+            dateSelected: false,
+            timeSelected: false,
+            availableTime: false,
+            
         }
     },
     components: {
-        'app-header': Header
+        'app-header': Header,
+        'v-date-picker': DatePicker
     },
     
     mounted() {
@@ -43,12 +63,67 @@ export default {
     },
 
     methods: {
-        test: function() {
-            console.log(this.$route.params);
-        },
+        fetchTime: function() {
 
-        fetchData: function() {
-            database.collection('')
+            if (this.date == undefined) {
+                this.timeslot = [];
+                return;
+            }
+
+            var date = this.date.getDate()
+            if (date < 10) {
+                date = "0" + date
+            }
+            var month = this.date.getMonth() + 1
+            if (month < 10) {
+                month = "0" + month
+            }
+            var year = this.date.getYear() % 100
+
+            var fulldate = date + month + year;
+            console.log(fulldate);
+
+            
+            database.collection('listings').doc(this.$route.params.id).collection('timeslots').doc(fulldate).get().then(snapshot => {
+                console.log(snapshot.data())
+
+                if (snapshot.exists) {
+                    const data = snapshot.data();
+
+                    this.timeslot = []
+
+                    Object.keys(data).map(time => {
+
+                        console.log(time)
+
+                        var now = new Date();
+
+                        if (data[time] >= this.pax) {
+                            var startTime = Number(time.substring(0,2))
+                            if (new Date(now.getFullYear(), now.getMonth(), now.getDate(), startTime, 0, 0, 0) > now) {
+                                this.availableTime = true;
+                                this.timeslot.push(time)
+                            }
+                        }
+                    })
+
+                    this.timeslot = this.timeslot.filter(element => {
+                        return element !== undefined;
+                    });
+
+                    this.timeslot.sort()
+                } else {
+                    const arrayResult = []
+
+                    this.availableTime = false;
+
+                    arrayResult.sort()
+
+                    this.timeslot = arrayResult
+                }
+
+                
+            })
         },
 
         submit: function(e) {
@@ -63,17 +138,126 @@ export default {
                 name: user.displayName,
                 pax: this.pax,
                 date: this.date,
-                time: this.time
+                time: this.selected
             }
+
+            var date = this.date.getDate()
+            if (date < 10) {
+                date = "0" + date
+            }
+            var month = this.date.getMonth() + 1
+            if (month < 10) {
+                month = "0" + month
+            }
+            var year = this.date.getYear() % 100
+
+            var fulldate = date + month + year;
+
+            database.collection('listings').doc(this.$route.params.id).collection('timeslots').doc(fulldate).get().then(snapshot =>{ 
+                const data = snapshot.data();
+
+                console.log(data)
+                console.log(this.selected.length)
+
+                for (var i = 0; i < this.selected.length; i++) {
+                    var time = this.selected[i]
+                    var updatedValue = data[time] - this.pax
+                    console.log(time)
+                    database.collection('listings').doc(this.$route.params.id).collection('timeslots').doc(fulldate).update({
+                        [time]: updatedValue
+                    })
+                }
+            })
             
             database.collection('bookings').add(data)
-        }
+        },
 
+
+
+    },
+
+    watch: {
+        date: async function() {
+            this.dateSelected = true;
+            await this.fetchTime();
+        },
+
+        pax: function() {
+            this.paxSelected = true;
+        },
 
     }
 }
 </script>
 
 <style scoped>
+/* Customize the label (the container) */
+.container {
+  display: block;
+  margin: auto;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 10%;
+}
 
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #2196f3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
 </style>
