@@ -2,20 +2,83 @@
   <div>
     <app-header></app-header>
 
-    <div v-show="showFilter">
-      <page-filter :applyFilter="filterList"></page-filter>
-    </div>
-
     <div class="wrap">
       <div class="search">
-        <p v-if="displayList.length == 0"> No results found:(</p>
-        <input v-model="searchString" type="text" class="searchTerm" placeholder="What are you looking for?"/>
-        <button type="submit" class="searchButton" v-on:click="searchText()">
-            <i class="fa fa-search"></i>
+        <input @input="searchText()" v-model="searchString" type="text" class="searchTerm" placeholder="What are you looking for?"/>
+
+        <button
+          type="button"
+          class="btn"
+          @click="showModal"
+        >
+          Filter
         </button>
-        <button v-on:click="filter()">Filter</button>
+
+        <div>
+          <b-form-select @input="sortList()" v-model="sortBy" :options="options"/>
+        </div>
       </div>
     </div>
+
+  <div>
+
+    <modal
+      v-show="isModalVisible"
+      @close="closeModal"
+      @apply="closeModal(); filterList()"
+    >
+      <template v-slot:body>
+        <div>
+            <div><label for="name">Location:</label><br>
+                <input type="checkbox" id="North" value="North" v-model="location">
+                <label for="North">North</label>
+                <input type="checkbox" id="South" value="South" v-model="location">
+                <label for="South">South</label>
+                <input type="checkbox" id="East" value="East" v-model="location">
+                <label for="East">East</label>
+                <input type="checkbox" id="West" value="West" v-model="location">
+                <label for="West">West</label>
+                <input type="checkbox" id="Central" value="Central" v-model="location">
+                <label for="Central">Central</label>
+            </div>
+            <div>
+                <label for="name">Price Point:</label><br>
+                <input type="checkbox" id="cheap" value="cheap" v-model="price">
+                <label for="cheap"></label>
+                <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+                <input type="checkbox" id="medium" value="medium" v-model="price">
+                <label for="medium"> </label>
+                <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+                <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+                <input type="checkbox" id="expensive" value="expensive" v-model="price">
+                <label for="expensive"></label>
+                <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+                <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+                <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="40px"/>
+            </div>
+            <div>
+                <label for="name">Noise Level:</label><br>
+                <input type="checkbox" id="quiet" value=1 v-model.number="noise">
+                <label for="quiet"></label>
+                <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+                <input type="checkbox" id="moderate" value=2 v-model.number="noise">
+                <label for="moderate"></label>
+                <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+                <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+                <input type="checkbox" id="loud" value=3 v-model.number="noise">
+                <label for="loud"></label>
+                <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+                <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+                <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="40px"/>
+            </div>
+        </div>
+  </template>
+    </modal>
+
+  </div>
+
+  <div v-if="displayList.length == 0"> No Results Found:(</div>
+  <div v-else> {{displayList.length}} Results Found</div>
 
     <div class="listings-list">
       <ul class="listings-list">
@@ -63,9 +126,9 @@
 </template>
 
 <script>
-import Header from "./UI/Header.vue";
-import database from '../firebase.js';
-import filters from "./Filter.vue";
+  import Header from "./UI/Header.vue";
+  import database from '../firebase.js';
+  import modal from './Modal.vue';
 
 
 export default {
@@ -74,16 +137,34 @@ export default {
       list: [],
       displayList: [],
       searchString: "",
-      showFilter: false
+      showFilter: false,
+      isModalVisible: false,
+      location: [],
+      price: [],
+      noise: [],
+      options: [
+        { value: null, text: "Sort By" },
+        { value: "a", text: "Ratings" },
+        { value: "b", text: "Price" },
+        { value: "c", text: "Noise" }
+      ],
+      sortBy: null
     };
   },
 
   components: {
     "app-header": Header,
-    "page-filter": filters
+    "modal": modal
   },
 
   methods: {
+    showModal() {
+      this.isModalVisible = true;
+    },
+    closeModal() {
+      this.isModalVisible = false;
+    },
+
     fetchItems: function() {
       database.collection('listings').get().then((querySnapShot) => {
       let item = {}
@@ -110,32 +191,38 @@ export default {
       var location = ["North", "South", "East", "West", "Central"];
       var price = ["cheap", "medium", "expensive"];
       var noise = [1, 2, 3];
-      if (this.$route.params.location != null) {
-        if (this.$route.params.location.length != 0) {
-          location = this.$route.params.location;
-        }
+      if (this.location.length != 0) {
+          location = this.location;
       }
-      if (this.$route.params.price != null) {
-        if (this.$route.params.price.length != 0) {
-          price = this.$route.params.price;
-        }
+
+      if (this.price.length != 0) {
+          price = this.price;
       }
-      if (this.$route.params.noise != null) {
-        if (this.$route.params.noise.length != 0) {
-          noise = this.$route.params.noise;
-        }
+
+      if (this.noise.length != 0) {
+          noise = this.noise;
       }
+
       this.displayList = this.list.filter(x => (location.includes(x['loc_filter']) && price.includes(x['price_filter']) && noise.includes(x['noise'])));
+      console.log(this.price);
+    
+    },
+  
+
+    sortList() {
+      if (this.sortBy == "Ratings") {
+        this.displayList.sort((x, y) => x.rating - y.rating);
+      } else if (this.sortBy == "Price") {
+
+      } else {
+        
+      }
     },
 
     route: function(event) {
             let doc_id = event.target.getAttribute("id");
             this.$router.push({path: "indiv", query: {id: doc_id}, params: { id: doc_id}})
         },
-
-    filter: function() {
-        this.$router.push({path: 'filter'});
-    },
 
   },
 
@@ -144,11 +231,6 @@ export default {
     this.displayList = this.list;
   },
 
-  /*
-  beforeUpdate: function() {
-    this.filterList();
-  }
-  */
 };
 </script>
 
@@ -245,30 +327,20 @@ body{
 
 .searchTerm {
   width: 100%;
-  border: 3px solid #c897cc;
+  border: 3px solid #ED7A78;
   border-right: none;
   padding: 5px;
   height: 20px;
   border-radius: 5px 0 0 5px;
   outline: none;
-  color: #c897cc;
+  color: #ED7A78;
 }
 
 .searchTerm:focus{
-  color: #c897cc;
+  color: #ED7A78;
 }
 
-.searchButton {
-  width: 40px;
-  height: 36px;
-  border: 1px solid #c897cc;
-  background: #c897cc;
-  text-align: center;
-  color: #fff;
-  border-radius: 0 5px 5px 0;
-  cursor: pointer;
-  font-size: 20px;
-}
+
 
 /*Resize the wrap to see the search bar change!*/
 .wrap{
