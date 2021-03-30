@@ -231,7 +231,7 @@ export default {
       database.collection('listings').get().then((querySnapShot) => {
       let item = {}
         querySnapShot.docs.forEach(doc => {
-          item= {...doc.data(), ['id']: doc.id}
+          item = {...doc.data(), ['id']: doc.id}
           console.log(item)
           if (item['price'] <= 10) {
             item['price_filter'] = "cheap";
