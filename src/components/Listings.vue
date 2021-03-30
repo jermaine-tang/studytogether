@@ -14,23 +14,25 @@
         >
           Filter
         </button>
+      </div>
+    </div>
 
-        <div>
-        <select v-model="sortBy" id="select">
+      <div>
+        <select v-model="sortBy">
           <option v-for="(option, index) in options" :key="index" v-bind:value="option.value">
             {{ option.text }}
           </option>
         </select>
-        </div>
 
         <button v-on:click="ascending = !ascending" class="sort-button">
           <i v-if="ascending" class="fa fa-sort-up"></i>
           <i v-else class="fa fa-sort-down"></i>
-          reverse
+          Reverse
         </button>
     </div>
-  <div>
 
+
+  <div>
     <modal
       v-show="isModalVisible"
       @close="closeModal"
@@ -83,7 +85,6 @@
         </div>
   </template>
     </modal>
-    </div>
   </div>
 
   <!-- <div v-if="displayedList().length == 0"> No Results Found:(</div>
@@ -130,7 +131,6 @@
       </ul>
       
     </div>
-
   </div>
 </template>
 
@@ -144,7 +144,6 @@ export default {
   data() {
     return {
       list: [],
-      displayList: [],
       searchString: "",
       showFilter: false,
       isModalVisible: false,
