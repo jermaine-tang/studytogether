@@ -3,14 +3,42 @@
     <app-header></app-header>
     <h1>Bookings</h1>
     <ul class="bookings-list">
-        <span class="status">Upcoming</span>
+        <li v-for="booking in bookings" :key="booking.index">
+            <!-- userid -->
+            <div>{{booking[0]}}</div>
+            <hr>
+            <!-- photo url -->
+            <div>{{booking[1]}}</div>
+            <hr>
+            <!-- cafe name -->
+            <div>{{booking[2]}}</div>
+            <hr>
+            <!-- date of visit -->
+            <div>{{booking[3]}}</div>
+            <hr>
+            <!-- duration -->
+            <div>{{booking[4]}}</div>
+
+            <!-- <img :src="booking[1]" alt="picture"> -->
+            <!-- <div>{{booking[0]}}</div> -->
+            <!-- <div id="name"><b>{{booking[2]}}</b></div>
+            <div id="clockIcon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <circle cx="12" cy="12" r="9" />
+                    <polyline points="12 7 12 12 15 15" />
+                </svg>
+                <span id="time"><b>{{booking[3]}}</b></span>
+            </div> -->
+        </li>
+        <!-- <span class="status">Upcoming</span>
         <li>
-            <!-- picture of cafe -->
+            
             <img id="main-pic" src = "https://danielfooddiary.com/wp-content/uploads/2019/07/banchongcafe1.jpg">
             <div id="name"><b> Happy Cafe </b></div>
-            <!-- Button to cancel booking -->
+            
             <button class="button"><b>Cancel Booking</b></button>
-            <!-- clock icon image and time of visit in a single div-->
+            
             <div id="clockIcon">
             <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -33,7 +61,7 @@
             </svg>
             <span id="time"><b>1 Feb 2021 / 13:00 - 17:00</b></span>
             </div>
-        </li>
+        </li> -->
     </ul>
 </div>
     
@@ -41,19 +69,59 @@
 
 <script>
 import Header from './UI/Header.vue';
+import database from '../firebase.js';
 
 export default {
     data() {
         return {
+            // list of all bookings
+            bookings: []
         }
     },
     methods: {
         sendReview: function() {
             this.$router.push({path:'reviews'})
-        }
+        },
+
+        fetchItems: function() {
+            var booking = []
+            database.collection('bookings').get().then(querySnapShot =>{
+                querySnapShot.docs.forEach(doc => {
+                    let data = doc.data()
+                    let userId = data['userid']
+                    booking[0] = userId
+                    let locationId = data['location']
+                    var document = database.collection('listings').doc(locationId).get().then(doc =>{
+                        var dd = doc.data()
+                        // phot url of cafe
+                        var photo = dd['photoURL2']
+                        // name of cafe
+                        var name = dd['name']
+                        return [photo, name]
+                    })
+                    booking.concat(document)
+                    let time = data['time']
+                    let duration = `${time[0].slice(0,4)}` + " - " + `${time.pop().slice(-4)}`
+                    let dateOfVisit = data['date'].toDate().toString().slice(4,15)
+                    booking[3] = dateOfVisit
+                    booking[4] = duration
+                })
+            })
+
+            this.bookings.push(booking)
+        },
     },
+
     components: {
         "app-header": Header
+    },
+
+    watch: {
+
+    },
+
+    created: function() {
+        this.fetchItems()
     }
 }
 </script>
@@ -73,7 +141,6 @@ li {
   flex-wrap: wrap;
   width: 1000px;
   position: relative;
-/*  flex-basis: 300px; */
   text-align: center;
   padding: 10px;
   border: 3px solid #ED7A78;
