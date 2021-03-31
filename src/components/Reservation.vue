@@ -73,6 +73,7 @@ export default {
             var date = this.date.getDate()
             if (date < 10) {
                 date = "0" + date
+                console.log(date)
             }
             var month = this.date.getMonth() + 1
             if (month < 10) {
@@ -99,8 +100,11 @@ export default {
                         var now = new Date();
 
                         if (data[time] >= this.pax) {
+                            console.log('test1');
+
                             var startTime = Number(time.substring(0,2))
-                            if (new Date(now.getFullYear(), now.getMonth(), now.getDate(), startTime, 0, 0, 0) > now) {
+                            if (new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate(), startTime, 0, 0, 0) > now) {
+                                console.log('test2');
                                 this.availableTime = true;
                                 this.timeslot.push(time)
                             }
@@ -110,6 +114,8 @@ export default {
                     this.timeslot = this.timeslot.filter(element => {
                         return element !== undefined;
                     });
+
+                    console.log(this.timeslot);
 
                     this.timeslot.sort()
                 } else {
