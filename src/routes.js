@@ -8,7 +8,7 @@ import Reviews from './components/Reviews.vue';
 
 export default[
     {path: '/', component: Homepage},
-    {path: '/listings', component: Listings},
+    {path: '/listings', name: 'listings', component: Listings},
     {path: '/login', component: Loginpage},
     {path: '/signup', component: SignupPage},
     {path: '/indiv', component: IndividualListings, props: true},
