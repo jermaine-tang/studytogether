@@ -4,67 +4,22 @@
     <h1>Bookings</h1>
     <ul class="bookings-list">
         <li v-for="booking in bookings" :key="booking.index">
-            <!-- userid -->
-            <div>{{booking[0]}}</div>
-            <hr>
-            <!-- photo url -->
-            <div>{{booking[1]}}</div>
-            <hr>
-            <!-- cafe name -->
-            <div>{{booking[2]}}</div>
-            <hr>
-            <!-- date of visit -->
-            <div>{{booking[3]}}</div>
-            <hr>
-            <!-- duration -->
-            <div>{{booking[4]}}</div>
-
-            <!-- <img :src="booking[1]" alt="picture"> -->
-            <!-- <div>{{booking[0]}}</div> -->
-            <!-- <div id="name"><b>{{booking[2]}}</b></div>
+            <img :src="booking[4]" alt="picture" id="main-pic">
+            <div id="name"><b>{{booking[5]}}</b></div>
+            <button class="button" v-if="new Date() < new Date(booking[2])">Cancel Booking</button>
+            <button class="button" v-if="new Date() >= new Date(booking[2])" v-bind:id ="booking[1]" v-on:click="route($event)">Leave Review</button>
             <div id="clockIcon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                     <circle cx="12" cy="12" r="9" />
                     <polyline points="12 7 12 12 15 15" />
                 </svg>
-                <span id="time"><b>{{booking[3]}}</b></span>
-            </div> -->
-        </li>
-        <!-- <span class="status">Upcoming</span>
-        <li>
-            
-            <img id="main-pic" src = "https://danielfooddiary.com/wp-content/uploads/2019/07/banchongcafe1.jpg">
-            <div id="name"><b> Happy Cafe </b></div>
-            
-            <button class="button"><b>Cancel Booking</b></button>
-            
-            <div id="clockIcon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <circle cx="12" cy="12" r="9" />
-                <polyline points="12 7 12 12 15 15" />
-            </svg>
-            <span id="time"><b>21 March 2021 / 12:00 - 16:00</b></span>
+                <span id="time"><b>{{booking[2]}} / {{booking[3]}}</b></span>
             </div>
+            
         </li>
-        <span class="status">Previous</span>
-        <li>
-            <img id="main-pic" src = "https://thesmartlocal.com/wp-content/uploads/2019/09/Cafes-North-Singapore-14.jpg">
-            <div id="name"><b> Bright Cafe </b></div>
-            <button class="button" v-on:click="sendReview()" ><b>Leave Review</b></button>
-            <div id="clockIcon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <circle cx="12" cy="12" r="9" />
-                <polyline points="12 7 12 12 15 15" />
-            </svg>
-            <span id="time"><b>1 Feb 2021 / 13:00 - 17:00</b></span>
-            </div>
-        </li> -->
     </ul>
 </div>
-    
 </template>
 
 <script>
@@ -74,8 +29,8 @@ import database from '../firebase.js';
 export default {
     data() {
         return {
-            // list of all bookings
-            bookings: []
+            bookings: [],
+            docArr: [],
         }
     },
     methods: {
@@ -83,41 +38,55 @@ export default {
             this.$router.push({path:'reviews'})
         },
 
-        fetchItems: function() {
-            var booking = []
-            database.collection('bookings').get().then(querySnapShot =>{
+        route: function(event) {
+            let doc_id = event.target.getAttribute("id");
+            this.$router.push({path: `reviews/${doc_id}`, query: {id: doc_id}})
+        },
+
+        getDoc: async function() {
+            var arr = []
+            await database.collection('bookings').get().then(querySnapShot => {
                 querySnapShot.docs.forEach(doc => {
-                    let data = doc.data()
-                    let userId = data['userid']
-                    booking[0] = userId
-                    let locationId = data['location']
-                    var document = database.collection('listings').doc(locationId).get().then(doc =>{
-                        var dd = doc.data()
-                        // phot url of cafe
-                        var photo = dd['photoURL2']
-                        // name of cafe
-                        var name = dd['name']
-                        return [photo, name]
-                    })
-                    booking.concat(document)
-                    let time = data['time']
-                    let duration = `${time[0].slice(0,4)}` + " - " + `${time.pop().slice(-4)}`
-                    let dateOfVisit = data['date'].toDate().toString().slice(4,15)
-                    booking[3] = dateOfVisit
-                    booking[4] = duration
+                    arr.push(doc.data())
                 })
             })
-
-            this.bookings.push(booking)
+            return arr
         },
+
+        fetchItems: async function() {
+            this.docArr = await this.getDoc()
+            let myBookings = []
+            this.docArr.forEach(async function(doc) {
+                
+                let userid = doc['userid']
+                let location = doc['location']
+                async function retrieve(locationId) {     
+                    var locationData = []
+                        await database.collection('listings').doc(locationId).get().then(doc => {
+                            let listingData = doc.data()
+                            locationData.push(listingData['photoURL2'])
+                            locationData.push(listingData['name'])
+                        })
+                    return locationData
+                }
+                let locationAndName = await retrieve(location)                
+                let date = doc['date'].toDate().toString()
+                let dateOfVisit = date.slice(4,15)
+                let time = doc['time']
+                let start = time[0].slice(0,4)
+                let end = time.pop().slice(-4)
+                let duration = start + ' - ' + end
+                let booking = [userid, location, dateOfVisit, duration]
+                let combined = [...booking, ...locationAndName]
+                myBookings.push(combined)
+            })
+            this.bookings = myBookings
+            console.log(this.bookings)
+        }
     },
 
     components: {
         "app-header": Header
-    },
-
-    watch: {
-
     },
 
     created: function() {
@@ -165,6 +134,8 @@ li {
     left: 90px;
     height: 50px;
     width: 90px;
+    font-size: 15px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 #clockIcon {
