@@ -3,8 +3,8 @@
     <app-header></app-header>
     <h1> Write a Review </h1>
     <br><br>
-    <img id="main-pic" src = "https://danielfooddiary.com/wp-content/uploads/2019/07/banchongcafe1.jpg">
-    <span id="name"><b>Bright Cafe</b></span>
+    <img :src="listingDetail['photoURL2']" alt="listing-pic" id="main-pic">
+    <span id="name">{{listingDetail['name']}}</span>
     <br><br>
     <form>
         <label for="title"> Title: </label> 
@@ -35,17 +35,42 @@
 </template>
 
 <script>
+// import func from 'vue-editor-bridge';
 import Header from './UI/Header.vue';
+import database from '../firebase.js';
 
 export default {
+
+    data() {
+        return {
+            listingDetail: {}
+        }
+    },
+
     components: {
         'app-header':Header
-    }
+    },
+
+    methods: {
+        fetchItems: function() {
+            database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
+                const toAdd = snapshot.data();
+                
+                this.listingDetail = toAdd;
+                console.log(toAdd);
+                console.log(this.listingDetail);
+                })     
+            },
+    },
+
+    created: function() {
+        // alert(this.$route.params.id)
+        this.fetchItems()
+    },
 }
 </script>
 
 <style scoped>
-
 #main-pic {
     position: relative;
     right: 150px;
