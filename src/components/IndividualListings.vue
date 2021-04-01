@@ -10,6 +10,8 @@
             <div id="name">{{ listingDetails.name }}</div>
             <hr>
             <br>
+            <div class="float-container">
+            <div class="float-left">
             <div id="price">
             <!--    <img src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png" width="35"/> -->
                 <span id="priceVal">$ {{ listingDetails.price }} / hour</span>
@@ -26,6 +28,11 @@
                 <span class="noiseVal" v-show="listingDetails.noise == 2"> Moderate </span>
                 <span class="noiseVal" v-show="listingDetails.noise == 3"> Loud </span>
             </div>
+            </div>
+            <div class="float-right">
+            <button class="book" v-on:click="bookPage()"><span>Book Now!</span></button>
+            </div>
+            </div>
             <br><br>
             <div id="amenities">
                 Amenities:
@@ -41,7 +48,6 @@
                 <br><br>
                 <img v-bind:src = "listingDetails.menu">
             </div>
-            <button v-on:click="bookPage()">Book Now!</button>
         </div>
     </div>
 </template>
@@ -103,6 +109,26 @@ ul {
   padding: 0; */
 }
 
+.float-container {
+    display: flex;
+    align-items: center;
+    width: 75%;
+    margin: auto;
+}
+
+.float-left, .float-right {
+    flex: 1;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+    vertical-align: middle;
+}
+
 #name {
     font-size: 40px;
 }
@@ -115,7 +141,7 @@ hr {
   margin-right: auto;
   border-style: inset;
   border-width: 1px;
-  width: 80%;
+  width: 85%;
   
 } 
 
@@ -125,18 +151,24 @@ hr {
 
 }
 
-#amenities, #price, #location, #noise, #menu {
+#amenities, #menu {
+    width: 75%;
     text-align: left;
-    margin-left: 200px;
     font-size: 20px;
+    margin: auto;
 }
+
+ #price, #location, #noise {
+     text-align: left;
+     margin: auto;
+     font-size: 20px;
+ }
 
 #amenitiesList {
     background-color: lightgrey;
     border-radius: 15px;
     padding-top: 20px;
     padding-bottom: 20px;
-    width: 85%
 }
 
 /*
@@ -150,15 +182,45 @@ hr {
     font-size: 25px;
 }
 
-#location, #noise {
+/* #location, #noise {
     display: flex;  
     flex-flow: row wrap;
     margin-left: 190px;
-}
+} */
 
 #locationVal, .noiseVal {
     margin-top: 5px;
     margin-left: 3px;
 }
 
+.book {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 10px;
+  color: whitesmoke;
+  background: #e040fb;
+  border: 2px solid transparent;
+  height: 60px;
+  width: 200px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  font-family: "Ubuntu", sans-serif;
+  font-weight: bold;
+  font-size: 25px;
+  transition: 0.2s;
+  float: right;
+}
+
+.book:hover {
+  border-color: white;
+  background-color:#d829f7;
+}
+
+.book:focus {
+  outline: none;
+}
 </style>
