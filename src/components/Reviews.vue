@@ -18,14 +18,14 @@
     <br><br>
     <label for="noise" id="noise">Noise:</label>
     <span></span>
-    <select id="noiseOptions" name="noiseOptions" v-on:change="onChangeNoise($event)" v-model="noise" required>
+    <select id="noiseOptions" name="noiseOptions" v-model="noise" required>
         <option value="quiet">1 - Quiet</option>
         <option value="tolerable">2 - Tolerable</option>
         <option value="whiteNoise">3 - Perfect</option>
     </select>
     <br><br>
     <label for="rating" id="rating">Rating:</label>
-    <select id="rating" name="rating" v-on:change="onChangeRating($event)" v-model="rating" required>
+    <select id="rating" name="rating" v-model="rating" required>
         <option value="veryPoor">1</option>
         <option value="poor">2</option>
         <option value="average">3</option>
@@ -75,14 +75,6 @@ export default {
                 console.log(toAdd);
                 console.log(this.listingDetail);
                 })     
-            },
-
-            onChangeNoise: function(e) {
-                // alert(e.target.value)
-            },
-
-            onChangeRating: function(e) {
-                // alert(e.target.value)
             },
 
             send: async function() {
