@@ -92,8 +92,8 @@
 
     <div class="listings-list">
       <ul class="listings-list">
-        <li v-for="(listing, index) in displayedList" :key="index" v-bind:id="listing.id" v-on:click="route($event)" >
-          <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
+        <li v-for="listing in list" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
+          <div class="name" v-bind:id="listing.id"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1">
           <br><br>
@@ -246,8 +246,8 @@ export default {
 
     route: function(event) {
             let doc_id = event.target.getAttribute("id");
-            this.$router.push({path: "indiv", query: {id: doc_id}, params: { id: doc_id}})
-        },
+            this.$router.push({name:"indiv", params: {id:doc_id}})
+        }
 
   },
 
