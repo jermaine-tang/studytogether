@@ -28,7 +28,7 @@
             </div>
             <br><br>
             <div id="amenities">
-                Amenities:
+                <span>Amenities:</span>
                 <ul id="amenitiesList">
                     <li v-for="i in listingDetails.amenities" :key="i.index">
                         {{ i }}
@@ -45,14 +45,22 @@
             <div id="reviews">
                 Reviews:
                 <br><br>
-                <div v-if="reviews.length == 0">No reviews yet. Be the first to leave a review!</div>
+                <div v-if="reviews.length == 0">No reviews yet. Make a booking and be the first to leave a review!</div>
                 <div v-if="reviews.length != 0">
-                    
+                    <ul>
+                        <li v-for="review in reviews" :key="review.id">
+                            <div id="title"> {{ review.title }} </div>
+                            <hr>
+                            <div id="comment"> {{ review.comments }} </div>
+                            <div id="noiseLvl"> Noise: {{ review.noise }} </div>
+                            <div id="rating"> Rating: {{ review.rating }} </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-</template>
+</template> 
 
 <script>
 import Header from "./UI/Header.vue";
@@ -109,14 +117,6 @@ export default {
 </script>
 
 <style scoped>
-ul {
- /* list-style-type: none; 
-  padding: 0; */
-}
-
-#name {
-    font-size: 40px;
-}
 
 hr { 
   display: block;
@@ -129,6 +129,43 @@ hr {
   width: 80%;
   
 } 
+#reviews ul {
+    list-style-type: none; 
+}
+
+#reviews li {
+    border: 5px solid #d6d6d6;
+    border-radius: 25px;
+    height: 100%;
+    width: 95%;
+    padding: 10px;
+    margin: 0 0 0 0;
+    background-color: #ebebeb;
+}
+
+#reviews #title {
+    font-size: 25px;
+}
+
+#reviews hr {
+  display: block;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  border-style: inset;
+  border-width: 1px;
+  width: 100%;
+  height: 12px;
+  border: 0;
+  box-shadow: inset 0 12px 12px -12px rgba(0, 0, 0, 0.5);
+}
+
+#name {
+    font-size: 40px;
+}
+
+
 
 .place {
     height: 250px;
@@ -171,5 +208,7 @@ hr {
     margin-top: 5px;
     margin-left: 3px;
 }
+
+
 
 </style>
