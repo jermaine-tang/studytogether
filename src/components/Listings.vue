@@ -95,7 +95,7 @@
         <li v-for="(listing, index) in displayedList" :key="index" v-bind:id="listing.id" v-on:click="route($event)" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
-          <img id="main-pic" v-bind:src = "listing.photoURL1">
+          <img id="main-pic" v-bind:src = "listing.photoURL1" height30px>
           <br><br>
           <div class="rating">
             <img v-if="listing.rating > 0" src="https://img.icons8.com/fluent/48/000000/star.png"/>
@@ -268,30 +268,26 @@ ul {
   padding-top: 3%; 
   margin: auto;
 }
-
 li {
 /*  flex-grow: 1;  */
   width: 600px;
 /*  flex-basis: 300px; */
   text-align: center;
   padding: 10px;
-  border: 3px solid #ED7A78;
+  border: 5px solid #ED7A78;
   margin: 10px;
   margin-top: 5px;
   border-radius: 25px;
   font-family: "Ubuntu", sans-serif;
-  margin: 0 0 10  0;
+  margin: auto;
 }
-
 .listings-list {
   margin-left: 3%;
   
 }
-
-
 #main-pic {
   border-radius: 15px;
-  width: 500px;
+  width: 80%;
   height: 300px;
 }
 
@@ -301,19 +297,6 @@ li {
   
 }
 
-/*
-.location, .noise, .price {
-  float: left;
-  
-  font-size: 20px;
-  display: inline-block;
-}
-
-
-#location-pin {
-  
-  margin-left: 30px;
-} */
 .details {
   float: left;
 
@@ -377,5 +360,29 @@ body{
 }
 
 
+
+@media (min-width: 740px) and (max-width: 1412px) {
+  .listings-list {
+    margin-left: 3%;]
+    width: 100%
+  }
+  ul {
+    width: 100%;
+  }
+  li {
+/*  flex-grow: 1;  */
+
+/*  flex-basis: 300px; */
+    text-align: center;
+    padding: 10px;
+    border: 5px solid #ED7A78;
+    margin: 10px;
+    margin-top: 5px;
+    border-radius: 25px;
+    font-family: "Ubuntu", sans-serif;
+    margin: auto;
+
+  }
+}
 
 </style>

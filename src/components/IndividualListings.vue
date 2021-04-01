@@ -41,6 +41,15 @@
                 <br><br>
                 <img v-bind:src = "listingDetails.menu">
             </div>
+            <br><br>
+            <div id="reviews">
+                Reviews:
+                <br><br>
+                <div v-if="reviews.length == 0">No reviews yet. Be the first to leave a review!</div>
+                <div v-if="reviews.length != 0">
+                    
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -53,10 +62,10 @@ export default {
     components: {
         "app-header": Header
     },
-   props: ['value'],
     data() {
         return {
-            listingDetails: {}
+            listingDetails: {},
+            reviews: []
         }
     },
     methods: {
@@ -67,9 +76,16 @@ export default {
                 this.listingDetails = toAdd;
                 console.log(toAdd);
                 console.log(this.listingDetails);
-                })     
+                });
+            database.collection('listings').doc(this.$route.query.id).collection('reviews').get().then(snapshot => {
+                snapshot.docs.forEach(doc => {
+                    const add = doc.data();
+                    this.reviews.push(add);
+                    console.log(this.reviews);
+                })  
+            })  
             },
-        
+
         /*
         updateOrder: function() {
             for (var copyKey in this.datapacket) {
@@ -83,7 +99,7 @@ export default {
         }*/
     },
 
-    created:function() {
+    created: function() {
         this.fetchItems()
     },
     watch: {
@@ -120,7 +136,7 @@ hr {
 
 }
 
-#amenities, #price, #location, #noise, #menu {
+#amenities, #price, #location, #noise, #menu, #reviews {
     text-align: left;
     margin-left: 200px;
     font-size: 20px;
