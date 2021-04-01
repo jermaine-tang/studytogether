@@ -13,5 +13,5 @@ export default[
     {path: '/signup', component: SignupPage},
     {path: '/indiv', component: IndividualListings, props: true},
     {path: '/bookings', component: Bookings},
-    {path: '/reviews', component: Reviews}
+    {path: '/reviews/:id', component: Reviews, props: true}
 ]
