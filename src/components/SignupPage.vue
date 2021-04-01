@@ -3,6 +3,8 @@
     <app-header></app-header>
     <div class="box">
       <p class="title">Register</p>
+      <div id='error-container'>
+      </div>
       <form class="form">
         <input
           class="email"
@@ -98,6 +100,17 @@ export default {
         this.$router.push({ path: "/login" })
       } catch (err) {
         console.log(err);
+        document.getElementById('error-container').innerHTML = 'Email is already in use';
+        document.getElementById('error-container').style.backgroundColor = 'rgb(255, 168, 168)';
+          document.getElementById('error-container').style.borderRadius = '20px';
+          document.getElementById('error-container').style.width = '72.5%';
+          document.getElementById('error-container').style.margin = 'auto';
+          document.getElementById('error-container').style.padding = '3px';
+          document.getElementById('error-container').style.marginBottom = '5px';
+          document.getElementById('error-container').style.fontFamily = '"Ubuntu", sans-serif';
+          document.getElementById('error-container').style.fontWeight = '500';
+          document.getElementsByClassName('title')[0].style.marginBottom = '8px';
+
       }
     },
   },

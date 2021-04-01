@@ -3,6 +3,8 @@
     <app-header></app-header>
     <div class="box">
       <p class="title">Sign in</p>
+      <div id='error-container'>
+      </div>
       <form class="form">
         <input
           class="email"
@@ -71,6 +73,16 @@ export default {
           }
         })
         .catch((err) => {
+          document.getElementById('error-container').innerHTML = "Invalid Email / Password"
+          document.getElementById('error-container').style.backgroundColor = 'rgb(255, 168, 168)';
+          document.getElementById('error-container').style.borderRadius = '20px';
+          document.getElementById('error-container').style.width = '72.5%';
+          document.getElementById('error-container').style.margin = 'auto';
+          document.getElementById('error-container').style.padding = '3px';
+          document.getElementById('error-container').style.marginBottom = '5px';
+          document.getElementById('error-container').style.fontFamily = '"Ubuntu", sans-serif';
+          document.getElementById('error-container').style.fontWeight = '500';
+          document.getElementsByClassName('title')[0].style.marginBottom = '8px';
           console.log(err);
         });
     },
@@ -82,7 +94,7 @@ export default {
 .box {
   background-color: #ffffff;
   width: 400px;
-  height: 350px;
+  height: 370px;
   margin: 7em auto;
   border-radius: 40px;
   box-shadow: 0px 0px 10px 10px lightgrey;
@@ -183,4 +195,5 @@ a {
 .submit:focus {
   outline: none;
 }
+
 </style>
