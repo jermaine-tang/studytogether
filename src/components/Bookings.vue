@@ -37,7 +37,6 @@
             </div>
         </li>
     </ul>
-
 </div>
 </template>
 
@@ -92,7 +91,7 @@ export default {
                     return (new Date(a[3]) < new Date(b[3])) ? -1 : 1;
                 }
             }
-
+            
             this.docArr.forEach(async function(doc) {
                 
                 let userid = doc['userid']
