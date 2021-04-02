@@ -183,14 +183,11 @@
 
     <div class="listings-list">
       <ul class="listings-list">
-        <li v-for="(listing, index) in displayedList" :key="index">
-          <div class="name" v-bind:id="listing.id" v-on:click="route($event)">
-            {{ listing.name }}
-          </div>
-          <br />
-          <img id="main-pic" v-bind:src="listing.photoURL1" />
-          <br /><br />
-
+        <li v-for="listing in list" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
+          <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
+          <br>
+          <img id="main-pic" v-bind:src = "listing.photoURL1" height="30px">
+          <br><br>
           <div class="rating">
             <img
               v-if="listing.rating > 0"
@@ -399,14 +396,10 @@ export default {
         });
     },
 
-    route: function (event) {
-      let doc_id = event.target.getAttribute("id");
-      this.$router.push({
-        path: "indiv",
-        query: { id: doc_id },
-        params: { id: doc_id },
-      });
-    },
+    route: function(event) {
+            let doc_id = event.target.getAttribute("id");
+            this.$router.push({name:"indiv", params: {id:doc_id}})
+        },
 
     bookmark: function (event) {
       //add the place to favourites
@@ -468,28 +461,25 @@ ul {
   padding-top: 3%;
   margin: auto;
 }
-
 li {
   /*  flex-grow: 1;  */
   width: 600px;
   /*  flex-basis: 300px; */
   text-align: center;
   padding: 10px;
-  border: 3px solid #ed7a78;
+  border: 5px solid #ED7A78;
   margin: 10px;
   margin-top: 5px;
   border-radius: 25px;
   font-family: "Ubuntu", sans-serif;
-  margin: 0 0 10 0;
+  margin: auto;
 }
-
 .listings-list {
   margin-left: 3%;
 }
-
 #main-pic {
   border-radius: 15px;
-  width: 500px;
+  width: 80%;
   height: 300px;
 }
 
@@ -497,19 +487,6 @@ li {
   font-size: 35px;
 }
 
-/*
-.location, .noise, .price {
-  float: left;
-  
-  font-size: 20px;
-  display: inline-block;
-}
-
-
-#location-pin {
-  
-  margin-left: 30px;
-} */
 .details {
   float: left;
 }
@@ -575,4 +552,31 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+
+
+@media (min-width: 740px) and (max-width: 1412px) {
+  .listings-list {
+    margin-left: 3%;
+    width: 100%
+  }
+  ul {
+    width: 100%;
+  }
+  li {
+/*  flex-grow: 1;  */
+
+/*  flex-basis: 300px; */
+    text-align: center;
+    padding: 10px;
+    border: 5px solid #ED7A78;
+    margin: 10px;
+    margin-top: 5px;
+    border-radius: 25px;
+    font-family: "Ubuntu", sans-serif;
+    margin: auto;
+
+  }
+}
+
 </style>
