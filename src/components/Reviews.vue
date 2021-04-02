@@ -19,18 +19,18 @@
     <label for="noise" id="noise">Noise:</label>
     <span></span>
     <select id="noiseOptions" name="noiseOptions" v-model="noise" required>
-        <option value="1">1 - Quiet</option>
-        <option value="2">2 - Tolerable</option>
-        <option value="3">3 - Some Noise</option>
+        <option value=1>1 - Quiet</option>
+        <option value=2>2 - Tolerable</option>
+        <option value=3>3 - Some Noise</option>
     </select>
     <br><br>
     <label for="rating" id="rating">Rating:</label>
     <select id="rating" name="rating" v-model="rating" required>
-        <option value="1">1 - Very Poor</option>
-        <option value="2">2 - Poor</option>
-        <option value="3">3 - Average</option>
-        <option value="4">4 - Good</option>
-        <option value="5">5 - Excellent</option>
+        <option value=1>1 - Very Poor</option>
+        <option value=2>2 - Poor</option>
+        <option value=3>3 - Average</option>
+        <option value=4>4 - Good</option>
+        <option value=5>5 - Excellent</option>
     </select>
     <!-- <label for="rating">Rating:</label>
     <img src="https://img.icons8.com/fluent/48/000000/star.png"/>
@@ -60,7 +60,6 @@ export default {
             comment: '',
             noise: 0,
             rating: 0,
-            totalRating: 0
         }
     },
 
@@ -90,14 +89,30 @@ export default {
                     return username;
                 }
                 let username = await retrieveUser(userId)
+
+
                 database.collection('listings').doc(locationId).collection('reviews').add({
                     title: this.title,
                     comments: this.comment,
-                    noise: this.noise,
-                    rating: this.rating,
+                    noise: Number(this.noise),
+                    rating: Number(this.rating),
                     userid: userId,
                     user: username
                 })
+
+                database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
+                    const toUpdate = snapshot.data();
+                    var newNumRatings = toUpdate.numRatings + 1;
+                    var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
+                    var newAvgRating = Math.round(Number(newRatingTotal) / Number(newNumRatings));
+                    var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
+                    var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
+                    database.collection('listings').doc(this.$route.params.id).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
+                    this.$router.push({path: "/bookings"}));
+                
+                })  
+
+                
             }
     },
 
