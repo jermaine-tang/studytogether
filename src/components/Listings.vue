@@ -363,7 +363,7 @@ body{
 
 @media (min-width: 740px) and (max-width: 1412px) {
   .listings-list {
-    margin-left: 3%;]
+    margin-left: 3%;
     width: 100%
   }
   ul {
