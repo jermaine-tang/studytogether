@@ -12,7 +12,7 @@
         <!-- Button to cancel bookmark -->
         <button
           class="button"
-          v-bind:id="listing.id"
+          v-bind:index="index"
           v-on:click="remove($event)"
         >
           Remove
@@ -32,7 +32,6 @@ export default {
     return {
       list: [],
       idList: [],
-      listUpdated: false,
     };
   },
 
@@ -45,32 +44,71 @@ export default {
   },
 
   methods: {
-    fetchItems: async function () {
-    // await setTimeout(() => {}, 1000)
-        var user = firebase.auth().currentUser;
+    getListing: async function () {
+      var arr = [];
+      await database
+        .collection("listings")
+        .get()
+        .then((querySnapShot) => {
+          let item = {};
+          querySnapShot.docs.forEach((doc) => {
+            item = { ...doc.data(), ["id"]: doc.id };
+            // console.log(item)
+            arr.push(item);
+          });
+        });
+      return arr;
+    },
 
-            console.log(user)
-
+    getUser: async function () {
+      var arr = [];
       await database
         .collection("users")
-        .doc(user.uid)
         .get()
-        .then((snapshot) => {
-          //   this.idList = snapshot.data().favourites;
-          var fav = snapshot.data().favourites;
-          if (!fav.empty) {
-            for (var i = 0; i < fav.length; i++) {
-              var id = fav[i];
-              database
-                .collection("listings")
-                .doc(id)
-                .get()
-                .then((querySnapshot) => {
-                  this.list.push(querySnapshot.data());
-                });
-            }
-          }
+        .then((querySnapShot) => {
+          let item = {};
+          querySnapShot.docs.forEach((doc) => {
+            item = { ...doc.data(), ["id"]: doc.id };
+            
+            // console.log(item)
+            arr.push(item);
+          });
         });
+      return arr;
+    },
+
+    fetchItems: async function () {
+      // await setTimeout(() => {}, 1000)
+      var listArr = await this.getListing();
+      // var userArr = await this.getUser()
+      console.log("get listings" + listArr);
+
+      var user = firebase.auth().currentUser;
+
+      console.log(user);
+
+        await database.collection('users').doc(user.uid).get().then(snapshot => {
+            const data = snapshot.data();
+            this.idList = data.favourites;
+            //this.list = new Array(this.idList.length)
+            console.log(this.idList)
+        })
+    
+    //   for (var i = 0; i < userArr.length; i++) {
+    //     if (userArr[i].id == user.id) {
+    //       this.idList = userArr[i].favourites;
+    //     }
+    //   }
+
+      for (var j = 0; j < listArr.length; j++) {
+          console.log(this.idList)
+          console.log(listArr[j].id)
+            console.log(this.idList.includes(listArr[j].id))
+        if (this.idList.includes(listArr[j].id)) {
+            //this.list[this.idList.indexOf(listArr[j].id)] = listArr[j]
+            this.list.push(listArr[j]);
+        }
+      }
 
       console.log(this.list);
 
@@ -91,29 +129,39 @@ export default {
     },
 
     remove: function (event) {
-      let doc_id = event.target.getAttribute("id");
+        
+      let doc_index = event.target.getAttribute("index");
+      //this.idList.splice(this.idList.indexOf(doc_id),1);
+    //   function checkID(object) {
+    //         return object == doc_id
+    //     }
+    //     console.log(this.list[this.list.findIndex(checkID)])
+      //this.list.splice(this.idList.indexOf(doc_id),1);
       console.log(event.target);
-      console.log(doc_id);
+      //console.log(doc_id);
+      this.idList.splice(doc_index, 1);
       let user = firebase.auth().currentUser;
       // var fav = [];
       // var newFav = [];
       database
         .collection("users")
         .doc(user.uid)
-        .get()
-        .then((snapshot) => {
-          const data = snapshot.data();
+        .update({ favourites: this.idList })
+        .then(() => {location.reload()});
+        //.get()
+        //.then((snapshot) => {
+          //const data = snapshot.data();
 
-          var fav = data.favourites;
+          //var fav = data.favourites;
 
-          const indexOf = fav.indexOf(doc_id);
+          //const indexOf = fav.indexOf(doc_id);
 
-          fav.splice(indexOf, 1);
+          //fav.splice(indexOf, 1);
 
-          database
-            .collection("users")
-            .doc(user.uid)
-            .update({ favourites: fav });
+         // database
+         //   .collection("users")
+         //   .doc(user.uid)
+         //   .update({ favourites: fav });
 
           // snapshot.docs.forEach(doc => {
           // if (doc.id == user.uid) {//get the user
@@ -130,18 +178,9 @@ export default {
           //     console.log("remove");
           // }
           // })
-        });
-        this.listUpdated = false;
+        //})
     },
   },
-
-  watch: {
-      listUpdated: async function() {
-          this.listUpdated = true;
-          await this.fetchItems;
-      }
-  }
-
 };
 </script>
 
