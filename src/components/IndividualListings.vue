@@ -25,8 +25,8 @@
             <div id="noise">
                 <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width=34px/>
                 <span class="noiseVal" v-show="listingDetails.noise == 1"> Quiet </span>
-                <span class="noiseVal" v-show="listingDetails.noise == 2"> Moderate </span>
-                <span class="noiseVal" v-show="listingDetails.noise == 3"> Loud </span>
+                <span class="noiseVal" v-show="listingDetails.noise == 2"> Tolerable </span>
+                <span class="noiseVal" v-show="listingDetails.noise == 3"> Some Noise </span>
             </div>
             </div>
             <div class="float-right">
@@ -55,13 +55,32 @@
                 <div v-if="reviews.length == 0">No reviews yet. Make a booking and be the first to leave a review!</div>
                 <div v-if="reviews.length != 0">
                     <ul>
-                        <li v-for="review in reviews" :key="review.id">
-                            <div id="title"> {{ review.title }} </div>
+                        <li  v-for="commentIndex in commentsToShow" :key="commentIndex">
+                            <div v-if="commentIndex < reviews.length">
+                            <div id="title"> {{ reviews[commentIndex].title }} </div>
                             <hr>
-                            <div id="comment"> {{ review.comments }} </div>
-                            <div id="noiseLvl"> Noise: {{ review.noise }} </div>
-                            <div id="rating"> Rating: {{ review.rating }} </div>
+                            <div id="comment"> {{ reviews[commentIndex].comments }} </div>
+                            <br>
+                            <div class="noiseLvl"> 
+                                Noise: 
+                                <img id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="35px"/>
+                                <img v-if="reviews[commentIndex].noise > 1" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="35px"/>
+                                <img v-if="reviews[commentIndex].noise > 2" id="noise-pic" src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png" width="35px"/>
+                            </div>
+                            
+                            <div class="rating"> 
+                                Rating:
+                                <img v-if="reviews[commentIndex].rating > 0" src="https://img.icons8.com/fluent/48/000000/star.png" width="30px"/>
+                                <img v-if="reviews[commentIndex].rating > 1" src="https://img.icons8.com/fluent/48/000000/star.png" width="30px"/>
+                                <img v-if="reviews[commentIndex].rating > 2" src="https://img.icons8.com/fluent/48/000000/star.png" width="30px"/>
+                                <img v-if="reviews[commentIndex].rating > 3" src="https://img.icons8.com/fluent/48/000000/star.png" width="30px"/>
+                                <img v-if="reviews[commentIndex].rating > 4" src="https://img.icons8.com/fluent/48/000000/star.png" width="30px"/>
+                            </div>
+                            </div>
                         </li>
+                        <div v-if="commentsToShow < reviews.length || reviews.length > commentsToShow">
+                            <button class="showMore" @click="commentsToShow += 3">Show more reviews</button>
+                        </div>
                     </ul>
                 </div>
             </div>
@@ -80,19 +99,18 @@ export default {
     data() {
         return {
             listingDetails: {},
-            reviews: []
+            reviews: [],
+            commentsToShow: 3,
+            totalComments: 0
         }
     },
     methods: {
         fetchItems: function() {
             database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
                 const toAdd = snapshot.data();
-                
                 this.listingDetails = toAdd;
-                console.log(toAdd);
-                console.log(this.listingDetails);
                 });
-            database.collection('listings').doc(this.$route.query.id).collection('reviews').get().then(snapshot => {
+            database.collection('listings').doc(this.$route.params.id).collection('reviews').get().then(snapshot => {
                 snapshot.docs.forEach(doc => {
                     const add = doc.data();
                     this.reviews.push(add);
@@ -121,6 +139,11 @@ export default {
     created: function() {
         this.fetchItems()
     },
+
+    mounted() {
+        this.totalComments = this.reviews.length;
+    },
+
     watch: {
         "$route": "fetchItems"
     }
@@ -168,6 +191,11 @@ hr {
   width: 85%;
   
 } 
+
+#reviews {
+    font-size: 20px;
+}
+
 #reviews ul {
     list-style-type: none; 
 }
@@ -178,7 +206,8 @@ hr {
     height: 100%;
     width: 95%;
     padding: 10px;
-    margin: 0 0 0 0;
+    margin: auto;
+    margin-bottom: 30px;
     background-color: #ebebeb;
 }
 
@@ -261,7 +290,7 @@ hr {
   cursor: pointer;
   border-radius: 10px;
   color: whitesmoke;
-  background: #e040fb;
+  background: #ED7A78;
   border: 2px solid transparent;
   height: 60px;
   width: 200px;
@@ -278,10 +307,36 @@ hr {
 
 .book:hover {
   border-color: white;
-  background-color:#d829f7;
+  background-color: #e33c39;
 }
 
 .book:focus {
   outline: none;
+}
+
+.showMore {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    color: whitesmoke;
+    background: #ED7A78;
+    border: 2px solid transparent;
+    height: 60px;
+    width: 300px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 15px;
+    padding-top: 15px;
+    font-family: "Ubuntu", sans-serif;
+    font-weight: bold;
+    font-size: 25px;
+    transition: 0.2s;
+}
+
+.showMore:hover {
+  border-color: white;
+  background-color: #e33c39;
 }
 </style>

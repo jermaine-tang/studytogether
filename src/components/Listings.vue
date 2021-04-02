@@ -93,9 +93,9 @@
     <div class="listings-list">
       <ul class="listings-list">
         <li v-for="listing in list" :key="listing.id" v-bind:id="listing.id" v-on:click="route($event)" >
-          <div class="name" v-bind:id="listing.id"> {{ listing.name }}</div>
+          <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
-          <img id="main-pic" v-bind:src = "listing.photoURL1" height30px>
+          <img id="main-pic" v-bind:src = "listing.photoURL1" height="30px">
           <br><br>
           <div class="rating">
             <img v-if="listing.rating > 0" src="https://img.icons8.com/fluent/48/000000/star.png"/>
