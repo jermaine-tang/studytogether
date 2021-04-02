@@ -160,7 +160,6 @@ export default {
 .pass:focus {
   outline: none;
   border-color: darkgrey;
-  color: rgb(139, 255, 139)
 }
 
 .email:focus::-webkit-input-placeholder,
@@ -226,6 +225,5 @@ a {
 
 .submit:focus {
   outline: none;
-  color: rgb(253, 200, 200);
 }
 </style>
