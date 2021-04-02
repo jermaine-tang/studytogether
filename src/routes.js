@@ -5,6 +5,7 @@ import SignupPage from './components/SignupPage.vue';
 import IndividualListings from './components/IndividualListings.vue';
 import Bookings from './components/Bookings.vue';
 import Reviews from './components/Reviews.vue';
+import Favourites from './components/Favourites.vue';
 import Reservation from './components/Reservation.vue';
 
 export default[
@@ -15,6 +16,7 @@ export default[
     {path: '/signup', component: SignupPage},
     // {path: '/indiv', component: IndividualListings, props: true},
     {path: '/bookings', component: Bookings},
+    {path: '/favourites', name: "favourites", component: Favourites},
     {path: '/reviews/:id', component: Reviews, props: true},
     {path: '/listings/:id/reserve', name: 'reservation', component: Reservation, props:true}
 ]
