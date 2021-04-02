@@ -175,79 +175,74 @@ import database from "../firebase.js";
 import firebase from "firebase";
 
 export default {
-	data() {
-		return {
-			listingDetail: {},
-			title: "",
-			comment: "",
-			noise: "",
-			rating: "",
-		};
-	},
 
-	components: {
-		"app-header": Header,
-	},
+    data() {
+        return {
+            listingDetail: {},
+            title: '',
+            comment: '',
+            noise: 0,
+            rating: 0,
+        }
+    },
 
-	methods: {
-		fetchItems: function() {
-			// var toAdd = {}
-            // alert(this.$route.params.id)
-			database
-				.collection("listings")
-				.doc(this.$route.params.id)
-				.get()
-				.then((snapshot) => {
-					var toAdd = snapshot.data();
-					this.listingDetail = toAdd;
-					// console.log(toAdd);
-					// console.log(this.listingDetail);
-				});
-			// this.listingDetail = data
-		},
+    components: {
+        'app-header':Header
+    },
 
-		send: async function() {
-			const locationId = this.$route.params.id;
-			console.log(locationId);
-			alert(locationId);
-			const userId = firebase.auth().currentUser.uid;
-			console.log(userId);
-			async function retrieveUser(idOfUser) {
-				var username = "";
-				await database
-					.collection("users")
-					.doc(idOfUser)
-					.get()
-					.then((doc) => {
-						let data = doc.data();
-						username = data["name"];
-					});
-				return username;
-			}
-			let username = await retrieveUser(userId);
-			database
-				.collection("listings")
-				.doc(locationId)
-				.collection("reviews")
-				.add({
-					title: this.title,
-					comments: this.comment,
-					noise: this.noise,
-					rating: this.rating,
-					userid: userId,
-					user: username,
-				});
-		},
+    methods: {
+        fetchItems: function() {
+            database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
+                const toAdd = snapshot.data();
+                this.listingDetail = toAdd;
+                console.log(toAdd);
+                console.log(this.listingDetail);
+                })     
+            },
 
-		route: function() {
-			this.$router.push({ path: "/bookings" });
-		},
-	},
+            send: async function() {
+                const locationId = this.$route.params.id
+                const userId = firebase.auth().currentUser.uid
+                async function retrieveUser(idOfUser) {
+                    var username = ''
+                        await database.collection('users').doc(idOfUser).get().then(doc => {
+                            let data = doc.data()
+                            username = data['name']
+                        })
+                    return username;
+                }
+                let username = await retrieveUser(userId)
 
-	created: function() {
-		this.fetchItems();
-	},
-};
+
+                database.collection('listings').doc(locationId).collection('reviews').add({
+                    title: this.title,
+                    comments: this.comment,
+                    noise: Number(this.noise),
+                    rating: Number(this.rating),
+                    userid: userId,
+                    user: username
+                })
+
+                database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
+                    const toUpdate = snapshot.data();
+                    var newNumRatings = toUpdate.numRatings + 1;
+                    var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
+                    var newAvgRating = Math.round(Number(newRatingTotal) / Number(newNumRatings));
+                    var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
+                    var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
+                    database.collection('listings').doc(this.$route.params.id).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
+                    this.$router.push({path: "/bookings"}));
+                
+                })  
+
+                
+            }
+    },
+
+    created: function() {
+        this.fetchItems()
+    },
+}
 </script>
 
 <style scoped>
