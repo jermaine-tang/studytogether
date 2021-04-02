@@ -415,6 +415,10 @@ export default {
 
           var fav = data.favourites;
 
+          if (fav == undefined) {
+            fav = [];
+          }
+
           if (fav.includes(doc_id)) {
             alert('Already bookmarked')
             return;
