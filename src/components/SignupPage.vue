@@ -77,7 +77,8 @@ export default {
         var data = {
           name: this.signup.name,
           email: this.signup.email,
-          number: this.signup.number
+          number: this.signup.number,
+          favourites: []
         }
 
         var user = firebase.auth().currentUser
