@@ -7,7 +7,9 @@
         <li v-for="booking in newBookings" :key="booking.index">
             <img :src="booking[5]" alt="picture" id="main-pic">
             <div id="name"><b>{{booking[6]}}</b></div>
-            <button class="button" v-on:click="cancel(booking.index)">Cancel Booking</button>
+            <a href="#" class="btn-gradient yellow small" v-bind:id="booking[7]" v-on:click="cancel(booking.index); del($event)">
+                Cancel Booking
+            </a>
             <div id="pax"><b>Total Coming: {{booking[1]}}</b></div>
             <div id="clockIcon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -25,7 +27,10 @@
         <li v-for="booking in pastBookings" :key="booking.index">
             <img :src="booking[5]" alt="picture" id="main-pic">
             <div id="name"><b>{{booking[6]}}</b></div>
-            <button class="button" v-bind:id ="booking[2]" v-on:click="route($event)">Leave Review</button>
+            <a href="#" class="btn-gradient yellow small" v-bind:id ="booking[2]" v-on:click="route($event)">
+                <!-- <b>Leave Review</b> -->
+                Leave Review
+            </a>
             <div id="pax"><b>Total Coming: {{booking[1]}}</b></div>
             <div id="clockIcon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -60,8 +65,18 @@ export default {
         },
 
         route: function(event) {
+            console.log(event)
             let doc_id = event.target.getAttribute("id");
+
+            console.log(doc_id)
+            console.log(this.pastBookings)
             this.$router.push({path: `reviews/${doc_id}`, query: {id: doc_id}})
+        },
+
+        del: function(event) {
+            let id = event.target.getAttribute("id")
+            alert(id)
+            database.collection('bookings').doc(id).delete().then(() => console.log('delete success'))
         },
 
         cancel: function(idx) {
@@ -71,8 +86,11 @@ export default {
         getDoc: async function() {
             var arr = []
             await database.collection('bookings').get().then(querySnapShot => {
+                let item = {}
                 querySnapShot.docs.forEach(doc => {
-                    arr.push(doc.data())
+                    item = {...doc.data(), ['id']: doc.id}
+                    // console.log(item)
+                    arr.push(item)
                 })
             })
             return arr
@@ -81,6 +99,7 @@ export default {
         fetchItems: async function() {
             this.docArr = await this.getDoc()
             var currentUser = firebase.auth().currentUser.uid 
+            console.log(currentUser)
             let upcoming = []
             let past = []
 
@@ -91,9 +110,9 @@ export default {
                     return (new Date(a[3]) < new Date(b[3])) ? -1 : 1;
                 }
             }
-            
+
             this.docArr.forEach(async function(doc) {
-                
+                let id = [doc['id']]
                 let userid = doc['userid']
                 let location = doc['location']
                 let pax = doc['pax']
@@ -114,14 +133,15 @@ export default {
                 let end = time.pop().slice(-4)
                 let duration = start + ' - ' + end
                 let booking = [userid, pax, location, dateOfVisit, duration]
-                let combined = [...booking, ...locationAndName]
+                let combined = [...booking, ...locationAndName,...id]
     
                 if(new Date() < new Date(combined[3]) && combined[0] == currentUser) {
                     upcoming.push(combined)
                     upcoming.sort(sortByDate)
                 } else if(combined[0] == currentUser) {
                     past.push(combined)
-                    upcoming.sort(sortByDate)
+                    // edit 
+                    past.sort(sortByDate)
                 }
             })
             this.newBookings = upcoming
@@ -173,18 +193,18 @@ li {
     font-size: 25px;
 }
 
-.button {
+/* button {
     position: relative;
-    left: 90px;
+    left: 150px;
     height: 50px;
     width: 90px;
     font-size: 15px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
+} */
 
 #pax {
-    position: relative;
-    left: 235px;
+    position: absolute;
+    left: 245px;
     bottom: 70px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 15px;
@@ -219,4 +239,41 @@ li {
     left: 10px;
     bottom: 15px;
 }
+
+/* imported css for buttons */
+
+.btn-gradient {
+	text-decoration: none;
+	color: white;
+	padding: 5px 10px;
+	display: inline-block;
+	position: relative;
+    left: 150px;
+    height: 50px;
+    width: 90px;
+    font-size: 15px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+	border: 1px solid rgba(0,0,0,0.21);
+	border-bottom: 4px solid rgba(0,0,0,0.21);
+	border-radius: 4px;
+	text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+}
+
+.btn-gradient.yellow {
+	background: rgba(240,210,100,1);
+	background: -webkit-gradient(linear, 0 0, 0 100%, from(rgba(240,210,100,1)), to(rgba(229,201,96,1)));
+	background: -webkit-linear-gradient(rgba(240,210,100,1) 0%, rgba(229,201,96,1) 100%);
+	background: -moz-linear-gradient(rgba(240,210,100,1) 0%, rgba(229,201,96,1) 100%);
+	background: -o-linear-gradient(rgba(240,210,100,1) 0%, rgba(229,201,96,1) 100%);
+	background: linear-gradient(rgba(240,210,100,1) 0%, rgba(229,201,96,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0d264', endColorstr='#e5c960', GradientType=0 );
+}
+
+.btn-gradient.red:active 	  {background: #E35252;}
+.btn-gradient.orange:active {background: #E8601B;}
+.btn-gradient.cyan:active 	{background: #169499;}
+.btn-gradient.blue:active 	{background: #608FBF;}
+.btn-gradient.purple:active {background: #BD8EB7;}
+.btn-gradient.yellow:active {background: #DBC05B;}
+.btn-gradient.green:active  {background: #72B08E;}
 </style>
