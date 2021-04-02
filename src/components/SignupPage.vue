@@ -3,6 +3,7 @@
     <app-header></app-header>
     <div class="box">
       <p class="title">Register</p>
+      <div id="error-container"></div>
       <form class="form">
         <input
           class="email"
@@ -37,7 +38,9 @@
           required
         />
         <br />
-        <button class="submit" type="submit" align="center" v-on:click="submit"><span>Sign Up</span></button>
+        <button class="submit" type="submit" align="center" v-on:click="submit">
+          <span>Sign Up</span>
+        </button>
       </form>
     </div>
   </div>
@@ -46,7 +49,7 @@
 <script>
 import Header from "./UI/Header.vue";
 import firebase from "firebase";
-import database from '../firebase.js';
+import database from "../firebase.js";
 
 export default {
   data() {
@@ -66,40 +69,104 @@ export default {
   methods: {
     submit: async function (e) {
       e.preventDefault();
-      try {
-        await firebase
-          .auth()
-          .createUserWithEmailAndPassword(
-            this.signup.email,
-            this.signup.password
-          );
 
-        var data = {
-          name: this.signup.name,
-          email: this.signup.email,
-          number: this.signup.number,
-          favourites: []
-        }
-
-        var user = firebase.auth().currentUser
-
-        database.collection('users').doc(user.uid).set(data);
-
-        await user.updateProfile({
-          displayName: this.signup.name
-        })
-        console.log(user);
-        
-        await user.sendEmailVerification();
-
-        firebase.auth().signOut();
-
-        alert("Account created successfully! Verify your account with link sent to your email!");
-
-        this.$router.push({ path: "/login" })
-      } catch (err) {
-        console.log(err);
+      if (
+        !this.signup.email ||
+        !this.signup.password ||
+        !this.signup.name ||
+        !this.signup.number
+      ) {
+        document.getElementById("error-container").innerHTML =
+          "Fill in all fields";
+        document.getElementById("error-container").style.backgroundColor =
+          "rgb(255, 168, 168)";
+        document.getElementById("error-container").style.borderRadius = "20px";
+        document.getElementById("error-container").style.width = "72.5%";
+        document.getElementById("error-container").style.margin = "auto";
+        document.getElementById("error-container").style.padding = "3px";
+        document.getElementById("error-container").style.marginBottom = "5px";
+        document.getElementById("error-container").style.fontFamily =
+          '"Ubuntu", sans-serif';
+        document.getElementById("error-container").style.fontWeight = "500";
+        document.getElementsByClassName("title")[0].style.marginBottom = "8px";
+        return;
       }
+
+      // try {
+      await firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.signup.email, this.signup.password)
+        .then()
+        .catch((err) => {
+          console.log(err);
+          if (err.code == "auth/invalid-email") {
+            document.getElementById("error-container").innerHTML =
+              "Invalid Email Format";
+          } else if (err.code == "auth/email-already-in-use") {
+            document.getElementById("error-container").innerHTML =
+              "Email is already in use";
+          } else if (err.code == "auth/weak-password") {
+            document.getElementById("error-container").innerHTML =
+              "Password should be at least 6 characters";
+          }
+          document.getElementById("error-container").style.backgroundColor =
+            "rgb(255, 168, 168)";
+          document.getElementById("error-container").style.borderRadius =
+            "20px";
+          document.getElementById("error-container").style.width = "72.5%";
+          document.getElementById("error-container").style.margin = "auto";
+          document.getElementById("error-container").style.padding = "3px";
+          document.getElementById("error-container").style.marginBottom = "5px";
+          document.getElementById("error-container").style.fontFamily =
+            '"Ubuntu", sans-serif';
+          document.getElementById("error-container").style.fontWeight = "500";
+          document.getElementsByClassName("title")[0].style.marginBottom =
+            "8px";
+        });
+
+      var data = {
+        name: this.signup.name,
+        email: this.signup.email,
+        number: this.signup.number,
+      };
+
+      var user = firebase.auth().currentUser;
+
+      database.collection("users").doc(user.uid).set(data);
+
+      await user.updateProfile({
+        displayName: this.signup.name,
+      });
+      console.log(user);
+
+      await user.sendEmailVerification();
+
+      firebase.auth().signOut();
+
+      alert(
+        "Account created successfully! Verify your account with link sent to your email!"
+      );
+
+      this.$router.push({ path: "/login" });
+      // } catch (err) {
+      //   console.log(err);
+      //   if (err.code == "auth/invalid-email") {
+      //     document.getElementById("error-container").innerHTML = "Invalid Email Format"
+      //   }
+      //   document.getElementById("error-container").innerHTML =
+      //     "Email is already in use";
+      //   document.getElementById("error-container").style.backgroundColor =
+      //     "rgb(255, 168, 168)";
+      //   document.getElementById("error-container").style.borderRadius = "20px";
+      //   document.getElementById("error-container").style.width = "72.5%";
+      //   document.getElementById("error-container").style.margin = "auto";
+      //   document.getElementById("error-container").style.padding = "3px";
+      //   document.getElementById("error-container").style.marginBottom = "5px";
+      //   document.getElementById("error-container").style.fontFamily =
+      //     '"Ubuntu", sans-serif';
+      //   document.getElementById("error-container").style.fontWeight = "500";
+      //   document.getElementsByClassName("title")[0].style.marginBottom = "8px";
+      // }
     },
   },
 };
