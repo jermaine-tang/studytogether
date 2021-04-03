@@ -91,6 +91,7 @@
 <script>
 import Header from "./UI/Header.vue";
 import database from '../firebase.js';
+import firebase from 'firebase';
 
 export default {
     components: {
@@ -120,7 +121,14 @@ export default {
             },
 
         bookPage: function() {
-            this.$router.push({ name: "reservation" })
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    this.$router.push({ name: "reservation" })
+                } else {
+                    alert('You have to be logged in to make a booking')
+                }
+            })
+            
         }
         
         /*
