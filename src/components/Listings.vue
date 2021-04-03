@@ -12,15 +12,20 @@
         />
         <i class="fa fa-search"></i>
 
-        <button type="button" class="btn" @click="showModal">Filter</button>
+        <button
+          type="button"
+          class="btn"
+          @click="showModal"
+        >
+          Filter
+        </button>
       </div>
     </div>
 
     <div>
       <select v-model="sortBy">
         <option
-          v-for="(option, index) in options"
-          :key="index"
+          v-for="(option, index) in options" :key="index"
           v-bind:value="option.value"
         >
           {{ option.text }}
@@ -35,7 +40,11 @@
     </div>
 
     <div>
-      <modal v-show="isModalVisible" @close="closeModal" @apply="closeModal">
+      <modal 
+        v-show="isModalVisible" 
+        @close="closeModal" 
+        @apply="closeModal"
+      >
         <template v-slot:body>
           <div>
             <div>
@@ -183,7 +192,7 @@
 
     <div class="listings-list">
       <ul class="listings-list">
-        <li v-for="listing in list" :key="listing.id" >
+        <li v-for="listing in displayedList" :key="listing.id" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1" height="30px">
@@ -301,6 +310,7 @@ export default {
       ],
       sortBy: null,
       ascending: true,
+
     };
   },
 
@@ -313,6 +323,9 @@ export default {
     //computed method to watch over search, filter and sort to update displayed list
     displayedList: function () {
       let tempList = this.list;
+
+      console.log("computed");
+
 
       //search method
       if (this.searchString != "" && this.searchString) {
@@ -365,6 +378,13 @@ export default {
 
       return tempList;
     },
+
+    test: function() {
+      console.log(this.searchString);
+      return this.searchString;
+    }
+
+
   },
 
   methods: {
@@ -405,7 +425,7 @@ export default {
       //add the place to favourites
       let doc_id = event.target.getAttribute("id");
       let user = firebase.auth().currentUser;
-      // var newFav = [];
+
       database
         .collection("users")
         .doc(user.uid)
@@ -422,8 +442,6 @@ export default {
             fav.push(doc_id);  
           }
           
-          console.log(fav)
-
           database.collection('users').doc(user.uid).update({ favourites: fav })
 
           // snapshot.docs.forEach((doc) => {
@@ -440,14 +458,13 @@ export default {
           //   .collection("users")
           //   .doc(user.uid)
           //   .update({ favourites: newFav });
-          // console.log("bookmark");
+          console.log("bookmarked");
         });
     },
   },
 
   created: function () {
     this.fetchItems();
-    this.displayList = this.list;
   },
 };
 </script>
