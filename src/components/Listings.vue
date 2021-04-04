@@ -183,7 +183,7 @@
 
     <div class="listings-list">
       <ul class="listings-list">
-        <li v-for="listing in list" :key="listing.id" >
+        <li v-for="listing in displayedList" :key="listing.id" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
           <br>
           <img id="main-pic" v-bind:src = "listing.photoURL1" height="30px">
