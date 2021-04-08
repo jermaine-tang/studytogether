@@ -136,6 +136,17 @@ export default {
       database.collection("users").doc(user.uid).set(data);
 
       database.collection('listings').doc(user.uid).set({
+        amenities: new Array(),
+        exact_loc: "",
+        loc_filter: "",
+        loc_neighbourhood: "",
+        name: "",
+        noise: 0,
+        numRatings: "",
+        price: 0,
+        rating: 0,
+        totalNoise: 0,
+        totalRating: 0,
         published: false
       })
 
