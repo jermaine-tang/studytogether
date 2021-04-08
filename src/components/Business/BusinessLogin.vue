@@ -1,8 +1,8 @@
 <template>
-  <div>
+    <div>
     <app-header></app-header>
     <div class="box">
-      <p class="title">Register</p>
+      <p class="title">Business Sign in</p>
       <div id="error-container"></div>
       <form class="form">
         <input
@@ -10,15 +10,7 @@
           type="email"
           align="center"
           placeholder="Email"
-          v-model="signup.email"
-          required
-        />
-        <input
-          class="user"
-          type="text"
-          align="center"
-          placeholder="Name"
-          v-model="signup.name"
+          v-model="loginform.email"
           required
         />
         <input
@@ -26,39 +18,35 @@
           type="password"
           align="center"
           placeholder="Password"
-          v-model="signup.password"
-          required
-        />
-        <input
-          class="number"
-          type="text"
-          align="center"
-          placeholder="Phone Number"
-          v-model="signup.number"
+          v-model="loginform.password"
           required
         />
         <br />
         <button class="submit" type="submit" align="center" v-on:click="submit">
-          <span>Sign Up</span>
+          <span>Sign in</span>
         </button>
       </form>
+      <p class="forgot" align="center">
+        <router-link to="/forgotpassword"><a>Forgot Password?</a></router-link>
+      </p>
+      <p class="signup" align="center">
+        Not yet Registered?
+        <router-link to="/signup"><a>Sign Up here!</a></router-link>
+      </p>
     </div>
   </div>
 </template>
 
 <script>
-import Header from "./UI/Header.vue";
+import Header from "../UI/Header.vue";
 import firebase from "firebase";
-import database from "../firebase.js";
 
 export default {
   data() {
     return {
-      signup: {
+      loginform: {
         email: "",
         password: "",
-        name: "",
-        number: "",
       },
     };
   },
@@ -67,15 +55,10 @@ export default {
   },
 
   methods: {
-    submit: async function (e) {
+    submit: function (e) {
       e.preventDefault();
 
-      if (
-        !this.signup.email ||
-        !this.signup.password ||
-        !this.signup.name ||
-        !this.signup.number
-      ) {
+      if (!this.loginform.email || !this.loginform.password) {
         document.getElementById("error-container").innerHTML =
           "Fill in all fields";
         document.getElementById("error-container").style.backgroundColor =
@@ -92,22 +75,31 @@ export default {
         return;
       }
 
-      // try {
-      await firebase
+      firebase
         .auth()
-        .createUserWithEmailAndPassword(this.signup.email, this.signup.password)
-        .then()
+        .signInWithEmailAndPassword(
+          this.loginform.email,
+          this.loginform.password
+        )
+        .then((userCredential) => {
+          var user = userCredential.user;
+          console.log(user);
+
+          if (!user.emailVerified) {
+            alert("Verify your email to continue");
+            firebase.auth().signOut();
+          } else {
+            this.$router.push({ path: "/" });
+          }
+        })
         .catch((err) => {
-          console.log(err);
-          if (err.code == "auth/invalid-email") {
+          console.log(err)
+          if (err.code == "auth/wrong-password") {
             document.getElementById("error-container").innerHTML =
-              "Invalid Email Format";
-          } else if (err.code == "auth/email-already-in-use") {
+            "Incorrect Password";
+          } else if (err.code == "auth/user-not-found") {
             document.getElementById("error-container").innerHTML =
-              "Email is already in use";
-          } else if (err.code == "auth/weak-password") {
-            document.getElementById("error-container").innerHTML =
-              "Password should be at least 6 characters";
+            "Email not registered";
           }
           document.getElementById("error-container").style.backgroundColor =
             "rgb(255, 168, 168)";
@@ -122,52 +114,8 @@ export default {
           document.getElementById("error-container").style.fontWeight = "500";
           document.getElementsByClassName("title")[0].style.marginBottom =
             "8px";
+          console.log(err);
         });
-
-      var data = {
-        name: this.signup.name,
-        email: this.signup.email,
-        number: this.signup.number,
-        usertype: 'customer'
-      };
-
-      var user = firebase.auth().currentUser;
-
-      database.collection("users").doc(user.uid).set(data);
-
-      await user.updateProfile({
-        displayName: this.signup.name,
-      });
-      console.log(user);
-
-      await user.sendEmailVerification();
-
-      firebase.auth().signOut();
-
-      alert(
-        "Account created successfully! Verify your account with link sent to your email!"
-      );
-
-      this.$router.push({ path: "/login" });
-      // } catch (err) {
-      //   console.log(err);
-      //   if (err.code == "auth/invalid-email") {
-      //     document.getElementById("error-container").innerHTML = "Invalid Email Format"
-      //   }
-      //   document.getElementById("error-container").innerHTML =
-      //     "Email is already in use";
-      //   document.getElementById("error-container").style.backgroundColor =
-      //     "rgb(255, 168, 168)";
-      //   document.getElementById("error-container").style.borderRadius = "20px";
-      //   document.getElementById("error-container").style.width = "72.5%";
-      //   document.getElementById("error-container").style.margin = "auto";
-      //   document.getElementById("error-container").style.padding = "3px";
-      //   document.getElementById("error-container").style.marginBottom = "5px";
-      //   document.getElementById("error-container").style.fontFamily =
-      //     '"Ubuntu", sans-serif';
-      //   document.getElementById("error-container").style.fontWeight = "500";
-      //   document.getElementsByClassName("title")[0].style.marginBottom = "8px";
-      // }
     },
   },
 };
@@ -177,7 +125,7 @@ export default {
 .box {
   background-color: #ffffff;
   width: 400px;
-  height: 410px;
+  height: 370px;
   margin: 7em auto;
   border-radius: 40px;
   box-shadow: 0px 0px 10px 10px lightgrey;
@@ -191,10 +139,8 @@ export default {
   font-size: 23px;
 }
 
-.user,
-.pass,
 .email,
-.number {
+.pass {
   width: 75%;
   color: darkgrey;
   font-weight: bold;
@@ -210,18 +156,14 @@ export default {
   font-family: "Ubuntu", sans-serif;
 }
 
-.user:focus,
-.pass:focus,
 .email:focus,
-.number:focus {
+.pass:focus {
   outline: none;
   border-color: darkgrey;
 }
 
-.user:focus::-webkit-input-placeholder,
-.pass:focus::-webkit-input-placeholder,
 .email:focus::-webkit-input-placeholder,
-.number:focus::-webkit-input-placeholder {
+.pass:focus::-webkit-input-placeholder {
   opacity: 0;
 }
 
@@ -232,7 +174,7 @@ export default {
   border-radius: 20px;
   color: whitesmoke;
   background: linear-gradient(to right, #9c27b0, #e040fb);
-  border: 0;
+  border: 0px;
   padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 10px;
@@ -240,7 +182,6 @@ export default {
   font-family: "Ubuntu", sans-serif;
   font-weight: bold;
   font-size: 13px;
-  transition: 0.2s;
 }
 
 .forgot {
