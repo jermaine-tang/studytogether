@@ -62,9 +62,19 @@
                 <div class="editPhotos">
                     <label for="photos">Photos: </label>
                     <upload></upload>
-                    
+                    <br>
+                    <br> 
+                    Current Photos:
+                    <br>
+                    <img class="place" v-bind:src = "this.photo1">
+                    <img class="place" v-bind:src = "this.photo2">
+                    <img class="place" v-bind:src = "this.photo3">
                 </div>
+                <br><br>
+                <button v-if="!published">Publish Listing</button>
+                <button v-if="published">Save Changes</button>
             </form>
+            <br>
         </div>
 	</div>
 </template>
@@ -91,7 +101,8 @@ export default {
             photo3: '',
             price: 0,
             amenities: ['Wifi', 'Toilet'],
-            options: ['Wifi','Toilet','Power Plug','Airconditioning']
+            options: ['Wifi','Toilet','Power Plug','Airconditioning'],
+            published: null,
         }
     },
 
@@ -123,6 +134,7 @@ export default {
                 this.photo1 = toAdd.photoURL1;
                 this.photo2 = toAdd.photoURL2;
                 this.photo3 = toAdd.photoURL3;
+                this.published = toAdd.published;
                 console.log(toAdd);
                 console.log(this.listingDetail);
                 })     
@@ -196,5 +208,9 @@ export default {
 
 textArea {
     width: 80%;
+}
+
+img {
+    width: 70%;
 }
 </style>

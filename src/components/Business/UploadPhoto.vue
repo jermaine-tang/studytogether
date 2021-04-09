@@ -10,46 +10,50 @@
         <div>
 
             <div>
-                <button @click="click1">choose a photo</button>
+                <button @click.prevent="click1">Choose Photo 1</button>
                 <input type="file" ref="input1"
                 style="display: none"
-                @change="previewImage" accept="image/*">                  
+                @change="previewImage1" accept="image/*">                  
             </div>
- 
-            <div v-if="imageData!=null">                     
+            <br>
+            <div v-if="imageData1!=null">                     
                 <img class="preview" height="268" width="356" :src="img1">
                  <br>
             </div>   
 
+            <br>
+
             <div>
-                <button @click="click1">choose a photo</button>
-                <input type="file" ref="input1"
+                <button @click.prevent="click2">Choose Photo 2</button>
+                <input type="file" ref="input2"
                 style="display: none"
-                @change="previewImage" accept="image/*">                  
+                @change="previewImage2" accept="image/*">                  
             </div>
- 
-            <div v-if="imageData!=null">                     
-                <img class="preview" height="268" width="356" :src="img1">
+            <br>
+            <div v-if="imageData2!=null">                     
+                <img class="preview" height="268" width="356" :src="img2">
                  <br>
             </div>  
 
+            <br>
+
             <div>
-                <button @click="click1">choose a photo</button>
-                <input type="file" ref="input1"
+                <button @click.prevent="click3">Choose Photo 3</button>
+                <input type="file" ref="input3"
                 style="display: none"
-                @change="previewImage" accept="image/*">                  
+                @change="previewImage3" accept="image/*">                  
             </div>
- 
-            <div v-if="imageData!=null">                     
-                <img class="preview" height="268" width="356" :src="img1">
-                 <br>
+            <br>
+            <div v-if="imageData3!=null">                     
+                <img class="preview" height="268" width="356" :src="img3">
+                <br>
             </div>  
        </div>
        </v-flex>
     </v-layout>
     <v-layout row>
       <v-flex class="text-center">
-        <button color="pink" @click="create">upload</button>
+        <button color="pink" @click.prevent="create">Upload</button>
       </v-flex>
     </v-layout>
   </v-container>
@@ -64,7 +68,7 @@ import database from "../../firebase.js";
 export default {
   data () {
     return {
-        bizID: '5iBl58sV6uv7riUzCQzn ',
+        bizID: '5iBl58sV6uv7riUzCQzn',
         img1:'',
         img2:'',
         img3:'',
@@ -89,45 +93,57 @@ export default {
       }
     **/
 
-      database.collections('listings').doc(this.bizID).update({
+      database.collection('listings').doc(this.bizID).update({
           photoURL1: this.img1,
           photoURL2: this.img2,
-          photoURL3: this.img3
+          photoURL3: this.img3,
       })
+
+      /**
       .then((response) => {
         console.log(response)
       })
       .catch(err => {
         console.log(err)
       })
+    **/
+      
     },
 
     click1() {
         this.$refs.input1.click()   
     },
 
+    click2() {
+        this.$refs.input2.click()   
+    },
+
+    click3() {
+        this.$refs.input3.click()   
+    },
+
     previewImage1(event) {
     this.uploadValue=0;
     this.img1=null;
     this.imageData1 = event.target.files[0];
-    this.onUpload()
+    this.onUpload1()
     },
 
     previewImage2(event) {
     this.uploadValue=0;
     this.img2=null;
     this.imageData2 = event.target.files[0];
-    this.onUpload()
+    this.onUpload2()
     },
 
     previewImage3(event) {
     this.uploadValue=0;
     this.img3=null;
     this.imageData3 = event.target.files[0];
-    this.onUpload()
+    this.onUpload3()
     },
 
-    onUpload(){
+    onUpload1(){
         this.img1=null;
         const storageRef=firebase.storage().ref(`${this.imageData1.name}`).put(this.imageData1);
         storageRef.on(`state_changed`,snapshot=>{
@@ -140,7 +156,9 @@ export default {
                 });
             }      
         );
+    },
 
+    onUpload2() {
         this.img2=null;
         const storageRef2=firebase.storage().ref(`${this.imageData2.name}`).put(this.imageData2);
         storageRef2.on(`state_changed`,snapshot=>{
@@ -153,7 +171,9 @@ export default {
                 });
             }      
         );
+    },
 
+    onUpload3() {
         this.img3=null;
         const storageRef3=firebase.storage().ref(`${this.imageData3.name}`).put(this.imageData3);
         storageRef3.on(`state_changed`,snapshot=>{
