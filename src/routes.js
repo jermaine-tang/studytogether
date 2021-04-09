@@ -9,6 +9,7 @@ import ForgotPassword from './components/ForgotPassword.vue';
 import Favourites from './components/Favourites.vue';
 import Reservation from './components/Reservation.vue';
 import MyBusiness from './components/Business/MyBusiness.vue'
+import Information from './components/Business/Information.vue'
 
 export default[
     {path: '/', component: Homepage},
@@ -22,5 +23,6 @@ export default[
     {path: '/favourites', name: "favourites", component: Favourites},
     {path: '/reviews/:id', component: Reviews, props: true},
     {path: '/listings/:id/reserve', name: 'reservation', component: Reservation, props:true},
-    {path: '/mybiz', name: 'business', component: MyBusiness}
+    {path: '/mybiz', name: 'business', component: MyBusiness},
+    {path: '/info', name: 'info', component: Information}
 ]

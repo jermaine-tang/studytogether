@@ -16,31 +16,31 @@
 
 <script>
 import Header from "../UI/Header.vue";
-import firebase from 'firebase';
 
 export default {
     data() {
         return {
-            bizID: ''
+        //    bizID: ''
         }
     },
     components: {
         "app-header": Header
     },
-
-    fetchID: function () {
+    methods: {
+ /*   fetchID: function () {
         var user = firebase.auth().currentUser;
         console.log(user);
         var userID = user.uid;
         this.bizID = userID;
-    },
+    }, */
     
-    route: function() {
-        this.$router.push({name:"info", params: {id:this.bizID}})
-    },
+        route: function() {
+            this.$router.push({name:"info"})
+        },
 
-    created: function () {
+/*    created: function () {
         this.fetchID();
+    } */
     }
 }
 
