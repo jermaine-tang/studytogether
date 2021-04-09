@@ -13,7 +13,7 @@
             </div>
             <br>
             <div v-if="imageData1!=null">                     
-                <img class="preview" height="268" width="356" :src="img1">
+                <img class="preview" height="80%" width="80%" :src="img1">
                  <br>
             </div>   
 
@@ -27,7 +27,7 @@
             </div>
             <br>
             <div v-if="imageData2!=null">                     
-                <img class="preview" height="268" width="356" :src="img2">
+                <img class="preview" height="80%" width="80%" :src="img2">
                  <br>
             </div>  
 
@@ -41,15 +41,16 @@
             </div>
             <br>
             <div v-if="imageData3!=null">                     
-                <img class="preview" height="268" width="356" :src="img3">
+                <img class="preview" height="80%" width="80%" :src="img3">
                 <br>
             </div>  
        </div>
        </v-flex>
     </v-layout>
+    <br>
     <v-layout row>
       <v-flex class="text-center">
-        <button color="pink" @click.prevent="create">Upload</button>
+        <button color="pink" @click="create">Upload Cafe Photos</button>
       </v-flex>
     </v-layout>
   </v-container>
@@ -64,7 +65,7 @@ import database from "../../firebase.js";
 export default {
   data () {
     return {
-        bizID: '5iBl58sV6uv7riUzCQzn',
+        bizID: '',
         img1:'',
         img2:'',
         img3:'',
@@ -93,7 +94,8 @@ export default {
           photoURL1: this.img1,
           photoURL2: this.img2,
           photoURL3: this.img3,
-      })
+      });
+
 
       /**
       .then((response) => {

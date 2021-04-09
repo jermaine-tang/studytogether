@@ -1,104 +1,108 @@
 <template>
-	<div id="editInfo">
+    <div id="editInfo">
 		<app-header></app-header>
         <h1>Edit Information:</h1>
-		<div id="details">
-            <form>
-                <div class="editName">
-                    <label class="inputField" for="name">Name:  </label>
-                    <input 
-                        type="text" 
-                        id="name" 
-                        name="name" 
-                        v-model="name" 
-                        required/>
-                </div>
-                <br>
-                <div class="editAmenities">
-                    <div id="changeAmenities">
-                        <label class="inputField">Amenities:</label>
-                        <div id="choose">
-                            <multiselect :data-items="this.options">
-                            </multiselect>
+        <!--    <form> -->
+                <div class="details">
+                    <div class="editName">
+                        <label class="inputField" for="name">Name:  </label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            v-model="name" 
+                            required/>
+                    </div>
+                    <hr>
+                    <div class="editAmenities">
+                        <div id="changeAmenities">
+                            <label class="inputField">Amenities:</label>
+                            <div id="choose">
+                                <multiselect :data-items="this.options" v-model="amenities">
+                                </multiselect>
+                            </div>
+                        </div>
+                        <br>
+                        <div id="existingAmenities">
+                            Exiting Amenities: 
+                            <div v-for="v in this.amenities" :key="v.index">{{ v }}</div>
                         </div>
                     </div>
-                    <br>
-                    <div id="existingAmenities">
-                        Exiting Amenities: 
-                        <div v-for="v in this.amenities" :key="v.index">{{ v }}</div>
+                    <hr>
+                    <div class="editPrice">
+                        <label for="price">Price:  </label>
+                        <input 
+                            type="number" 
+                            id="price" 
+                            name="price" 
+                            v-model="price" 
+                            required/> / hour
                     </div>
-                </div>
-                <br>
-                <div class="editPrice">
-                    <label for="price">Price:  </label>
-                    <input 
-                        type="number" 
-                        id="price" 
-                        name="price" 
-                        v-model="price" 
-                        required/> / hour
-                </div>
-                <br>
-                <div class="editLocation">
-                    <label for="location">Location: </label>
-                    <br>
-                    <textarea 
-                        v-model="exact_loc"
-                        row=20
-                        cols=50>
-                    </textArea>
-                </div>
-                <br>
-                <div class="editRegion">
-                    <label for="region">Region: </label>
-                    <select v-model="region">
-                        <option>North</option>
-                        <option>South</option>
-                        <option>East</option>
-                        <option>West</option>
-                    </select>
-                </div>
-                <br>
-                <div class="editNeighbourhood">
-                    <label class="inputField" for="neighbourhood">Name:  </label>
-                    <input 
-                        type="text" 
-                        id="neighbourhood" 
-                        name="neighbourhood" 
-                        v-model="neighbourhood" 
-                        required/>
-                </div>
-                <br>
-                <div class="editPhotos">
-                    <label for="photos">Photos: </label>
-                    <br><br>
-                    <upload></upload>
-                    <br>
-                    <br> 
-                    <br>
-                    Current Photos:
-                    <br><br>
-                    <img class="place" v-bind:src = "this.photo1">
-                    <img class="place" v-bind:src = "this.photo2">
-                    <img class="place" v-bind:src = "this.photo3">
-                </div>
-                <br>
-                <div class="editMenu">
-                    <label for="menu">Menu: </label>
-                    <uploadMenu></uploadMenu>
-                    <br><br>
-                    Current Menu:
-                    <br><br>
-                    <img v-bind:src = "this.menu">
-                    <br>
+                    <hr>
+                    <div class="editLocation">
+                        <label for="location">Location: </label>
+                        <br>
+                        <textarea 
+                            v-model="exact_loc"
+                            row=20
+                            cols=50>
+                        </textArea>
+                    </div>
+                    <hr>
+                    <div class="editRegion">
+                        <label for="region">Region: </label>
+                        <select v-model="region">
+                            <option>North</option>
+                            <option>South</option>
+                            <option>East</option>
+                            <option>West</option>
+                        </select>
+                    </div>
+                    <hr>
+                    <div class="editNeighbourhood">
+                        <label class="inputField" for="neighbourhood">Name:  </label>
+                        <input 
+                            type="text" 
+                            id="neighbourhood" 
+                            name="neighbourhood" 
+                            v-model="neighbourhood" 
+                            required/>
+                    </div>
+                    <button v-if="!published" @click.prevent="save">Publish Listing</button>
+                    <button v-if="published" @click.prevent="save">Save Changes</button>
                 </div>
                 <br><br>
-                <button v-if="!published" @click="save">Publish Listing</button>
-                <button v-if="published" @click="save">Save Changes</button>
-            </form>
-            <br>
-        </div>
-	</div>
+                <div class="details">
+                    <div class="editPhotos">
+                        Current Photos:
+                        <br><br>
+                        <img class="place" v-bind:src = "this.photo1">
+                        <img class="place" v-bind:src = "this.photo2">
+                        <img class="place" v-bind:src = "this.photo3">
+                        <br>
+                        <br> 
+                        <br>
+                        <label for="photos">Upload New Photos: </label>
+                        <br><br>
+                        <upload></upload>
+                        
+                    </div>
+                    <hr>
+                    <div class="editMenu">
+                        Current Menu:
+                        <br><br>
+                        <img v-bind:src = "this.menu">
+                        <br><br>
+                        <label for="menu">Upload New Menu: </label>
+                        <br><br>
+                        <uploadMenu></uploadMenu>
+                        <br>
+                    </div>
+                    <br><br>
+                </div>
+        <!--    </form> -->
+            <br>  
+    </div>
 </template>
 
 <script>
@@ -114,7 +118,7 @@ export default {
     data() {
         return {
             listingDetail: {},
-            bizID: '5iBl58sV6uv7riUzCQzn',
+            bizID: '',
             name: '',
             exact_loc: '',
             region: '',
@@ -124,7 +128,7 @@ export default {
             photo3: '',
             price: 0,
             menu: '',
-            amenities: ['Wifi', 'Toilet'],
+            amenities: [],
             options: ['Wifi','Toilet','Power Plug','Airconditioning'],
             published: null,
         }
@@ -146,7 +150,7 @@ export default {
             this.bizID = userID;
         },
 
-        fetchItems: function() {
+        fetchItems: async function() {
             database.collection('listings').doc(this.bizID).get().then(snapshot => {
                 const toAdd = snapshot.data();
                 this.listingDetail = toAdd;
@@ -169,8 +173,15 @@ export default {
 
         save: function() {
             database.collection('listings').doc(this.bizID).update({
-                
-            })
+                loc_filter: this.region,
+                loc_neighbourhood: this.neighbourhood,
+                exact_loc: this.exact_loc,
+                name: this.name,
+                price: this.price,
+                amenities: this.amenities,
+                published: true,
+            });
+            console.log(this.name)
         }
     },
 
@@ -178,6 +189,10 @@ export default {
         this.fetchItems(),
         this.fetchID()
     },
+
+    updated: function() {
+        this.fetchItems()
+    }
 }
 </script>
 
@@ -194,8 +209,14 @@ export default {
     display: inline-block;
 }
 
-.editName, .editAmenities, .editPrice, .editLocation, .editRegion, .editPhotos, .editNeighbourhood, .editMenu {
+.details{
     border: 2px solid grey;
+    padding: 20px;
+    width: 50%;
+    margin: auto;
+}
+
+.editName, .editAmenities, .editPrice, .editLocation, .editRegion, .editPhotos, .editNeighbourhood, .editMenu {
     padding: 20px;
     width: 50%;
     margin: auto;
@@ -206,6 +227,17 @@ textArea {
 }
 
 img {
-    width: 60%;
+    width: 90%;
 }
+
+hr { 
+  display: block;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  border-style: inset;
+  border-width: 1px;
+  color: lightgrey;
+} 
 </style>

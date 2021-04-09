@@ -5,7 +5,7 @@
         <div>
 
             <div>
-                <button @click.prevent="click1">Choose Photo 1</button>
+                <button @click.prevent="click1">Choose Menu Photo</button>
                 <input type="file" ref="input1"
                 style="display: none"
                 @change="previewImage1" accept="image/*">                  
@@ -18,9 +18,10 @@
        </div>
        </v-flex>
     </v-layout>
+    <br>
     <v-layout row>
       <v-flex class="text-center">
-        <button color="pink" @click.prevent="create">Upload</button>
+        <button color="pink" @click="create">Upload Menu Photo</button>
       </v-flex>
     </v-layout>
   </v-container>
@@ -35,7 +36,7 @@ import database from "../../firebase.js";
 export default {
   data () {
     return {
-        bizID: '5iBl58sV6uv7riUzCQzn',
+        bizID: '',
         img1:'',
         imageData1:''
     }
@@ -58,7 +59,7 @@ export default {
 
       database.collection('listings').doc(this.bizID).update({
           menu: this.img1,
-      })
+      });
 
       /**
       .then((response) => {
