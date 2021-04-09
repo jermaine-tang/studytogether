@@ -59,20 +59,42 @@
                     </select>
                 </div>
                 <br>
+                <div class="editNeighbourhood">
+                    <label class="inputField" for="neighbourhood">Name:  </label>
+                    <input 
+                        type="text" 
+                        id="neighbourhood" 
+                        name="neighbourhood" 
+                        v-model="neighbourhood" 
+                        required/>
+                </div>
+                <br>
                 <div class="editPhotos">
                     <label for="photos">Photos: </label>
+                    <br><br>
                     <upload></upload>
                     <br>
                     <br> 
-                    Current Photos:
                     <br>
+                    Current Photos:
+                    <br><br>
                     <img class="place" v-bind:src = "this.photo1">
                     <img class="place" v-bind:src = "this.photo2">
                     <img class="place" v-bind:src = "this.photo3">
                 </div>
+                <br>
+                <div class="editMenu">
+                    <label for="menu">Menu: </label>
+                    <uploadMenu></uploadMenu>
+                    <br><br>
+                    Current Menu:
+                    <br><br>
+                    <img v-bind:src = "this.menu">
+                    <br>
+                </div>
                 <br><br>
-                <button v-if="!published">Publish Listing</button>
-                <button v-if="published">Save Changes</button>
+                <button v-if="!published" @click="save">Publish Listing</button>
+                <button v-if="published" @click="save">Save Changes</button>
             </form>
             <br>
         </div>
@@ -86,7 +108,7 @@ import firebase from "firebase";
 import { MultiSelect } from '@progress/kendo-vue-dropdowns';
 import '@progress/kendo-theme-default/dist/all.css';
 import Upload from "./UploadPhoto.vue";
-
+import UploadMenu from "./UploadMenu.vue";
 export default {
 
     data() {
@@ -96,10 +118,12 @@ export default {
             name: '',
             exact_loc: '',
             region: '',
+            neighbourhood: '',
             photo1: '',
             photo2: '',
             photo3: '',
             price: 0,
+            menu: '',
             amenities: ['Wifi', 'Toilet'],
             options: ['Wifi','Toilet','Power Plug','Airconditioning'],
             published: null,
@@ -109,7 +133,8 @@ export default {
     components: {
         'app-header': Header,
         'multiselect': MultiSelect,
-        "upload": Upload,
+        'upload': Upload,
+        'uploadMenu': UploadMenu,
     },
 
     methods: {
@@ -126,6 +151,7 @@ export default {
                 const toAdd = snapshot.data();
                 this.listingDetail = toAdd;
                 this.region = toAdd.loc_filter;
+                this.neighbourhood = toAdd.loc_neighbourhood;
                 this.exact_loc = toAdd.exact_loc;
                 this.name = toAdd.name;
                 this.price = toAdd.price;
@@ -134,49 +160,18 @@ export default {
                 this.photo1 = toAdd.photoURL1;
                 this.photo2 = toAdd.photoURL2;
                 this.photo3 = toAdd.photoURL3;
+                this.menu = toAdd.menu;
                 this.published = toAdd.published;
                 console.log(toAdd);
                 console.log(this.listingDetail);
                 })     
             },
 
-            send: async function() {
-                const locationId = this.$route.params.id
-                const userId = firebase.auth().currentUser.uid
-                async function retrieveUser(idOfUser) {
-                    var username = ''
-                        await database.collection('users').doc(idOfUser).get().then(doc => {
-                            let data = doc.data()
-                            username = data['name']
-                        })
-                    return username;
-                }
-                let username = await retrieveUser(userId)
-
-
-                database.collection('listings').doc(locationId).collection('reviews').add({
-                    title: this.title,
-                    comments: this.comment,
-                    noise: Number(this.noise),
-                    rating: Number(this.rating),
-                    userid: userId,
-                    user: username
-                })
-
-                database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
-                    const toUpdate = snapshot.data();
-                    var newNumRatings = toUpdate.numRatings + 1;
-                    var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
-                    var newAvgRating = Math.round(Number(newRatingTotal) / Number(newNumRatings));
-                    var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
-                    var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
-                    database.collection('listings').doc(this.$route.params.id).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
-                    this.$router.push({path: "/bookings"}));
+        save: function() {
+            database.collection('listings').doc(this.bizID).update({
                 
-                })  
-
-                
-            }
+            })
+        }
     },
 
     created: function() {
@@ -199,7 +194,7 @@ export default {
     display: inline-block;
 }
 
-.editName, .editAmenities, .editPrice, .editLocation, .editRegion, .editPhotos {
+.editName, .editAmenities, .editPrice, .editLocation, .editRegion, .editPhotos, .editNeighbourhood, .editMenu {
     border: 2px solid grey;
     padding: 20px;
     width: 50%;
@@ -211,6 +206,6 @@ textArea {
 }
 
 img {
-    width: 70%;
+    width: 60%;
 }
 </style>

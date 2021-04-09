@@ -1,10 +1,6 @@
 <template>
   <v-container>
-    <v-layout row>
-      <v-flex class="text-center font-weight-black">
-        <h1>Upload a photo</h1>
-      </v-flex>
-    </v-layout>
+
     <v-layout row>
       <v-flex  md6 offset-sm3>
         <div>
