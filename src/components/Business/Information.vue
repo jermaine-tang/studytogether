@@ -50,9 +50,19 @@
                 </div>
                 <br>
                 <div class="editRegion">
+                    <label for="region">Region: </label>
+                    <select v-model="region">
+                        <option>North</option>
+                        <option>South</option>
+                        <option>East</option>
+                        <option>West</option>
+                    </select>
                 </div>
                 <br>
                 <div class="editPhotos">
+                    <label for="photos">Photos: </label>
+                    <upload></upload>
+                    
                 </div>
             </form>
         </div>
@@ -65,18 +75,20 @@ import database from "../../firebase.js";
 import firebase from "firebase";
 import { MultiSelect } from '@progress/kendo-vue-dropdowns';
 import '@progress/kendo-theme-default/dist/all.css';
-
+import Upload from "./UploadPhoto.vue";
 
 export default {
 
     data() {
         return {
             listingDetail: {},
-            bizID: '',
+            bizID: '5iBl58sV6uv7riUzCQzn',
             name: '',
             exact_loc: '',
             region: '',
-            photos: [],
+            photo1: '',
+            photo2: '',
+            photo3: '',
             price: 0,
             amenities: ['Wifi', 'Toilet'],
             options: ['Wifi','Toilet','Power Plug','Airconditioning']
@@ -85,12 +97,13 @@ export default {
 
     components: {
         'app-header': Header,
-        'multiselect': MultiSelect
+        'multiselect': MultiSelect,
+        "upload": Upload,
     },
 
     methods: {
 
-        fetchID: function () {
+        fetchID: async function () {
             var user = firebase.auth().currentUser;
             console.log(user);
             var userID = user.uid;
@@ -101,13 +114,15 @@ export default {
             database.collection('listings').doc(this.bizID).get().then(snapshot => {
                 const toAdd = snapshot.data();
                 this.listingDetail = toAdd;
-                this.region = toAdd.loc_neighbourhood;
+                this.region = toAdd.loc_filter;
                 this.exact_loc = toAdd.exact_loc;
                 this.name = toAdd.name;
                 this.price = toAdd.price;
                 this.amenities = toAdd.amenities;
                 // check again
-                this.photos = toAdd.photos;
+                this.photo1 = toAdd.photoURL1;
+                this.photo2 = toAdd.photoURL2;
+                this.photo3 = toAdd.photoURL3;
                 console.log(toAdd);
                 console.log(this.listingDetail);
                 })     
@@ -179,4 +194,7 @@ export default {
     margin: auto;
 }
 
+textArea {
+    width: 80%;
+}
 </style>
