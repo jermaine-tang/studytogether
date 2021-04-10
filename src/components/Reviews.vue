@@ -4,7 +4,7 @@
 
 		<div id="all">
 			<div id="details">
-				<!-- <h1>Write a Review</h1> -->
+                <!-- cafe name and picture -->
 				<span id="name">{{ listingDetail["name"] }}</span>
 				<img
 					:src="listingDetail['photoURL1']"
@@ -255,21 +255,21 @@ export default {
 }
 
 #main-pic {
-	position: relative;
-	right: 80px;
+	position: absolute;
+	/* right: 150px; */
 	height: 510px;
 	width: 510px;
-	left: 40px;
+	left: 8%;
 	/* bottom: 10px; */
-	top: 180px;
+	top: 50%;
 	border-radius: 30px;
 }
 
 #name {
 	position: relative;
-	bottom: 400px;
-	/* top: 50px; */
-	left: 410px;
+	/* bottom: 400px; */
+	top: 8%;
+	left: 90%;
 	font-size: 40px;
 }
 
@@ -282,11 +282,9 @@ export default {
 	font-size: 16px;
 }
 
-/* #details {
-	position: relative;
-    top: 20%;
-    background-size: 100px;
 
+/* #details {
+	position: fixed;
 } */
 
 #send {
@@ -349,9 +347,10 @@ input[type="submit"]:hover {
 
 .container {
 	position: absolute;
+    right: 2%;
 	display: flex;
 	flex-wrap: wrap;
-	width: 800px;
+	width: 700px;
 	height: 600px;
 	margin-left: 52%;
 	margin-top: 5%;

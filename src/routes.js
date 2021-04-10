@@ -8,6 +8,7 @@ import Reviews from './components/Reviews.vue';
 import ForgotPassword from './components/ForgotPassword.vue';
 import Favourites from './components/Favourites.vue';
 import Reservation from './components/Reservation.vue';
+import BizBookings from './components/Business/Biz Bookings.vue';
 import MyBusiness from './components/Business/MyBusiness.vue'
 
 export default[
@@ -22,5 +23,6 @@ export default[
     {path: '/favourites', name: "favourites", component: Favourites},
     {path: '/reviews/:id', component: Reviews, props: true},
     {path: '/listings/:id/reserve', name: 'reservation', component: Reservation, props:true},
+    {path: '/bizBookings', component: BizBookings},
     {path: '/mybiz', name: 'business', component: MyBusiness}
 ]
