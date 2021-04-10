@@ -2,46 +2,61 @@
 <div id="bookings list">
     <app-header></app-header>
     <h1>Bookings</h1>
-    <ul class="upcoming-bookings-list" v-if="newBookings.length > 0">
-        <h3><b>Upcoming</b></h3>
-        <li v-for="booking in newBookings" :key="booking.index">
-            <img :src="booking[5]" alt="picture" id="main-pic">
-            <div id="name"><b>{{booking[6]}}</b></div>
-            <a href="#" class="btn-gradient yellow small" v-bind:id="booking[7]" v-on:click="cancel(booking.index); del($event)">
-                Cancel Booking
-            </a>
-            <div id="pax"><b>Total Coming: {{booking[1]}}</b></div>
-            <div id="clockIcon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <circle cx="12" cy="12" r="9" />
-                    <polyline points="12 7 12 12 15 15" />
-                </svg>
-                <span id="time"><b>{{booking[3]}} / {{booking[4]}}</b></span>
-            </div>
-        </li>
-    </ul>
+    <div class="table" v-if="newBookings.length > 0">
+        <ul>
+            <h3><b>Upcoming</b></h3>
+            <li v-for="booking in newBookings" :key="booking.index">
+                <div id="name"><b>{{booking[6]}}</b></div>
+                <br>
+                <!-- picture -->
+                <img :src="booking[5]" alt="picture" id="main-pic">
+                <!-- button -->
+                <button href="#" class="btn" v-bind:id="booking[7]" v-on:click="cancel(booking.index); del($event)">
+                    Cancel Booking
+                </button>
+                <!-- pax -->
+                <div id="pax"><b>Total Coming: {{booking[1]}}</b></div>
+                <!-- timing -->
+                <div id="clockIcon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <circle cx="12" cy="12" r="9" />
+                        <polyline points="12 7 12 12 15 15" />
+                    </svg>
+                    <span id="time"><b>{{booking[3]}} / {{booking[4]}}</b></span>
+                </div>
+            </li>
+        </ul>
+    </div>
 
-    <ul class="past-booking-list">
-        <h3><b>Previous</b></h3>
-        <li v-for="booking in pastBookings" :key="booking.index">
-            <img :src="booking[5]" alt="picture" id="main-pic">
-            <div id="name"><b>{{booking[6]}}</b></div>
-            <a href="#" class="btn-gradient yellow small" v-bind:id ="booking[2]" v-on:click="route($event)">
-                <!-- <b>Leave Review</b> -->
-                Leave Review
-            </a>
-            <div id="pax"><b>Total Coming: {{booking[1]}}</b></div>
-            <div id="clockIcon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <circle cx="12" cy="12" r="9" />
-                    <polyline points="12 7 12 12 15 15" />
-                </svg>
-                <span id="time"><b>{{booking[3]}} / {{booking[4]}}</b></span>
-            </div>
-        </li>
-    </ul>
+    <div class="past-booking-list" v-if="pastBookings.length > 0">
+        <ul>
+            <h3><b>Previous</b></h3>
+            <li v-for="booking in pastBookings" :key="booking.index">
+                <div id="name"><b>{{booking[6]}}</b></div>
+                <br>
+                <!-- picture -->
+                <img :src="booking[5]" alt="picture" id="main-pic">
+                <!-- button -->
+                <button href="#" class="btn" v-bind:id ="booking[2]" v-on:click="route($event)">
+                    <!-- <b>Leave Review</b> -->
+                    Leave Review
+                </button>
+                <!-- pax -->
+                <div id="pax"><b>Total Coming: {{booking[1]}}</b></div>
+                <!-- timing -->
+                <div id="clockIcon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <circle cx="12" cy="12" r="9" />
+                        <polyline points="12 7 12 12 15 15" />
+                    </svg>
+                    <span id="time"><b>{{booking[3]}} / {{booking[4]}}</b></span>
+                </div>
+            </li>
+        </ul>
+    </div>
+    
 </div>
 </template>
 
@@ -75,7 +90,6 @@ export default {
 
         del: function(event) {
             let id = event.target.getAttribute("id")
-            alert(id)
             database.collection('bookings').doc(id).delete().then(() => console.log('delete success'))
         },
 
@@ -89,7 +103,6 @@ export default {
                 let item = {}
                 querySnapShot.docs.forEach(doc => {
                     item = {...doc.data(), ['id']: doc.id}
-                    // console.log(item)
                     arr.push(item)
                 })
             })
@@ -99,15 +112,23 @@ export default {
         fetchItems: async function() {
             this.docArr = await this.getDoc()
             var currentUser = firebase.auth().currentUser.uid 
-            console.log(currentUser)
+            // console.log(currentUser)
             let upcoming = []
             let past = []
 
-            function sortByDate(a, b) {
+            function sortByDateUpcoming(a, b) {
                 if (new Date(a[3]) == new Date(b[3])) {
                     return 0;
                 } else {
                     return (new Date(a[3]) < new Date(b[3])) ? -1 : 1;
+                }
+            }
+
+            function sortByDatePast(a, b) {
+                if (new Date(a[3]) == new Date(b[3])) {
+                    return 0;
+                } else {
+                    return (new Date(a[3]) > new Date(b[3])) ? -1 : 1;
                 }
             }
 
@@ -137,11 +158,10 @@ export default {
     
                 if(new Date() < new Date(combined[3]) && combined[0] == currentUser) {
                     upcoming.push(combined)
-                    upcoming.sort(sortByDate)
+                    upcoming.sort(sortByDateUpcoming)
                 } else if(combined[0] == currentUser) {
                     past.push(combined)
-                    // edit 
-                    past.sort(sortByDate)
+                    past.sort(sortByDatePast)
                 }
             })
             this.newBookings = upcoming
@@ -160,75 +180,124 @@ export default {
 </script>
 
 <style scoped>
+
+
+
 ul {
-  display: flex; 
+  /* display: flex; 
   flex-wrap: wrap;
   list-style-type: none;
   padding: 30%;
   padding-top: 3%; 
   margin: auto;
+  height:30%; */
+  display: inline-block;
+  overflow-y: scroll;
+  list-style-type: none;
+  height: 100%;
+  width: 100%;
+  vertical-align:top;
+  padding-left: 0px;
 }
 
 li {
-  display: flex;
-  flex-wrap: wrap;
-  width: 1000px;
+  display: inline-block;
+  width: 50%;
+  /* height: 80%; */
   position: relative;
   text-align: center;
   padding: 10px;
   border: 3px solid #ED7A78;
   margin: 10px;
   margin-top: 5px;
+  margin-bottom: 0px;
+  padding-bottom: 1px;
   border-radius: 25px;
   font-family: "Ubuntu", sans-serif;
   margin: 0 0 10 0;
 }
 
+h1 {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 40px;
+}
+
+h3 {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 20px;
+}
 /* .bookings-list {
     margin-left: 36px;
 } */
+
+.table {
+	display: table;   
+	margin: 0 auto;
+    height: 100%;
+    width: 100%;
+}
 
 .status {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 25px;
 }
 
-/* button {
+.btn {
     position: relative;
-    left: 150px;
+    /* float: left; */
+    left: 20%;
+    /* top: 20%; */
+    bottom:150px;
+    /* margin-top: 10px;
+    margin-bottom: 10px; */
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    color: whitesmoke;
+    background: #ED7A78;
+    border: 2px solid transparent;
     height: 50px;
     width: 90px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 50px;
+    padding-top: 10px;
+    font-family: "Ubuntu", sans-serif;
+    /* font-weight: bold; */
     font-size: 15px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-} */
+    transition: 0.2s;
+}
+
 
 #pax {
-    position: absolute;
-    left: 245px;
-    bottom: 70px;
+    position: relative;
+    left: 10%;
+    bottom: 140px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 15px;
 }
 
 #clockIcon {
-    position: absolute;
-    top: 120px;
-    left: 235px;    
+    position: relative;
+    left: 20%;
+    bottom: 100px;
 }
 
 #main-pic {
   position: relative;
+  right:20%;
   border-radius: 15px;
-  width: 200px;
-  height: 150px;
+  width: 40%;
+  height: 40%;
+  
 }
 
 #name {
     position: relative;
-    left: 30px;
-    top: 15px;
+    width:100%;
+    right: 1px;
     font-family:Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 30px;
+    font-size: 25px;
     font-weight: 1000;
 }
 
@@ -240,6 +309,10 @@ li {
     bottom: 15px;
 }
 
+#button {
+    position:relative;
+
+}
 /* imported css for buttons */
 
 .btn-gradient {
@@ -276,4 +349,7 @@ li {
 .btn-gradient.purple:active {background: #BD8EB7;}
 .btn-gradient.yellow:active {background: #DBC05B;}
 .btn-gradient.green:active  {background: #72B08E;}
+
+
+
 </style>

@@ -10,6 +10,8 @@ import Favourites from './components/Favourites.vue';
 import Reservation from './components/Reservation.vue';
 import MyBusiness from './components/Business/MyBusiness.vue';
 import BusinessSignup from './components/Business/BusinessSignup.vue';
+import BizBookings from './components/Business/Biz Bookings.vue';
+import Information from './components/Business/Information.vue';
 
 // import firebase from 'firebase'
 
@@ -83,5 +85,16 @@ export default [
     {
         path: '/bizsignup',
         component: BusinessSignup
+    },
+    {
+        path: '/info', 
+        name: 'info', 
+        component: Information,
+        meta: { auth: 'owner' }
+    },
+    {
+        path: '/bizBookings', 
+        component: BizBookings,
+        meta: { auth: 'owner' }
     }
 ]
