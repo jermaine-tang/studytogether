@@ -75,10 +75,6 @@ export default {
     "v-date-picker": DatePicker,
   },
 
-  mounted() {
-    console.log(this.$route.params.id);
-  },
-
   methods: {
     fetchTime: function () {
       if (this.date == undefined) {

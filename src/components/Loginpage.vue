@@ -3,6 +3,7 @@
     <app-header></app-header>
     <div class="box">
       <p class="title">Sign in</p>
+      <div id="error-container"></div>
       <form class="form">
         <input
           class="email"
@@ -21,13 +22,16 @@
           required
         />
         <br />
-        <button class="submit" type="submit" align="center" v-on:click="submit"
-          ><span>Sign in</span></button
-        >
+        <button class="submit" type="submit" align="center" v-on:click="submit">
+          <span>Sign in</span>
+        </button>
       </form>
-      <p class="forgot" align="center"><a href="#">Forgot Password?</a></p>
+      <p class="forgot" align="center">
+        <router-link to="/forgotpassword"><a>Forgot Password?</a></router-link>
+      </p>
       <p class="signup" align="center">
-        Not yet Registered? <a href="/signup">Sign Up here!</a>
+        Not yet Registered?
+        <router-link to="/signup"><a>Sign Up here!</a></router-link>
       </p>
     </div>
   </div>
@@ -53,6 +57,24 @@ export default {
   methods: {
     submit: function (e) {
       e.preventDefault();
+
+      if (!this.loginform.email || !this.loginform.password) {
+        document.getElementById("error-container").innerHTML =
+          "Fill in all fields";
+        document.getElementById("error-container").style.backgroundColor =
+          "rgb(255, 168, 168)";
+        document.getElementById("error-container").style.borderRadius = "20px";
+        document.getElementById("error-container").style.width = "72.5%";
+        document.getElementById("error-container").style.margin = "auto";
+        document.getElementById("error-container").style.padding = "3px";
+        document.getElementById("error-container").style.marginBottom = "5px";
+        document.getElementById("error-container").style.fontFamily =
+          '"Ubuntu", sans-serif';
+        document.getElementById("error-container").style.fontWeight = "500";
+        document.getElementsByClassName("title")[0].style.marginBottom = "8px";
+        return;
+      }
+
       firebase
         .auth()
         .signInWithEmailAndPassword(
@@ -62,15 +84,36 @@ export default {
         .then((userCredential) => {
           var user = userCredential.user;
           console.log(user);
-          
+
           if (!user.emailVerified) {
-            alert('Verify your email to continue');
+            alert("Verify your email to continue");
             firebase.auth().signOut();
           } else {
             this.$router.push({ path: "/" });
           }
         })
         .catch((err) => {
+          console.log(err)
+          if (err.code == "auth/wrong-password") {
+            document.getElementById("error-container").innerHTML =
+            "Incorrect Password";
+          } else if (err.code == "auth/user-not-found") {
+            document.getElementById("error-container").innerHTML =
+            "Email not registered";
+          }
+          document.getElementById("error-container").style.backgroundColor =
+            "rgb(255, 168, 168)";
+          document.getElementById("error-container").style.borderRadius =
+            "20px";
+          document.getElementById("error-container").style.width = "72.5%";
+          document.getElementById("error-container").style.margin = "auto";
+          document.getElementById("error-container").style.padding = "3px";
+          document.getElementById("error-container").style.marginBottom = "5px";
+          document.getElementById("error-container").style.fontFamily =
+            '"Ubuntu", sans-serif';
+          document.getElementById("error-container").style.fontWeight = "500";
+          document.getElementsByClassName("title")[0].style.marginBottom =
+            "8px";
           console.log(err);
         });
     },
@@ -82,7 +125,7 @@ export default {
 .box {
   background-color: #ffffff;
   width: 400px;
-  height: 350px;
+  height: 370px;
   margin: 7em auto;
   border-radius: 40px;
   box-shadow: 0px 0px 10px 10px lightgrey;

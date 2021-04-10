@@ -5,8 +5,11 @@ import SignupPage from './components/SignupPage.vue';
 import IndividualListings from './components/IndividualListings.vue';
 import Bookings from './components/Bookings.vue';
 import Reviews from './components/Reviews.vue';
+import ForgotPassword from './components/ForgotPassword.vue';
+import Favourites from './components/Favourites.vue';
 import Reservation from './components/Reservation.vue';
 import BizBookings from './components/Business/Biz Bookings.vue';
+import MyBusiness from './components/Business/MyBusiness.vue'
 
 export default[
     {path: '/', component: Homepage},
@@ -16,7 +19,10 @@ export default[
     {path: '/signup', component: SignupPage},
     // {path: '/indiv', component: IndividualListings, props: true},
     {path: '/bookings', component: Bookings},
+    {path: '/forgotpassword', component: ForgotPassword},
+    {path: '/favourites', name: "favourites", component: Favourites},
     {path: '/reviews/:id', component: Reviews, props: true},
     {path: '/listings/:id/reserve', name: 'reservation', component: Reservation, props:true},
     {path: '/bizBookings', component: BizBookings}
+    {path: '/mybiz', name: 'business', component: MyBusiness}
 ]
