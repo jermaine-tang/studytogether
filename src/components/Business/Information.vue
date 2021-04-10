@@ -24,7 +24,7 @@
                         </div>
                         <br>
                         <div id="existingAmenities">
-                            Exiting Amenities: 
+                            Existing Amenities: 
                             <div v-for="v in this.amenities" :key="v.index">{{ v }}</div>
                         </div>
                     </div>
