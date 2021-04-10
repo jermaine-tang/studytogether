@@ -23,6 +23,6 @@ export default[
     {path: '/favourites', name: "favourites", component: Favourites},
     {path: '/reviews/:id', component: Reviews, props: true},
     {path: '/listings/:id/reserve', name: 'reservation', component: Reservation, props:true},
-    {path: '/bizBookings', component: BizBookings}
+    {path: '/bizBookings', component: BizBookings},
     {path: '/mybiz', name: 'business', component: MyBusiness}
 ]

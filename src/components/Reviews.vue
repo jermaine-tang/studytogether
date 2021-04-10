@@ -269,7 +269,7 @@ export default {
 	position: relative;
 	/* bottom: 400px; */
 	top: 8%;
-	left: 110%;
+	left: 90%;
 	font-size: 40px;
 }
 
@@ -282,11 +282,9 @@ export default {
 	font-size: 16px;
 }
 
-/* #details {
-	position: relative;
-    top: 20%;
-    background-size: 100px;
 
+/* #details {
+	position: fixed;
 } */
 
 #send {
