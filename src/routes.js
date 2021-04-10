@@ -25,6 +25,6 @@ export default[
     {path: '/reviews/:id', component: Reviews, props: true},
     {path: '/listings/:id/reserve', name: 'reservation', component: Reservation, props:true},
     {path: '/mybiz', name: 'business', component: MyBusiness},
-    {path: '/info', name: 'info', component: Information}
+    {path: '/info', name: 'info', component: Information},
     {path: '/bizBookings', component: BizBookings}
 ]
