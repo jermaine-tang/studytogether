@@ -48,7 +48,11 @@ export default {
     methods: {
 
         getDoc: async function() {
-            var userId = '5iBl58sV6uv7riUzCQzn'
+            // hardcode
+            // var userId = '5iBl58sV6uv7riUzCQzn'
+
+            // CurrentUSer.uid == listing doc ID
+            var userId = firebase.auth().currentUser.uid
             var arr = []
             await database.collection('listings').doc(userId).collection('timeslots').get().then(querySnapShot => {
                 let slot = {}
