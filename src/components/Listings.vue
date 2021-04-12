@@ -12,9 +12,44 @@
         />
         <i class="fa fa-search"></i>
 
-        <button type="button" class="btn" @click="showModal">Filter</button>
+        <button class="btn" @click="showModal">Filter</button>
       </div>
     </div>
+
+    <!-- <div class="search">
+      <b-input-group>
+        <b-form-input
+          type="text"
+          placeholder="What are you searching for?"
+          v-model="searchString"
+        ></b-form-input>
+
+        <b-input-group-append>
+          <b-button variant="outline-primary"
+            ><b-icon icon="search"></b-icon
+          ></b-button>
+          <b-button variant="outline-primary" @click="showModal"
+            ><b-icon icon="filter"></b-icon
+          ></b-button>
+        </b-input-group-append>
+      </b-input-group>
+    </div> -->
+
+    <!-- <div>
+      <b-dropdown
+        id="dropdown-1"
+        text="Sort By"
+        class="m-md-2"
+        v-model="sortBy"
+      >
+        <b-dropdown-item
+          v-for="(option, index) in options"
+          :key="index"
+          v-bind:value="option.value"
+          >{{ option.text }}</b-dropdown-item
+        >
+      </b-dropdown>
+    </div> -->
 
     <div>
       <select v-model="sortBy">
@@ -181,7 +216,7 @@
     <!-- <div v-if="displayedList().length == 0"> No Results Found:(</div>
   <div v-else> {{displayedList().length}} Results Found</div> -->
 
-    <div class="listings-list">
+    <!-- <div class="listings">
       <ul class="listings-list">
         <li v-for="listing in displayedList" :key="listing.id" >
           <div class="name" v-bind:id="listing.id" v-on:click="route($event)"> {{ listing.name }}</div>
@@ -272,6 +307,282 @@
         </li>
         <div class="divider"></div>
       </ul>
+    </div> -->
+    <div class="listings">
+      <ul class="listings-list">
+        <li v-for="listing in displayedList" :key="listing.id">
+          <img id="main-pic" v-bind:src="listing.photoURL1" height="30px" />
+          <div class="title">
+            <h5 class="name" v-bind:id="listing.id" v-on:click="route($event)">
+              {{ listing.name }}
+            </h5>
+
+            <b-icon
+              v-if="favourites.includes(listing.id)"
+              icon=" bookmark-fill"
+              style="cursor: pointer"
+              class="bookmark"
+              v-bind:id="listing.id"
+              v-on:click="unbookmark($event)"
+            ></b-icon>
+            <b-icon
+              v-else
+              icon="bookmark"
+              style="cursor: pointer"
+              class="bookmark"
+              v-bind:id="listing.id"
+              v-on:click="bookmark($event)"
+            ></b-icon>
+          </div>
+          <div class="details">
+            <!-- <div class="rating">
+              <img
+                v-if="listing.rating > 0"
+                src="https://img.icons8.com/fluent/48/000000/star.png"
+              />
+              <img
+                v-if="listing.rating > 1"
+                src="https://img.icons8.com/fluent/48/000000/star.png"
+              />
+              <img
+                v-if="listing.rating > 2"
+                src="https://img.icons8.com/fluent/48/000000/star.png"
+              />
+              <img
+                v-if="listing.rating > 3"
+                src="https://img.icons8.com/fluent/48/000000/star.png"
+              />
+              <img
+                v-if="listing.rating > 4"
+                src="https://img.icons8.com/fluent/48/000000/star.png"
+              />
+            </div> -->
+            <p class="location" style="font-size: 25px">
+              <b-icon
+                icon="geo-fill"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 50px;
+                  color: red;
+                "
+              ></b-icon>
+              {{ listing.loc_neighbourhood }}
+            </p>
+            <!-- <div class="location">
+              <img
+                id="location-pin"
+                src="https://img.icons8.com/pastel-glyph/64/000000/place-marker--v1.png"
+                width="40px"
+              />
+              <span id="locationVal">{{ listing.loc_neighbourhood }}</span>
+            </div> -->
+            <!-- <br /> -->
+
+            <p class="price" style="font-size: 25px">
+              <b-icon
+                icon="cash-stack"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 50px;
+                  color: green;
+                "
+              ></b-icon>
+              ${{ listing.price }}
+            </p>
+
+            <!-- <div class="price">
+              <span id="price-pics">
+                <img
+                  src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"
+                  width="40px"
+                />
+                <img
+                  v-if="listing.price > 10 && listing.price <= 20"
+                  src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"
+                  width="40px"
+                />
+                <img
+                  v-if="listing.price > 20"
+                  src="https://img.icons8.com/metro/26/000000/us-dollar--v1.png"
+                  width="40px"
+                />
+              </span>
+            </div> -->
+            <!-- <br /> -->
+            <p v-if="listing.noise == 1" class="noise" style="font-size: 25px">
+              <b-icon
+                icon="volume-up"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 50px;
+                "
+              ></b-icon>
+              Quiet
+            </p>
+
+            <p v-if="listing.noise == 2" class="noise" style="font-size: 25px">
+              <b-icon
+                icon="volume-up"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 50px;
+                "
+              ></b-icon>
+              Tolerable
+            </p>
+
+            <p v-if="listing.noise == 3" class="noise" style="font-size: 25px">
+              <b-icon
+                icon="volume-up"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 50px;
+                "
+              ></b-icon>
+              Some Noise
+            </p>
+
+            <p class="reviews" style="font-size: 25px">
+              <b-icon
+                v-if="listing.rating >= 1"
+                icon="star-fill"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-else-if="listing.rating >= 0.5"
+                icon="star-half"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-if="listing.rating >= 2"
+                icon="star-fill"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-else-if="listing.rating >= 1.5"
+                icon="star-half"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-if="listing.rating >= 3"
+                icon="star-fill"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-else-if="listing.rating >= 2.5"
+                icon="star-half"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-if="listing.rating >= 4"
+                icon="star-fill"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-else-if="listing.rating >= 3.5"
+                icon="star-half"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-if="listing.rating >= 5"
+                icon="star-fill"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+              <b-icon
+                v-else-if="listing.rating >= 4.5"
+                icon="star-half"
+                style="
+                  margin-top: auto;
+                  margin-bottom: auto;
+                  margin-right: 5px;
+                  color: gold;
+                "
+              ></b-icon>
+            </p>
+            <!-- <div class="noise">
+              <span id="noise-pics">
+                <img
+                  id="noise-pic"
+                  src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png"
+                  width="40px"
+                />
+                <img
+                  v-if="listing.noise > 1"
+                  id="noise-pic"
+                  src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png"
+                  width="40px"
+                />
+                <img
+                  v-if="listing.noise > 2"
+                  id="noise-pic"
+                  src="https://img.icons8.com/fluent-systems-regular/24/000000/low-volume.png"
+                  width="40px"
+                />
+              </span>
+            </div> -->
+
+            <!-- <div class="bookmark">
+              <img
+                v-bind:id="listing.id"
+                v-on:click="bookmark($event)"
+                src="https://img.icons8.com/windows/32/000000/bookmark-ribbon--v1.png"
+                width="40px"
+              />
+            </div> -->
+          </div>
+        </li>
+        <div class="divider"></div>
+      </ul>
     </div>
   </div>
 </template>
@@ -280,7 +591,7 @@
 import Header from "./UI/Header.vue";
 import database from "../firebase.js";
 import firebase from "firebase";
-import modal from "./Modal.vue";
+import Modal from "./Modal.vue";
 
 export default {
   data() {
@@ -293,7 +604,7 @@ export default {
       price: [],
       noise: [],
       options: [
-        { value: null, text: "Sort By" },
+        // { value: null, text: "Sort By" },
         { value: "a", text: "Name" },
         { value: "b", text: "Ratings" },
         { value: "c", text: "Price" },
@@ -301,12 +612,13 @@ export default {
       ],
       sortBy: null,
       ascending: true,
+      favourites: [],
     };
   },
 
   components: {
     "app-header": Header,
-    modal: modal,
+    modal: Modal,
   },
 
   computed: {
@@ -370,13 +682,14 @@ export default {
   methods: {
     showModal() {
       this.isModalVisible = true;
+      console.log(this.isModalVisible)
     },
     closeModal() {
       this.isModalVisible = false;
     },
 
-    fetchItems: function () {
-      database
+    fetchItems: async function () {
+      await database
         .collection("listings")
         .get()
         .then((querySnapShot) => {
@@ -394,19 +707,33 @@ export default {
             this.list.push(item);
           });
         });
+
+      let user = firebase.auth().currentUser;
+      await database
+        .collection("users")
+        .doc(user.uid)
+        .get()
+        .then((snapshot) => {
+          const data = snapshot.data();
+          var fav = data.favourites;
+
+          this.favourites = fav;
+        });
+
+      console.log(this.favourites);
     },
 
-    route: function(event) {
-            let doc_id = event.target.getAttribute("id");
-            this.$router.push({name:"indiv", params: {id:doc_id}})
-        },
-
-    bookmark: function (event) {
-      //add the place to favourites
+    route: function (event) {
       let doc_id = event.target.getAttribute("id");
+      this.$router.push({ name: "indiv", params: { id: doc_id } });
+    },
+
+    bookmark: async function (event) {
+      //add the place to favourites
+      let doc_id = event.currentTarget.getAttribute("id");
       let user = firebase.auth().currentUser;
       // var newFav = [];
-      database
+      await database
         .collection("users")
         .doc(user.uid)
         .get()
@@ -420,15 +747,19 @@ export default {
           }
 
           if (fav.includes(doc_id)) {
-            alert('Already bookmarked')
+            alert("Already bookmarked");
             return;
-          } else {
-            fav.push(doc_id);  
+          } else if (doc_id) {
+            fav.push(doc_id);
+            this.favourites.push(doc_id);
           }
-          
-          console.log(fav)
 
-          database.collection('users').doc(user.uid).update({ favourites: fav })
+          console.log(fav);
+
+          database
+            .collection("users")
+            .doc(user.uid)
+            .update({ favourites: fav });
 
           // snapshot.docs.forEach((doc) => {
           //   let fav = doc.data().favourites;
@@ -447,6 +778,30 @@ export default {
           // console.log("bookmark");
         });
     },
+
+    unbookmark: function(event) {
+      let doc_id = event.currentTarget.getAttribute("id")
+      let user = firebase.auth().currentUser
+
+      console.log(doc_id)
+
+      this.favourites = this.favourites.filter(function(value) {
+        return value != doc_id
+      })
+
+      database.collection('users').doc(user.uid).update({ favourites: this.favourites })
+
+
+    },
+
+    // clicked: function (event) {
+    //   let doc_id = event.target.getAttribute("id");
+    //   if (this.favorites.includes(doc_id)) {
+    //     return "bookmark-fill";
+    //   } else {
+    //     return "bookmark";
+    //   }
+    // },
   },
 
   created: function () {
@@ -461,37 +816,43 @@ ul {
   display: flex;
   flex-wrap: wrap;
   list-style-type: none;
-  padding: 10%;
+  /* padding: 10%; */
   padding-top: 3%;
+  padding-left: 0;
   margin: auto;
 }
 li {
-  /*  flex-grow: 1;  */
-  width: 600px;
-  /*  flex-basis: 300px; */
-  text-align: center;
-  padding: 10px;
-  border: 5px solid #ED7A78;
-  margin: 10px;
+  width: 300px;
+  /* text-align: center; */
+  /* padding: 10px;
+  border: 5px solid #ed7a78;
+  margin: 10px; */
   margin-top: 5px;
   border-radius: 25px;
   font-family: "Ubuntu", sans-serif;
-  margin: auto;
+  margin-left: 5%;
 }
-.listings-list {
+/* .listings-list {
   margin-left: 3%;
-}
+} */
 #main-pic {
+  margin-bottom: 15px;
   border-radius: 15px;
-  width: 80%;
-  height: 300px;
+  width: 100%;
+  height: 250px;
 }
 
-.name {
+.title {
+  padding-bottom: 12px;
+  border-bottom: 2px solid grey;
+  padding-left: 7px;
+  padding-right: 7px;
+  display: flex;
   font-size: 35px;
 }
-
-.details {
+.name {
+  font-size: 35px;
+  text-align: left;
   float: left;
 }
 
@@ -501,13 +862,29 @@ li {
 }
 
 .location,
+.price,
+.noise {
+  padding-left: 7px;
+  text-align: left;
+  font-family: "Ubuntu", sans-serif;
+  margin: auto;
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+.bookmark {
+  float: right;
+  margin-left: auto;
+}
+
+/* .location,
 .noise,
 .price {
   display: flex;
   flex-flow: row wrap;
   margin-left: 50px;
   font-size: 20px;
-}
+} */
 
 #locationVal,
 .noiseVal {
@@ -515,10 +892,10 @@ li {
   margin-left: 3px;
 }
 
-.bookmark {
+/* .bookmark {
   float: right;
   margin-right: 50px;
-}
+} */
 
 @import url(https://fonts.googleapis.com/css?family=Open+Sans);
 
@@ -528,9 +905,8 @@ body {
 }
 
 .search {
-  width: 100%;
-  position: relative;
-  display: flex;
+  width: 30%;
+  margin: auto;
 }
 
 .searchTerm {
@@ -557,30 +933,23 @@ body {
   transform: translate(-50%, -50%);
 }
 
-
-
-@media (min-width: 740px) and (max-width: 1412px) {
+/* @media (min-width: 740px) and (max-width: 1412px) {
   .listings-list {
     margin-left: 3%;
-    width: 100%
+    width: 100%;
   }
   ul {
     width: 100%;
   }
   li {
-/*  flex-grow: 1;  */
-
-/*  flex-basis: 300px; */
     text-align: center;
     padding: 10px;
-    border: 5px solid #ED7A78;
+    border: 5px solid #ed7a78;
     margin: 10px;
     margin-top: 5px;
     border-radius: 25px;
     font-family: "Ubuntu", sans-serif;
     margin: auto;
-
   }
-}
-
+} */
 </style>

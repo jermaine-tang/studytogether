@@ -3,9 +3,8 @@
     <app-header></app-header>
     <h1>Favourites</h1>
     <ul class="favourites-list">
-      <li v-for="(listing, index) in list" :key="index">
-        <!-- picture of cafe -->
-        <img id="main-pic" v-bind:src="listing.photoURL1" />
+      <li class="segment" v-for="(listing, index) in list" :key="index">
+        <img :src="listing.photoURL1" alt="picture" class="main-pic" />
         <div id="name">
           <b> {{ listing.name }} </b>
         </div>
@@ -216,6 +215,18 @@ li {
   height: 50px;
   width: 90px;
 }
+
+h1 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 40px;
+  margin-bottom: 15px;
+  width: 30%;
+  margin:auto;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: 2px solid grey;
+}
+
 
 #main-pic {
   position: relative;

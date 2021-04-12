@@ -227,7 +227,7 @@ export default {
                     const toUpdate = snapshot.data();
                     var newNumRatings = toUpdate.numRatings + 1;
                     var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
-                    var newAvgRating = Math.round(Number(newRatingTotal) / Number(newNumRatings));
+                    var newAvgRating = Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2;
                     var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
                     var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
                     database.collection('listings').doc(this.$route.params.id).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(

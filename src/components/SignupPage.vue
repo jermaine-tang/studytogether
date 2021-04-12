@@ -128,6 +128,7 @@ export default {
         name: this.signup.name,
         email: this.signup.email,
         number: this.signup.number,
+        favourites: new Array(),
       };
 
       var user = firebase.auth().currentUser;
