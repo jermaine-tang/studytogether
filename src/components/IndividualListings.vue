@@ -46,7 +46,7 @@
             <div id="menu" v-if="listingDetails.menu">
                 Menu:
                 <br><br>
-                <img v-bind:src = "listingDetails.menu">
+                <img id="menuPhoto" v-bind:src = "listingDetails.menu">
             </div>
             <br><br>
             <div id="reviews">
@@ -346,5 +346,9 @@ hr {
 .showMore:hover {
   border-color: white;
   background-color: #e33c39;
+}
+
+#menuPhoto {
+    width: 80%;
 }
 </style>
