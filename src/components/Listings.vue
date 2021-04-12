@@ -45,6 +45,10 @@
         @close="closeModal" 
         @apply="closeModal"
       >
+        <template v-slot:header>
+          Filter By:
+        </template>
+
         <template v-slot:body>
           <div>
             <div>
