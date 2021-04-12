@@ -333,6 +333,9 @@ export default {
 
       //search method
       if (this.searchString != "" && this.searchString) {
+        tempList.map((item) => {
+          console.log(item.name);
+        })
         tempList = tempList.filter((item) =>
           item.name.toLowerCase().includes(this.searchString.toLowerCase())
         );

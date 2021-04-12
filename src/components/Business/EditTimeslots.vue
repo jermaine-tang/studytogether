@@ -11,7 +11,8 @@
                 <div class="timeslot">
 
                 <div v-if="dateSelected && availableTime">
-                    <button v-on:click="showModal">Add Booking Timings</button>
+                    <button v-on:click="showModal">Add Timeslots</button>
+                    <button v-on:click="selectAll()">Select All</button>
                     <h3>Time: Pax</h3>
                     <label class="timing-listing" v-for="(slot, index) in timeslots" :key="index" >
                         {{ slot.time }} : {{slot.pax}}
@@ -19,11 +20,11 @@
                         <span class="checkmark"></span>
                     </label>
                     <input v-model.number="pax" placeholder="Input pax limit">
-                    <button  v-on:click="update()">Update Pax Limit</button>
+                    <button  v-on:click="update()">Update Pax</button>
                     <button  v-on:click="del()"> Delete Timeslot</button>
                 </div>
                 <div v-else-if="dateSelected">
-                    <button v-on:click="showModal">Add Booking Timings</button>
+                    <button v-on:click="showModal">Add Timeslots</button>
                     <h3>No timeslots available</h3>
                 </div>
                 <div v-else> Choose a date to start </div>
@@ -40,15 +41,8 @@
                         <template v-slot:body>
                             <p><input v-model="start" placeholder="Start Time"></p>
                             <p><input v-model="end" placeholder="End Time"></p>
-                            <select v-model="duration">
-                            <option
-                                v-for="(option, index) in options" :key="index"
-                                v-bind:value="option.value"
-                            >
-                                {{option.text}}
-                            </option>
-                            </select>
                             <p><input v-model.number="pax" placeholder="Pax limit"></p>
+                            <input type="checkbox" v-bind:value=true v-model="applyMonth"/>Apply for the Month
                         </template>
                     </modal>
                 </div>
@@ -73,7 +67,7 @@
     export default {
         data() {
             return {
-                bizID: '5iBl58sV6uv7riUzCQzn',//change 
+                bizID: '5iBl58sV6uv7riUzCQzn',//change according to user
                 timeslots: [],
                 selected: new Array(),//timeslot selected
                 paxDisplayed: 0,
@@ -82,16 +76,10 @@
                 pax: null,
                 start: "",
                 end: "",
-                duration: null,
                 dateSelected: false,
                 availableTime: false,
                 isModalVisible: false,
-                options: [
-                    { value: null, text: "Duration" },
-                    { value: 1, text: "1 hour" },
-                    { value: 2, text: "2 hours" },
-                ],
-
+                applyMonth: false
             }
         },
 
@@ -111,6 +99,10 @@
         },
 
         methods: {
+            selectAll: function() {
+                this.selected = this.timeslots;
+            },
+
             showModal: function() {
                 this.isModalVisible = true;
             },
@@ -120,7 +112,6 @@
             },
 
             fetch: function() {//fetch the timeslots info
-
                 if (this.date == undefined) {
                     return;
                 }
@@ -139,7 +130,7 @@
                 console.log(this.fulldate);
 
                 //this.bizID = this.$route.params.id;
-                //console.log("id: "+this.bizID);
+                console.log("id: "+this.bizID);
                 //change after fetch
                 
                 database
@@ -175,15 +166,13 @@
 
             },
 
-            add: function() {//release new timeslots
+            add: async function() {//release new timeslots
                 if (this.start == "") {
                     alert("Please input a start time.")
                 } else if (this.end == "") {
                     alert("Please input an end time")
                 } else if (this.pax == null) {
                     alert("Please input a pax limit.")
-                } else if (this.duration == null) {
-                    alert("Please select a duration.")
                 }
 
                 var startHour = Math.floor(parseInt(this.start)/100);
@@ -201,44 +190,99 @@
                     alert("Start Time cannot exceed End Time.")
                 }
 
-                var docRef = database.collection('listings')
-                    .doc(this.bizID)
-                    .collection('timeslots')
-                    .doc(this.fulldate);
-
-                    var newSlots = [];
-                    while (startHour < endHour) {
-                        var endSlot = startHour + this.duration;
-                        var startStr = startHour.toString() + startMin;
-                        if (startHour < 10) {
-                            startStr = "0" + startStr;
-                        }
-                        var endStr = endSlot.toString() + endMin
-                        if (endSlot < 10) {
-                            endStr = "0" + endStr;
-                        }//create string representation of the time slots
-                        newSlots.push({[startStr + " - " + endStr] : this.pax});//collect the new timeslots
-                        startHour = endSlot;
-                        console.log(newSlots);
-                    }//end of while loop
-
-                        docRef
-                        .get()
-                        .then((snapshot) => {
-                            if (snapshot.exists) {//alr have existing timeslots
-                                for (var j=0; j< newSlots.length; j++) {
-                                    docRef.update( newSlots[j]);
-                                }
-                            } else {//empty doc
-                                docRef.set(newSlots[0]);
-                                for (var k=1; k< newSlots.length; k++) {
-                                    docRef.update(newSlots[k]);
-                                }
-                                
+                        var newSlots = [];
+                        while (startHour < endHour) {
+                            var endSlot = startHour + 1;
+                            var startStr = startHour.toString() + startMin;
+                            if (startHour < 10) {
+                                startStr = "0" + startStr;
                             }
-                        });
-                    
+                            var endStr = endSlot.toString() + endMin
+                            if (endSlot < 10) {
+                                endStr = "0" + endStr;
+                            }//create string representation of the time slots
+                            newSlots.push({[startStr + " - " + endStr] : this.pax});//collect the new timeslots
+                            startHour = endSlot;
+                            console.log(newSlots);
+                        }//end of while loop
 
+                if (this.applyMonth) {//add timeslots for the whole month
+                    var month = this.date.getMonth() + 1;
+                    var year = this.date.getYear() % 100;  
+                    var numDay = 30;
+                    var day = 1;
+                    var longer = [1, 3, 5, 7, 8, 10, 12]
+                    if (longer.includes(month)) {
+                        numDay = 31;
+                    } else if (month == 2) {
+                        if (this.date.getYear() % 4 == 0) {
+                            numDay = 29;
+                        } else {
+                            numDay = 28;
+                        }
+                    }//calculate the number of days of the month
+                    if (month < 10) {
+                        month = "0" + month;
+                    } 
+
+                    while (day <= numDay) {//loop through the days of the month
+                        var date = day;//change after each loop
+                        if (date < 10) {
+                            date = "0" + day;
+                        }
+                        var fulldate = date + month + year;//date of that specific day
+                        console.log(fulldate);
+                        
+                        var docRef = database.collection('listings')
+                            .doc(this.bizID)
+                            .collection('timeslots')
+                            .doc(fulldate);//hard code works
+
+                            await docRef
+                            .get()
+                            .then((snapshot) => {
+                                if (snapshot.exists) {//alr have existing timeslots
+                                    for (var j=0; j< newSlots.length; j++) {
+                                        console.log("update" + newSlots[j]);
+                                        docRef.update(newSlots[j]);
+                                    }
+                                } else {//empty doc
+                                    console.log("set" + newSlots[0]);
+                                    docRef.set(newSlots[0]);
+                                    for (var k=1; k< newSlots.length; k++) {
+                                        docRef.update(newSlots[k]);
+                                    }
+                                    
+                                }
+                            });
+                        day ++;
+                    }
+
+                    this.applyMonth = false;
+                    location.reload();
+                } else {//add timeslot for the day
+                        var docRefDate = database.collection('listings')
+                            .doc(this.bizID)
+                            .collection('timeslots')
+                            .doc(this.fulldate);
+
+                            await docRefDate
+                            .get()
+                            .then((snapshot) => {
+                                if (snapshot.exists) {//alr have existing timeslots
+                                    for (var j=0; j< newSlots.length; j++) {
+                                        docRefDate.update( newSlots[j]);
+                                    }
+                                } else {//empty doc
+                                    docRefDate.set(newSlots[0]);
+                                    for (var k=1; k< newSlots.length; k++) {
+                                        docRefDate.update(newSlots[k]);
+                                    }
+                                    
+                                }
+                            });
+                        location.reload();
+                }
             },
 
             update: function() {//update pax limit
@@ -286,42 +330,8 @@
                         .then(() => location.reload());
                 }                
             },
-
-
-            /*
-            fetch: async function () {
-                //this.bizID = this.$route.params.id;
-                //console.log("id: "+this.bizID);
-                //change after fetch
-                
-                database
-                    .collection('listings')
-                    .doc(this.bizID)
-                    .collection('timeslots')
-                    .get()
-                    .then((querySnapShot) => {
-                        querySnapShot.docs.forEach((doc) => {
-                            const data = doc.data();
-                            var item = {[doc.id]: []};
-                            Object.keys(data).forEach((timeslot) => {
-                                item[doc.id].push([timeslot, data[timeslot]]);
-                            });
-                            this.timeslots.push(item);//date: [time, pax]
-                        });
-                        this.timeslots.sort();
-                        
-                    });
-            },
-            */
-        },
-
-        /*
-        created: function () {
-            this.fetch();
-        }
-        */
     }
-
+}
 </script>
 
 

@@ -5,12 +5,11 @@
             Information
             <br><br>
             <button v-on:click="route()">Edit General Information</button>
-        </div>
         <br><br>
         <!-- Xie Ran's part -->
         <button v-on:click="edit()">Edit Timeslots</button>
-
         <br><br>
+        </div>
                     
     </div>
 </template>
