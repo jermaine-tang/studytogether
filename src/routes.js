@@ -8,15 +8,11 @@ import Reviews from './components/Reviews.vue';
 import ForgotPassword from './components/ForgotPassword.vue';
 import Favourites from './components/Favourites.vue';
 import Reservation from './components/Reservation.vue';
-<<<<<<< HEAD
 import BizBookings from './components/Business/Biz Bookings.vue';
-import MyBusiness from './components/Business/MyBusiness.vue'
 import Information from './components/Business/Information.vue'
-=======
 import MyBusiness from './components/Business/MyBusiness.vue';
 import EditTimeslots from './components/Business/EditTimeslots.vue';
 
->>>>>>> biz_edit
 
 export default[
     {path: '/', component: Homepage},
@@ -31,11 +27,8 @@ export default[
     {path: '/reviews/:id', component: Reviews, props: true},
     {path: '/listings/:id/reserve', name: 'reservation', component: Reservation, props:true},
     {path: '/mybiz', name: 'business', component: MyBusiness},
-<<<<<<< HEAD
     {path: '/info', name: 'info', component: Information},
-    {path: '/bizBookings', component: BizBookings}
-=======
+    {path: '/bizBookings', component: BizBookings},
     {path: '/edit', name: 'edit', component: EditTimeslots, props:true}
 
->>>>>>> biz_edit
 ]
