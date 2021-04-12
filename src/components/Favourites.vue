@@ -27,6 +27,12 @@
           <b> {{ listing.name }} </b>
         </div>
         <button class="button" v-bind:index="index" v-on:click="remove($event)">
+        Button to cancel bookmark -->
+        <!-- <button
+          class="button"
+          v-bind:id="listing.id"
+          v-on:click="remove($event)"
+        >
           Remove
         </button> -->
       </li>
@@ -90,62 +96,30 @@ export default {
     },
 
     fetchItems: async function () {
-      // await setTimeout(() => {}, 1000)
       var listArr = await this.getListing();
-      // var userArr = await this.getUser()
-      console.log("get listings" + listArr);
 
       var user = firebase.auth().currentUser;
 
-      console.log(user);
+        await database.collection('users').doc(user.uid).get().then(snapshot => {
+            const data = snapshot.data();
+            this.idList = data.favourites;
 
-      await database
-        .collection("users")
-        .doc(user.uid)
-        .get()
-        .then((snapshot) => {
-          const data = snapshot.data();
-          this.idList = data.favourites;
-          //this.list = new Array(this.idList.length)
-          console.log(this.idList);
-        });
-
-      //   for (var i = 0; i < userArr.length; i++) {
-      //     if (userArr[i].id == user.id) {
-      //       this.idList = userArr[i].favourites;
-      //     }
-      //   }
+        })
 
       for (var j = 0; j < listArr.length; j++) {
-        console.log(this.idList);
-        console.log(listArr[j].id);
-        console.log(this.idList.includes(listArr[j].id));
+
         if (this.idList.includes(listArr[j].id)) {
-          //this.list[this.idList.indexOf(listArr[j].id)] = listArr[j]
-          this.list.push(listArr[j]);
+            this.list.push(listArr[j]);
         }
       }
 
       console.log(this.list);
 
-      //   if (!this.idList.empty) {
-      //     await database
-      //       .collection("listings")
-      //       .get()
-      //       .then((snapshot) => {
-      //         let item = {};
-      //         snapshot.docs.forEach((doc) => {
-      //           if (this.idList.includes(doc.id)) {
-      //             item = { ...doc.data(), ["id"]: doc.id };
-      //             this.list.push(item); //push the list of favourites into list
-      //           }
-      //         });
-      //       });
-      //   }
+ 
     },
 
     remove: function (event) {
-      let doc_index = event.currentTarget.getAttribute("index");
+      // let doc_index = event.currentTarget.getAttribute("index");
       //this.idList.splice(this.idList.indexOf(doc_id),1);
       //   function checkID(object) {
       //         return object == doc_id
@@ -154,48 +128,25 @@ export default {
       //this.list.splice(this.idList.indexOf(doc_id),1);
       // console.log(event.target);
       //console.log(doc_id);
-      this.idList.splice(doc_index, 1);
+      // this.idList.splice(doc_index, 1);
+      let doc_id = event.target.getAttribute("id");
+      console.log(doc_id);
+      var newList = [];
+      for (var k = 0; k < this.idList.length; k++) {
+          if (doc_id != this.idList[k]) {
+              newList.push(this.idList[k]);
+          }
+      }
+      console.log(newList);
+
+      this.idList = newList;
+
       let user = firebase.auth().currentUser;
-      // var fav = [];
-      // var newFav = [];
       database
         .collection("users")
         .doc(user.uid)
         .update({ favourites: this.idList })
-        .then(() => {
-          location.reload();
-        });
-      //.get()
-      //.then((snapshot) => {
-      //const data = snapshot.data();
-
-      //var fav = data.favourites;
-
-      //const indexOf = fav.indexOf(doc_id);
-
-      //fav.splice(indexOf, 1);
-
-      // database
-      //   .collection("users")
-      //   .doc(user.uid)
-      //   .update({ favourites: fav });
-
-      // snapshot.docs.forEach(doc => {
-      // if (doc.id == user.uid) {//get the user
-      //     fav = doc.data().favourites;
-      //     console.log(fav);
-      //     for (let i = 0; i < fav.length; i++) {
-      //         if (fav[i] != doc_id) {
-      //             newFav.push(fav[i]);
-      //             console.log(newFav[i] + "added");
-      //         }
-      //     }
-      //     database.collection('users').doc(user.uid).update({"favourites": newFav});
-      //     console.log(newFav);
-      //     console.log("remove");
-      // }
-      // })
-      //})
+        .then(() => {location.reload()});
     },
   },
 };

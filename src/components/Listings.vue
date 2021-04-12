@@ -12,7 +12,13 @@
         />
         <i class="fa fa-search"></i>
 
-        <button class="btn" @click="showModal">Filter</button>
+        <button
+          type="button"
+          class="btn"
+          @click="showModal"
+        >
+          Filter
+        </button>
       </div>
     </div>
 
@@ -54,8 +60,7 @@
     <div>
       <select v-model="sortBy">
         <option
-          v-for="(option, index) in options"
-          :key="index"
+          v-for="(option, index) in options" :key="index"
           v-bind:value="option.value"
         >
           {{ option.text }}
@@ -70,7 +75,15 @@
     </div>
 
     <div>
-      <modal v-show="isModalVisible" @close="closeModal" @apply="closeModal">
+      <modal 
+        v-show="isModalVisible" 
+        @close="closeModal" 
+        @apply="closeModal"
+      >
+        <template v-slot:header>
+          Filter By:
+        </template>
+
         <template v-slot:body>
           <div>
             <div>
@@ -626,8 +639,14 @@ export default {
     displayedList: function () {
       let tempList = this.list;
 
+      console.log("computed");
+
+
       //search method
       if (this.searchString != "" && this.searchString) {
+        tempList.map((item) => {
+          console.log(item.name);
+        })
         tempList = tempList.filter((item) =>
           item.name.toLowerCase().includes(this.searchString.toLowerCase())
         );
@@ -677,6 +696,13 @@ export default {
 
       return tempList;
     },
+
+    test: function() {
+      console.log(this.searchString);
+      return this.searchString;
+    }
+
+
   },
 
   methods: {
@@ -775,7 +801,7 @@ export default {
           //   .collection("users")
           //   .doc(user.uid)
           //   .update({ favourites: newFav });
-          // console.log("bookmark");
+          console.log("bookmarked");
         });
     },
 
@@ -806,7 +832,6 @@ export default {
 
   created: function () {
     this.fetchItems();
-    this.displayList = this.list;
   },
 };
 </script>
