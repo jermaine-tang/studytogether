@@ -12,6 +12,8 @@ import MyBusiness from './components/Business/MyBusiness.vue';
 import BusinessSignup from './components/Business/BusinessSignup.vue';
 import BizBookings from './components/Business/Biz Bookings.vue';
 import Information from './components/Business/Information.vue';
+import EditTimeslots from './components/Business/EditTimeslots.vue';
+
 
 // import firebase from 'firebase'
 
@@ -87,14 +89,21 @@ export default [
         component: BusinessSignup
     },
     {
-        path: '/info', 
-        name: 'info', 
+        path: '/info',
+        name: 'info',
         component: Information,
         meta: { auth: 'owner' }
     },
     {
-        path: '/bizBookings', 
+        path: '/bizBookings',
         component: BizBookings,
+        meta: { auth: 'owner' }
+    },
+    {
+        path: '/edit', 
+        name: 'edit', 
+        component: EditTimeslots, 
+        props: true,
         meta: { auth: 'owner' }
     }
 ]
