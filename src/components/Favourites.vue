@@ -5,17 +5,30 @@
     <ul class="favourites-list">
       <li class="segment" v-for="(listing, index) in list" :key="index">
         <img :src="listing.photoURL1" alt="picture" class="main-pic" />
-        <div id="name">
+        <div class="info">
+          <div class="title">
+            <h3 class="name">
+              {{ listing.name }}
+            </h3>
+
+            <b-button
+              class="button"
+              variant="outline-danger"
+              v-bind:index="index"
+              v-on:click="remove($event)"
+              >Remove</b-button
+            >
+          </div>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique saepe reprehenderit, iure animi necessitatibus reiciendis 
+          </p>
+        </div>
+        <!-- <div id="name">
           <b> {{ listing.name }} </b>
         </div>
-        <!-- Button to cancel bookmark -->
-        <button
-          class="button"
-          v-bind:index="index"
-          v-on:click="remove($event)"
-        >
+        <button class="button" v-bind:index="index" v-on:click="remove($event)">
           Remove
-        </button>
+        </button> -->
       </li>
     </ul>
   </div>
@@ -68,7 +81,7 @@ export default {
           let item = {};
           querySnapShot.docs.forEach((doc) => {
             item = { ...doc.data(), ["id"]: doc.id };
-            
+
             // console.log(item)
             arr.push(item);
           });
@@ -86,26 +99,30 @@ export default {
 
       console.log(user);
 
-        await database.collection('users').doc(user.uid).get().then(snapshot => {
-            const data = snapshot.data();
-            this.idList = data.favourites;
-            //this.list = new Array(this.idList.length)
-            console.log(this.idList)
-        })
-    
-    //   for (var i = 0; i < userArr.length; i++) {
-    //     if (userArr[i].id == user.id) {
-    //       this.idList = userArr[i].favourites;
-    //     }
-    //   }
+      await database
+        .collection("users")
+        .doc(user.uid)
+        .get()
+        .then((snapshot) => {
+          const data = snapshot.data();
+          this.idList = data.favourites;
+          //this.list = new Array(this.idList.length)
+          console.log(this.idList);
+        });
+
+      //   for (var i = 0; i < userArr.length; i++) {
+      //     if (userArr[i].id == user.id) {
+      //       this.idList = userArr[i].favourites;
+      //     }
+      //   }
 
       for (var j = 0; j < listArr.length; j++) {
-          console.log(this.idList)
-          console.log(listArr[j].id)
-            console.log(this.idList.includes(listArr[j].id))
+        console.log(this.idList);
+        console.log(listArr[j].id);
+        console.log(this.idList.includes(listArr[j].id));
         if (this.idList.includes(listArr[j].id)) {
-            //this.list[this.idList.indexOf(listArr[j].id)] = listArr[j]
-            this.list.push(listArr[j]);
+          //this.list[this.idList.indexOf(listArr[j].id)] = listArr[j]
+          this.list.push(listArr[j]);
         }
       }
 
@@ -128,15 +145,14 @@ export default {
     },
 
     remove: function (event) {
-        
-      let doc_index = event.target.getAttribute("index");
+      let doc_index = event.currentTarget.getAttribute("index");
       //this.idList.splice(this.idList.indexOf(doc_id),1);
-    //   function checkID(object) {
-    //         return object == doc_id
-    //     }
-    //     console.log(this.list[this.list.findIndex(checkID)])
+      //   function checkID(object) {
+      //         return object == doc_id
+      //     }
+      //     console.log(this.list[this.list.findIndex(checkID)])
       //this.list.splice(this.idList.indexOf(doc_id),1);
-      console.log(event.target);
+      // console.log(event.target);
       //console.log(doc_id);
       this.idList.splice(doc_index, 1);
       let user = firebase.auth().currentUser;
@@ -146,38 +162,40 @@ export default {
         .collection("users")
         .doc(user.uid)
         .update({ favourites: this.idList })
-        .then(() => {location.reload()});
-        //.get()
-        //.then((snapshot) => {
-          //const data = snapshot.data();
+        .then(() => {
+          location.reload();
+        });
+      //.get()
+      //.then((snapshot) => {
+      //const data = snapshot.data();
 
-          //var fav = data.favourites;
+      //var fav = data.favourites;
 
-          //const indexOf = fav.indexOf(doc_id);
+      //const indexOf = fav.indexOf(doc_id);
 
-          //fav.splice(indexOf, 1);
+      //fav.splice(indexOf, 1);
 
-         // database
-         //   .collection("users")
-         //   .doc(user.uid)
-         //   .update({ favourites: fav });
+      // database
+      //   .collection("users")
+      //   .doc(user.uid)
+      //   .update({ favourites: fav });
 
-          // snapshot.docs.forEach(doc => {
-          // if (doc.id == user.uid) {//get the user
-          //     fav = doc.data().favourites;
-          //     console.log(fav);
-          //     for (let i = 0; i < fav.length; i++) {
-          //         if (fav[i] != doc_id) {
-          //             newFav.push(fav[i]);
-          //             console.log(newFav[i] + "added");
-          //         }
-          //     }
-          //     database.collection('users').doc(user.uid).update({"favourites": newFav});
-          //     console.log(newFav);
-          //     console.log("remove");
-          // }
-          // })
-        //})
+      // snapshot.docs.forEach(doc => {
+      // if (doc.id == user.uid) {//get the user
+      //     fav = doc.data().favourites;
+      //     console.log(fav);
+      //     for (let i = 0; i < fav.length; i++) {
+      //         if (fav[i] != doc_id) {
+      //             newFav.push(fav[i]);
+      //             console.log(newFav[i] + "added");
+      //         }
+      //     }
+      //     database.collection('users').doc(user.uid).update({"favourites": newFav});
+      //     console.log(newFav);
+      //     console.log("remove");
+      // }
+      // })
+      //})
     },
   },
 };
@@ -188,49 +206,96 @@ ul {
   display: flex;
   flex-wrap: wrap;
   list-style-type: none;
-  padding: 30%;
-  padding-top: 3%;
   margin: auto;
+  padding-left: 0;
 }
 
 li {
   display: flex;
-  flex-wrap: wrap;
-  width: 1000px;
-  position: relative;
-  /*  flex-basis: 300px; */
+  width: 60%;
+  height: 200px;
+  /* height: 80%; */
+  /* position: relative; */
   text-align: center;
-  padding: 10px;
-  border: 3px solid #ed7a78;
-  margin: 10px;
-  margin-top: 5px;
-  border-radius: 25px;
+  /* padding: 10px; */
+  /* border: 3px solid #ED7A78; */
+  /* margin: 10px; */
+  /* margin-top: 5px; */
+  /* margin-bottom: 0px; */
+  /* padding-bottom: 1px; */
+  /* border-radius: 25px; */
   font-family: "Ubuntu", sans-serif;
-  margin: 0 0 10 0;
+  margin: auto;
+  /* margin: 0 0 10 0; */
+}
+
+.title {
+  padding-bottom: 12px;
+  border-bottom: 2px solid grey;
+  display: flex;
+  font-size: 35px;
+  margin-bottom: 15px;
 }
 
 .button {
-  position: relative;
-  left: 90px;
-  height: 50px;
-  width: 90px;
+  font-size: 20px;
+  margin-top: 0px;
+  float: right;
+  margin-left: auto;
 }
+
+.name {
+  font-size: 35px;
+  text-align: left;
+  float: left;
+  margin-bottom: 0px;
+}
+
 
 h1 {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: 40px;
   margin-bottom: 15px;
   width: 30%;
-  margin:auto;
+  margin: auto;
   padding-top: 5px;
   padding-bottom: 5px;
   border: 2px solid grey;
 }
 
+.segment {
+  margin-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 50px;
+  padding-right: 50px;
+  border-bottom: 2px solid wheat;
+}
 
-#main-pic {
+.main-pic {
+  float: left;
+  border-radius: 15px;
+  margin-right: 10px;
+}
+
+.info {
+  width: 100%;
+  float: right;
+  margin: auto;
+  padding-left: 20px;
+}
+
+.main-pic {
+  /* position: relative; */
+  float: left;
+  /* right:20%; */
+  border-radius: 15px;
+  width: 40%;
+  height: 100%;
+}
+
+/* #main-pic {
   position: relative;
-  /* left: 1px; */
+  left: 1px;
   border-radius: 15px;
   width: 200px;
   height: 150px;
@@ -243,5 +308,5 @@ h1 {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: 30px;
   font-weight: 1000;
-}
+} */
 </style>
