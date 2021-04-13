@@ -4,7 +4,7 @@
             <div class="modal">
             <header class="modal-header">
                 <slot name="header">
-                Filter By:
+                Default heading
                 </slot>
                 <button
                 type="button"
@@ -28,7 +28,7 @@
                 class="btn-green"
                 @click="apply"
                 >
-                Apply Filter
+                Apply
                 </button>
             </footer>
             </div>
