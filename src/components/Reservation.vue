@@ -72,7 +72,8 @@ export default {
       currMBookings: 0,
       currMRevenue: 0,
       monthID: '',
-      timeIDs: []
+      timeIDs: [],
+    //  currTData: []
     };
   },
   components: {
@@ -173,7 +174,7 @@ export default {
     },
 
 
-    updateData: async function () {
+    updateMData: async function () {
       var dateString = this.date.toDateString()
       let monthString = dateString.slice(4,7)
       console.log(monthString)
@@ -187,7 +188,31 @@ export default {
         })
         console.log(someArr)
         return someArr
-      },
+    },
+
+    updateTData: async function() {
+      var locationID = this.$route.params.id;
+      var currTData = []
+      for (var i = 0; i < this.selected.length; i++) {
+            var time = this.selected[i];
+            await database
+              .collection("listings")
+              .doc(locationID)
+              .collection("timeslotsData")
+              .doc(time)
+              .get()
+              .then((snapshot) => {
+                const timeData = snapshot.data();
+                currTData.push({time: snapshot.id, currTBookings: Number(timeData.bookings), currTRevenue: Number(timeData.revenue)})
+                console.log("curr time bookigns", "=>", timeData.bookings)
+              //  this.currTBookings = timeData.bookings
+              //  this.currTRevenue = timeData.revenue
+              })
+      }
+      console.log(currTData)
+      return currTData
+    },
+
 
     submit: async function (e) {
       e.preventDefault(); 
@@ -244,8 +269,26 @@ export default {
               .update({
                 [time]: updatedValue,
               });
+
+            /*
+            database
+              .collection("listings")
+              .doc(locationID)
+              .collection("timeslotsData")
+              .doc(time)
+              .get()
+              .then((snapshot) => {
+                const timeData = snapshot.data();
+                this.currTData += {time: timeData.id, currTBookings: timeData.bookings, currTRevenue: timeData.revenue}
+                console.log("curr time bookigns", "=>", timeData.bookings)
+              //  this.currTBookings = timeData.bookings
+              //  this.currTRevenue = timeData.revenue
+              })
+              */
           }
         });
+
+      console.log(this.currTData)
 
       database.collection("bookings").add(data);
 
@@ -254,7 +297,7 @@ export default {
       let monthString = dateString.slice(4,7)
       console.log(monthString)
       
-      var result = await this.updateData()
+      var result = await this.updateMData()
       console.log(result)
       result.forEach(doc => {
         this.currMBookings += doc.bookings
@@ -262,31 +305,46 @@ export default {
         this.monthID += doc.id
         console.log(doc.id)
       })
-      
-      
+  
 
+      console.log("currBookings", this.currMBookings)
+      console.log("currRevenue", this.currMRevenue)
+      console.log("what's the issue1")
 
-        console.log("currBookings", this.currMBookings)
-        console.log("currRevenue", this.currMRevenue)
-        console.log("what's the issue1")
-
-        console.log(locationID)
-        var newMBookings = this.currMBookings + 1
-        console.log(this.selected.length)
-        console.log(this.pax)
-        console.log(this.price)
-        var newMRevenue = this.currMRevenue + (this.pax*this.price*this.selected.length)
+      console.log(locationID)
+      var newMBookings = this.currMBookings + Number(this.pax)
+      console.log(this.selected.length)
+      console.log(this.pax)
+      console.log(this.price)
+      var newMRevenue = this.currMRevenue + (this.pax*this.price*this.selected.length)
 
         // update monthlyData
-        await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
-            bookings: newMBookings,
-            revenue: newMRevenue
-          })
+      await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
+        bookings: newMBookings,
+        revenue: newMRevenue
+      })
       //.then(() => {console.log("help")});
-        console.log("what's the issue2")
+      console.log("what's the issue2")
 
-        alert("Booking successful!");
-        this.$router.push({ path: "/listings" });
+      var result2 = await this.updateTData()
+      console.log("result2", "=>", result2[0].time)
+      for (var i = 0; i < this.selected.length; i++) {
+        var time = this.selected[i];
+        console.log("selected time", time)
+        var dataToAdd = result2[i];
+        console.log("check selected time", time)
+        console.log("current time bookings", "=>", dataToAdd.currTBookings)
+        var newTBookings = Number(Number(dataToAdd.currTBookings) + Number(this.pax));
+        var newTRevenue = Number(dataToAdd.currTRevenue + (this.pax*this.price))
+        await database.collection('listings').doc(locationID).collection('timeslotsData').doc(time).update({
+          bookings: newTBookings,
+          revenue: newTRevenue
+        })
+      }
+
+      console.log("done")
+      alert("Booking successful!");
+      this.$router.push({ path: "/listings" });
     
     },
   },

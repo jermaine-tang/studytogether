@@ -398,6 +398,8 @@ export default {
 
     route: function(event) {
             let doc_id = event.target.getAttribute("id");
+            var currDate = new Date()
+            database.collection("listings").doc(doc_id).collection("monthlyData")
             this.$router.push({name:"indiv", params: {id:doc_id}})
         },
 

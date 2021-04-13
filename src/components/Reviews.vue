@@ -44,9 +44,9 @@
 									v-model="noise"
 									required
 								>
-									<option value="quiet">1 - Quiet</option>
-									<option value="tolerable">2 - Tolerable</option>
-									<option value="whiteNoise">3 - Perfect</option>
+									<option value=1>1 - Quiet</option>
+									<option value=2>2 - Tolerable</option>
+									<option value=3>3 - Perfect</option>
 								</select>
 							</div>
 						</div>
@@ -57,11 +57,11 @@
 							</div>
 							<div class="col-75">
 								<select id="rating" name="rating" v-model="rating" required>
-									<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>
-									<option value="5">5</option>
+									<option value=1>1</option>
+									<option value=2>2</option>
+									<option value=3>3</option>
+									<option value=4>4</option>
+									<option value=5>5</option>
 								</select>
 							</div>
 						</div>
@@ -249,16 +249,30 @@ export default {
 			
 			var locationID = this.$route.params.id;
 			console.log(locationID)
-            database.collection('listings').doc(locationID).get().then(snapshot => {
-                const toUpdate = snapshot.data();
-                var newNumRatings = toUpdate.numRatings + 1;
-                var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
-                var newAvgRating = Math.round(Number(newRatingTotal) / Number(newNumRatings));
-                var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
-                var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
+			console.log("month", this.monthID)
+
+			await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).get().then(snapshot => {
+				const toUpdate = snapshot.data();
+				var newNumRatings = Number(Number(toUpdate.numRatings) + 1);
+				console.log()
+				var newRatingTotal = Number(Number(toUpdate.totalRatings) + Number(this.rating));
+				var newAvgRating = Number(Math.round(Number(newRatingTotal) / Number(newNumRatings)));
 				database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
-					ratings: newAvgRating
-					})
+					ratings: newAvgRating,
+					numRatings: newNumRatings,
+					totalRatings: newRatingTotal
+				})
+			})
+
+            await database.collection('listings').doc(locationID).get().then(snapshot => {
+                const toUpdate = snapshot.data();
+                var newNumRatings = Number(Number(toUpdate.numRatings) + 1);
+                var newRatingTotal = Number(Number(toUpdate.totalRating) + Number(this.rating));
+                var newAvgRating = Number(Math.round(Number(newRatingTotal) / Number(newNumRatings)));
+                var newNoiseTotal = Number(Number(toUpdate.totalNoise) + Number(this.noise));
+                var newAvgNoise = Number(Math.round(Number(newNoiseTotal) / Number(newNumRatings)));
+				console.log(newNoiseTotal)
+				console.log(newAvgNoise)
                 database.collection('listings').doc(locationID).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
                 this.$router.push({path: "/bookings"}));
                 
