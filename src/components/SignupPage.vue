@@ -128,7 +128,6 @@ export default {
         name: this.signup.name,
         email: this.signup.email,
         number: this.signup.number,
-        usertype: 'customer'
       };
 
       var user = firebase.auth().currentUser;

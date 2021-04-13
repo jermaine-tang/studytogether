@@ -33,10 +33,6 @@
         Not yet Registered?
         <router-link to="/signup"><a>Sign Up here!</a></router-link>
       </p>
-      <p class="signup" align="center">
-        Business Owner?
-        <router-link to="/bizsignup"><a>Register here!</a></router-link>
-      </p>
     </div>
   </div>
 </template>
@@ -129,7 +125,7 @@ export default {
 .box {
   background-color: #ffffff;
   width: 400px;
-  height: 390px;
+  height: 370px;
   margin: 7em auto;
   border-radius: 40px;
   box-shadow: 0px 0px 10px 10px lightgrey;
