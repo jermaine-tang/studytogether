@@ -6,12 +6,12 @@
         <ul>
             <h3><b>Upcoming</b></h3>
             <li v-for="booking in newBookings" :key="booking.index">
-                <div id="name"><b>{{booking[6]}}</b></div>
+                <div id="name"><b>{{booking[7]}}</b></div>
                 <br>
                 <!-- picture -->
-                <img :src="booking[5]" alt="picture" id="main-pic">
+                <img :src="booking[6]" alt="picture" id="main-pic">
                 <!-- button -->
-                <button href="#" class="btn" v-bind:id="booking[7]" v-on:click="cancel(booking.index); del($event)">
+                <button href="#" class="btn" v-bind:id="booking[8]" v-on:click="cancel(booking.index); del($event)">
                     Cancel Booking
                 </button>
                 <!-- pax -->
@@ -33,12 +33,12 @@
         <ul>
             <h3><b>Previous</b></h3>
             <li v-for="booking in pastBookings" :key="booking.index">
-                <div id="name"><b>{{booking[6]}}</b></div>
+                <div id="name"><b>{{booking[7]}}</b></div>
                 <br>
                 <!-- picture -->
-                <img :src="booking[5]" alt="picture" id="main-pic">
+                <img :src="booking[6]" alt="picture" id="main-pic">
                 <!-- button -->
-                <button href="#" class="btn" v-bind:id ="booking[2]" v-bind:date="booking[3]" v-on:click="route($event)">
+                <button href="#" class="btn" v-bind:id ="booking[2]" v-bind:date="booking[5]" v-on:click="route($event)">
                     <!-- <b>Leave Review</b> -->
                     Leave Review
                 </button>
@@ -150,11 +150,12 @@ export default {
                 let locationAndName = await retrieve(location)                
                 let date = doc['date'].toDate().toString()
                 let dateOfVisit = date.slice(4,15)
+                let month = dateOfVisit.slice(0,3)
                 let time = doc['time']
                 let start = time[0].slice(0,4)
                 let end = time.pop().slice(-4)
                 let duration = start + ' - ' + end
-                let booking = [userid, pax, location, dateOfVisit, duration]
+                let booking = [userid, pax, location, dateOfVisit, duration, month]
                 let combined = [...booking, ...locationAndName,...id]
     
                 if(new Date() < new Date(combined[3]) && combined[0] == currentUser) {

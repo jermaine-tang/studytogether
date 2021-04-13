@@ -85,14 +85,8 @@
 						<br />
 						<div id="send">
 							<div class="row">
-								<input
-									type="submit"
-									value="submit"
-									v-on:click="
-										send();
-										route();
-									"
-								/>
+								<button v-on:click.prevent="send()">Submit
+								</button>
 							</div>
 						</div>
 					</form>
@@ -199,13 +193,13 @@ export default {
                 this.listingDetail = toAdd;
                 console.log(toAdd);
                 console.log(this.listingDetail);
+				console.log(this.$route.params.id)
+				console.log(this.$route.query.date)
                 })     
             },
 
 		updateData: async function () {
-			var date = this.$route.params.date
-			var dateString = date.toDateString();
-			let monthString = dateString.slice(4,7)
+			var monthString = this.$route.query.date;
 			console.log(monthString)
 			var someArr = []
 			await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
@@ -243,9 +237,7 @@ export default {
             })
 
 			// get month doc id and currbookings and currrevenue
-			var date = this.$route.params.date
-			var dateString = date.toDateString()
-			let monthString = dateString.slice(4,7)
+			var monthString = this.$route.query.date
 			console.log(monthString)
 				
 			var result = await this.updateData()
@@ -368,7 +360,7 @@ label {
 	display: inline-block;
 }
 
-input[type="submit"] {
+button {
 	background-color: #4caf50;
 	color: white;
 	padding: 12px 20px;
