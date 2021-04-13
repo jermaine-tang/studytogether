@@ -38,7 +38,7 @@
                 <!-- picture -->
                 <img :src="booking[5]" alt="picture" id="main-pic">
                 <!-- button -->
-                <button href="#" class="btn" v-bind:id ="booking[2]" v-on:click="route($event)">
+                <button href="#" class="btn" v-bind:id ="booking[2]" v-bind:date="booking[3]" v-on:click="route($event)">
                     <!-- <b>Leave Review</b> -->
                     Leave Review
                 </button>
@@ -82,10 +82,11 @@ export default {
         route: function(event) {
             console.log(event)
             let doc_id = event.target.getAttribute("id");
+            let dateBooked = event.target.getAttribute("date");
 
             console.log(doc_id)
             console.log(this.pastBookings)
-            this.$router.push({path: `reviews/${doc_id}`, query: {id: doc_id}})
+            this.$router.push({path: `reviews/${doc_id}`, query: {id: doc_id, date: dateBooked}})
         },
 
         del: function(event) {

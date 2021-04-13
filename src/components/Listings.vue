@@ -279,7 +279,7 @@
 <script>
 import Header from "./UI/Header.vue";
 import database from "../firebase.js";
-import firebase from "firebase";
+import firebase from "firebase/app";
 import modal from "./Modal.vue";
 
 export default {

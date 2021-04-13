@@ -183,6 +183,8 @@ export default {
             comment: '',
             noise: 0,
             rating: 0,
+			monthID: '',
+			
         }
     },
 
@@ -200,43 +202,78 @@ export default {
                 })     
             },
 
-            send: async function() {
-                const locationId = this.$route.params.id
-                const userId = firebase.auth().currentUser.uid
-                async function retrieveUser(idOfUser) {
-                    var username = ''
-                        await database.collection('users').doc(idOfUser).get().then(doc => {
-                            let data = doc.data()
-                            username = data['name']
-                        })
-                    return username;
-                }
-                let username = await retrieveUser(userId)
+		updateData: async function () {
+			var date = this.$route.params.date
+			var dateString = date.toDateString();
+			let monthString = dateString.slice(4,7)
+			console.log(monthString)
+			var someArr = []
+			await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
+				querySnapshot.docs.forEach((doc) => {
+					console.log(doc.id, "=>", doc.data())
+					let data = {...doc.data(), ['id']: doc.id}
+					someArr.push(data)
+				})
+			})
+			console.log(someArr)
+			return someArr
+		},
 
-
-                database.collection('listings').doc(locationId).collection('reviews').add({
-                    title: this.title,
-                    comments: this.comment,
-                    noise: Number(this.noise),
-                    rating: Number(this.rating),
-                    userid: userId,
-                    user: username
-                })
-
-                database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
-                    const toUpdate = snapshot.data();
-                    var newNumRatings = toUpdate.numRatings + 1;
-                    var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
-                    var newAvgRating = Math.round(Number(newRatingTotal) / Number(newNumRatings));
-                    var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
-                    var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
-                    database.collection('listings').doc(this.$route.params.id).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
-                    this.$router.push({path: "/bookings"}));
-                
-                })  
-
-                
+        send: async function() {
+			const locationId = this.$route.params.id
+            const userId = firebase.auth().currentUser.uid
+            async function retrieveUser(idOfUser) {
+                var username = ''
+                    await database.collection('users').doc(idOfUser).get().then(doc => {
+                        let data = doc.data()
+                        username = data['name']
+                    })
+                return username;
             }
+            let username = await retrieveUser(userId)
+
+
+            database.collection('listings').doc(locationId).collection('reviews').add({
+                title: this.title,
+                comments: this.comment,
+                noise: Number(this.noise),
+                rating: Number(this.rating),
+                userid: userId,
+                user: username
+            })
+
+			// get month doc id and currbookings and currrevenue
+			var date = this.$route.params.date
+			var dateString = date.toDateString()
+			let monthString = dateString.slice(4,7)
+			console.log(monthString)
+				
+			var result = await this.updateData()
+			console.log(result)
+			result.forEach(doc => {
+				this.monthID += doc.id
+				console.log(doc.id)
+			})
+			
+			var locationID = this.$route.params.id;
+			console.log(locationID)
+            database.collection('listings').doc(locationID).get().then(snapshot => {
+                const toUpdate = snapshot.data();
+                var newNumRatings = toUpdate.numRatings + 1;
+                var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
+                var newAvgRating = Math.round(Number(newRatingTotal) / Number(newNumRatings));
+                var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
+                var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
+				database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
+					ratings: newAvgRating
+					})
+                database.collection('listings').doc(locationID).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
+                this.$router.push({path: "/bookings"}));
+                
+            })  
+
+                
+        }
     },
 
     created: function() {

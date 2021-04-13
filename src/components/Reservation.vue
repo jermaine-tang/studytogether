@@ -54,7 +54,7 @@
 <script>
 import Header from "./UI/Header.vue";
 import database from "../firebase.js";
-import firebase from "firebase";
+import firebase from "firebase/app";
 import DatePicker from "v-calendar/lib/components/date-picker.umd";
 
 export default {
@@ -68,6 +68,11 @@ export default {
       dateSelected: false,
       timeSelected: false,
       availableTime: false,
+      price: 0,
+      currMBookings: 0,
+      currMRevenue: 0,
+      monthID: '',
+      timeIDs: []
     };
   },
   components: {
@@ -156,8 +161,36 @@ export default {
         });
     },
 
-    submit: function (e) {
-      e.preventDefault();
+    fetchItems: function() {
+      console.log("hi")
+      var locationID = this.$route.params.id;
+      
+      database.collection('listings').doc(locationID).get().then(snapshot => {
+        const toAdd = snapshot.data();
+        this.price = toAdd.price;
+        console.log(this.price)
+      });
+    },
+
+
+    updateData: async function () {
+      var dateString = this.date.toDateString()
+      let monthString = dateString.slice(4,7)
+      console.log(monthString)
+        var someArr = []
+        await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
+          querySnapshot.docs.forEach((doc) => {
+            console.log(doc.id, "=>", doc.data())
+            let data = {...doc.data(), ['id']: doc.id}
+            someArr.push(data)
+          })
+        })
+        console.log(someArr)
+        return someArr
+      },
+
+    submit: async function (e) {
+      e.preventDefault(); 
 
       if (this.selected.length == 0) {
         alert("Please select at least 1 timeslot");
@@ -175,6 +208,7 @@ export default {
         pax: this.pax,
         date: this.date,
         time: this.selected,
+
       };
 
       var date = this.date.getDate();
@@ -215,10 +249,51 @@ export default {
 
       database.collection("bookings").add(data);
 
-      alert("Booking successful!");
-      this.$router.push({ path: "/listings" });
+      // get month doc id and currbookings and currrevenue
+      var dateString = this.date.toDateString()
+      let monthString = dateString.slice(4,7)
+      console.log(monthString)
+      
+      var result = await this.updateData()
+      console.log(result)
+      result.forEach(doc => {
+        this.currMBookings += doc.bookings
+        this.currMRevenue += doc.revenue
+        this.monthID += doc.id
+        console.log(doc.id)
+      })
+      
+      
+
+
+        console.log("currBookings", this.currMBookings)
+        console.log("currRevenue", this.currMRevenue)
+        console.log("what's the issue1")
+
+        console.log(locationID)
+        var newMBookings = this.currMBookings + 1
+        console.log(this.selected.length)
+        console.log(this.pax)
+        console.log(this.price)
+        var newMRevenue = this.currMRevenue + (this.pax*this.price*this.selected.length)
+
+        // update monthlyData
+        await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
+            bookings: newMBookings,
+            revenue: newMRevenue
+          })
+      //.then(() => {console.log("help")});
+        console.log("what's the issue2")
+
+        alert("Booking successful!");
+        this.$router.push({ path: "/listings" });
+    
     },
   },
+  created: function() {
+        this.fetchItems();
+    },
+  
 
   watch: {
     date: async function () {
