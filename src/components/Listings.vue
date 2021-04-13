@@ -301,6 +301,7 @@ export default {
       ],
       sortBy: null,
       ascending: true,
+      docid: ''
     };
   },
 
@@ -396,12 +397,49 @@ export default {
         });
     },
 
-    route: function(event) {
-            let doc_id = event.target.getAttribute("id");
-            var currDate = new Date()
-            database.collection("listings").doc(doc_id).collection("monthlyData")
-            this.$router.push({name:"indiv", params: {id:doc_id}})
-        },
+    route: async function(event) {
+      this.docid = event.target.getAttribute("id");
+      console.log(this.docid)
+      var currDate = new Date()
+      let dateInString = currDate.toDateString()
+      let monthString = dateInString.slice(4,7)
+      console.log(monthString)
+
+      var result = await this.fetchClicks()
+
+      var monthClicks = 0;
+      var monthID = '';
+
+      result.forEach(doc => {
+        monthClicks += doc.clicks
+        monthID += doc.id
+        console.log(doc.id)
+      })
+
+      await database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthID).update({
+        clicks: Number(monthClicks + 1)
+      })
+      // database.collection("listings").doc(doc_id).collection("monthlyData")
+      this.$router.push({name:"indiv", params: {id:this.docid}});
+    },
+
+    fetchClicks: async function() {
+      var currDate = new Date()
+      let dateInString = currDate.toDateString()
+      let monthString = dateInString.slice(4,7)
+
+      var someArr = []
+      await database.collection('listings').doc(this.docid).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
+        querySnapshot.docs.forEach((doc) => {
+          console.log(doc.id, "=>", doc.data())
+          let data = {...doc.data(), ['id']: doc.id}
+          someArr.push(data)
+        })
+      })
+      console.log(someArr)
+      return someArr;
+
+    },
 
     bookmark: function (event) {
       //add the place to favourites

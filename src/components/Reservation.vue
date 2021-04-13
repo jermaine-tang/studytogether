@@ -178,16 +178,16 @@ export default {
       var dateString = this.date.toDateString()
       let monthString = dateString.slice(4,7)
       console.log(monthString)
-        var someArr = []
-        await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
-          querySnapshot.docs.forEach((doc) => {
-            console.log(doc.id, "=>", doc.data())
-            let data = {...doc.data(), ['id']: doc.id}
-            someArr.push(data)
-          })
+      var someArr = []
+      await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
+        querySnapshot.docs.forEach((doc) => {
+          console.log(doc.id, "=>", doc.data())
+          let data = {...doc.data(), ['id']: doc.id}
+          someArr.push(data)
         })
-        console.log(someArr)
-        return someArr
+      })
+      console.log(someArr)
+      return someArr
     },
 
     updateTData: async function() {
