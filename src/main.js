@@ -21,7 +21,6 @@ const myRouter = new VueRouter({
 
 myRouter.beforeEach((to, from, next) => {
   const auth = to.meta.auth
-  console.log(auth)
   if (!auth) {
     next();
   } else {

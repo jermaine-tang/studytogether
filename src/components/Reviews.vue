@@ -217,7 +217,7 @@ export default {
                 database.collection('listings').doc(locationId).collection('reviews').add({
                     title: this.title,
                     comments: this.comment,
-                    noise: Number(this.noise),
+                    noise: this.noise,
                     rating: Number(this.rating),
                     userid: userId,
                     user: username

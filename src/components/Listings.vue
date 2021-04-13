@@ -2,7 +2,149 @@
   <div>
     <app-header></app-header>
 
-    <div class="wrap">
+    <div class="toptopbar">
+      <div class="topbar">
+        <b-input-group class="searchbar">
+          <b-form-input
+            class="search"
+            v-model="searchString"
+            placeholder="What are you looking for?"
+          ></b-form-input>
+          <b-input-group-append>
+            <b-button variant="outline-primary" v-b-modal.modal-prevent-closing
+              ><b-icon icon="filter"></b-icon
+            ></b-button>
+          </b-input-group-append>
+        </b-input-group>
+
+        <div class="sorting">
+          <b-dropdown text="SortBy">
+            <b-dropdown-item
+              v-for="option in sortOptions"
+              :key="option.value"
+              :value="option.value"
+              @click="sortBy = option.value"
+            >
+              {{ option.text }}
+            </b-dropdown-item>
+            <template v-slot:button-content>
+              {{ sortBy }}
+            </template>
+          </b-dropdown>
+          <b-button squared variant="outline-secondary" v-on:click="ascending = !ascending" class="sort-button">
+            <b-icon v-if="ascending" icon="sort-down"></b-icon>
+            <b-icon v-else icon="sort-down-alt"></b-icon>
+            <!-- <i v-if="ascending" class="fa fa-sort-up"></i>
+        <i v-else class="fa fa-sort-down"></i>
+        Reverse -->
+          </b-button>
+        </div>
+      </div>
+
+      <b-modal
+        id="modal-prevent-closing"
+        ref="modal"
+        title="Choose your Filters"
+        @show="resetModal"
+        @hidden="resetModal"
+        @ok="handleOk"
+        ok-only
+      >
+        <form ref="form" @submit.stop.prevent="handleSubmit">
+          <h4>Location</h4>
+          <b-form-checkbox-group
+            v-model="location"
+            :options="locationOptions"
+            class="mb-3"
+            value-field="item"
+            text-field="name"
+            disabled-field="notEnabled"
+          ></b-form-checkbox-group>
+          <div>
+            Selected: <strong>{{ location }}</strong>
+          </div>
+          <h4>Price Level</h4>
+          <b-form-checkbox-group
+            id="checkbox-group-2"
+            v-model="price"
+            :aria-describedby="ariaDescribedby"
+          >
+            <b-form-checkbox value="cheap"
+              ><b-icon icon="cash-stack" class="filter-cash"></b-icon
+            ></b-form-checkbox>
+            <b-form-checkbox value="medium"
+              ><b-icon icon="cash-stack" class="filter-cash"></b-icon
+              ><b-icon icon="cash-stack" class="filter-cash"></b-icon
+            ></b-form-checkbox>
+            <b-form-checkbox value="expensive"
+              ><b-icon icon="cash-stack" class="filter-cash"></b-icon
+              ><b-icon icon="cash-stack" class="filter-cash"></b-icon
+              ><b-icon icon="cash-stack" class="filter-cash"></b-icon
+            ></b-form-checkbox>
+          </b-form-checkbox-group>
+          <div>
+            Selected: <strong>{{ price }}</strong>
+          </div>
+          <h4>Noise Level</h4>
+          <b-form-checkbox-group
+            id="checkbox-group-2"
+            v-model="noise"
+            :aria-describedby="ariaDescribedby"
+          >
+            <b-form-checkbox value="1"
+              ><b-icon icon="volume-off" class="filter-volume"></b-icon
+            ></b-form-checkbox>
+            <b-form-checkbox value="2"
+              ><b-icon icon="volume-off" class="filter-volume"></b-icon
+              ><b-icon icon="volume-down" class="filter-volume"></b-icon
+            ></b-form-checkbox>
+            <b-form-checkbox value="3"
+              ><b-icon icon="volume-off" class="filter-volume"></b-icon
+              ><b-icon icon="volume-down" class="filter-volume"></b-icon
+              ><b-icon icon="volume-up" class="filter-volume"></b-icon
+            ></b-form-checkbox>
+          </b-form-checkbox-group>
+          <div>
+            Selected: <strong>{{ noise }}</strong>
+          </div>
+
+          <!-- <div>
+          <input type="checkbox" id="cheap" value="cheap" v-model="price" />
+          <label for="cheap"></label>
+          <b-icon icon="cash-stack" class="filter-cash"></b-icon>
+          <input type="checkbox" id="medium" value="medium" v-model="price" />
+          <label for="medium"> </label>
+          <b-icon icon="cash-stack" class="filter-cash"></b-icon>
+          <b-icon icon="cash-stack" class="filter-cash"></b-icon>
+          <input
+            type="checkbox"
+            id="expensive"
+            value="expensive"
+            v-model="price"
+          />
+          <label for="expensive"></label>
+          <b-icon icon="cash-stack" class="filter-cash"></b-icon>
+          <b-icon icon="cash-stack" class="filter-cash"></b-icon>
+          <b-icon icon="cash-stack" class="filter-cash"></b-icon>
+          </div> -->
+          <!-- <b-form-group
+          label="Name"
+          label-for="name-input"
+          invalid-feedback="Name is required"
+          :state="nameState"
+        >
+          <b-form-input
+            id="name-input"
+            v-model="name"
+            :state="nameState"
+            required
+          ></b-form-input>
+        </b-form-group> -->
+        </form>
+      </b-modal>
+    </div>
+
+    <!-- <div class="wrap">
       <div class="search">
         <input
           v-model="searchString"
@@ -14,13 +156,12 @@
 
         <button
           type="button"
-          class="btn"
-          @click="showModal"
+          v-on:click="showModal"
         >
           Filter
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- <div class="search">
       <b-input-group>
@@ -57,24 +198,25 @@
       </b-dropdown>
     </div> -->
 
-    <div>
-      <select v-model="sortBy">
+    <!-- <div> -->
+    <!-- <select v-model="sortBy">
         <option
-          v-for="(option, index) in options" :key="index"
+          v-for="(option, index) in options"
+          :key="index"
           v-bind:value="option.value"
         >
           {{ option.text }}
         </option>
-      </select>
+      </select> -->
 
-      <button v-on:click="ascending = !ascending" class="sort-button">
+    <!-- <button v-on:click="ascending = !ascending" class="sort-button">
         <i v-if="ascending" class="fa fa-sort-up"></i>
         <i v-else class="fa fa-sort-down"></i>
         Reverse
       </button>
-    </div>
+    </div> -->
 
-    <div>
+    <!-- <div>
       <modal 
         v-show="isModalVisible" 
         @close="closeModal" 
@@ -224,7 +366,7 @@
           </div>
         </template>
       </modal>
-    </div>
+    </div> -->
 
     <!-- <div v-if="displayedList().length == 0"> No Results Found:(</div>
   <div v-else> {{displayedList().length}} Results Found</div> -->
@@ -324,7 +466,7 @@
     <div class="listings">
       <ul class="listings-list">
         <li v-for="listing in displayedList" :key="listing.id">
-          <img id="main-pic" v-bind:src="listing.photoURL1" height="30px" />
+          <img class="main-pic" v-bind:src="listing.photoURL1" height="30px" v-bind:id="listing.id" v-on:click="route($event)" />
           <div class="title">
             <h5 class="name" v-bind:id="listing.id" v-on:click="route($event)">
               {{ listing.name }}
@@ -604,7 +746,7 @@
 import Header from "./UI/Header.vue";
 import database from "../firebase.js";
 import firebase from "firebase";
-import Modal from "./Modal.vue";
+// import Modal from "./Modal.vue";
 
 export default {
   data() {
@@ -616,14 +758,21 @@ export default {
       location: [],
       price: [],
       noise: [],
-      options: [
-        // { value: null, text: "Sort By" },
-        { value: "a", text: "Name" },
-        { value: "b", text: "Ratings" },
-        { value: "c", text: "Price" },
-        { value: "d", text: "Noise" },
+      locationOptions: [
+        { item: "North", name: "North" },
+        { item: "South", name: "South" },
+        { item: "East", name: "East" },
+        { item: "West", name: "West" },
+        { item: "Central", name: "Central" },
       ],
-      sortBy: null,
+      sortOptions: [
+        // { value: null, text: "Sort By" },
+        { value: "Name", text: "Name" },
+        { value: "Ratings", text: "Ratings" },
+        { value: "Price", text: "Price" },
+        { value: "Noise", text: "Noise" },
+      ],
+      sortBy: "Sort By",
       ascending: true,
       favourites: [],
     };
@@ -631,8 +780,19 @@ export default {
 
   components: {
     "app-header": Header,
-    modal: Modal,
+    // modal: Modal,
   },
+
+  // watch: {
+  //   location: function () {
+  //     if (this.location.length != 0) {
+  //       this.list = this.list.filter(function (value) {
+  //         console.log(value);
+  //         return this.location.includes(value.location);
+  //       });
+  //     }
+  //   },
+  // },
 
   computed: {
     //computed method to watch over search, filter and sort to update displayed list
@@ -641,12 +801,11 @@ export default {
 
       console.log("computed");
 
-
       //search method
       if (this.searchString != "" && this.searchString) {
         tempList.map((item) => {
           console.log(item.name);
-        })
+        });
         tempList = tempList.filter((item) =>
           item.name.toLowerCase().includes(this.searchString.toLowerCase())
         );
@@ -655,7 +814,7 @@ export default {
       //filter method
       var location = ["North", "South", "East", "West", "Central"];
       var price = ["cheap", "medium", "expensive"];
-      var noise = [1, 2, 3];
+      var noise = ["1", "2", "3"];
       if (this.location.length != 0) {
         location = this.location;
       }
@@ -667,6 +826,7 @@ export default {
       if (this.noise.length != 0) {
         noise = this.noise;
       }
+
       tempList = tempList.filter(
         (x) =>
           location.includes(x["loc_filter"]) &&
@@ -675,16 +835,16 @@ export default {
       );
 
       //sort method
-      if (this.sortBy == "a") {
+      if (this.sortBy == "Name") {
         tempList = tempList.sort((x, y) => {
           let fx = x.name.toLowerCase(),
             fy = y.name.toLowerCase();
           return fx < fy ? -1 : 1;
         });
-      } else if (this.sortBy == "b") {
+      } else if (this.sortBy == "Ratings") {
         tempList = tempList.sort((x, y) => x.rating - y.rating);
-      } else if (this.sortBy == "c") {
-        tempList = tempList.sort((x, y) => x.orice - y.price);
+      } else if (this.sortBy == "Price") {
+        tempList = tempList.sort((x, y) => x.price - y.price);
       } else {
         tempList = tempList.sort((x, y) => x.noise - y.noise);
       }
@@ -697,18 +857,16 @@ export default {
       return tempList;
     },
 
-    test: function() {
+    test: function () {
       console.log(this.searchString);
       return this.searchString;
-    }
-
-
+    },
   },
 
   methods: {
     showModal() {
       this.isModalVisible = true;
-      console.log(this.isModalVisible)
+      console.log(this.isModalVisible);
     },
     closeModal() {
       this.isModalVisible = false;
@@ -733,6 +891,9 @@ export default {
             this.list.push(item);
           });
         });
+
+      this.displayedList = this.list;
+      console.log(this.list);
 
       let user = firebase.auth().currentUser;
       await database
@@ -805,19 +966,20 @@ export default {
         });
     },
 
-    unbookmark: function(event) {
-      let doc_id = event.currentTarget.getAttribute("id")
-      let user = firebase.auth().currentUser
+    unbookmark: function (event) {
+      let doc_id = event.currentTarget.getAttribute("id");
+      let user = firebase.auth().currentUser;
 
-      console.log(doc_id)
+      console.log(doc_id);
 
-      this.favourites = this.favourites.filter(function(value) {
-        return value != doc_id
-      })
+      this.favourites = this.favourites.filter(function (value) {
+        return value != doc_id;
+      });
 
-      database.collection('users').doc(user.uid).update({ favourites: this.favourites })
-
-
+      database
+        .collection("users")
+        .doc(user.uid)
+        .update({ favourites: this.favourites });
     },
 
     // clicked: function (event) {
@@ -842,7 +1004,7 @@ ul {
   flex-wrap: wrap;
   list-style-type: none;
   /* padding: 10%; */
-  padding-top: 3%;
+  padding-top: 1%;
   padding-left: 0;
   margin: auto;
 }
@@ -855,16 +1017,17 @@ li {
   margin-top: 5px;
   border-radius: 25px;
   font-family: "Ubuntu", sans-serif;
-  margin-left: 5%;
+  margin-left: 4%;
 }
 /* .listings-list {
   margin-left: 3%;
 } */
-#main-pic {
+.main-pic {
   margin-bottom: 15px;
   border-radius: 15px;
   width: 100%;
   height: 250px;
+  cursor: pointer;
 }
 
 .title {
@@ -879,6 +1042,7 @@ li {
   font-size: 35px;
   text-align: left;
   float: left;
+  cursor: pointer;
 }
 
 .rating {
@@ -902,6 +1066,52 @@ li {
   margin-left: auto;
 }
 
+.filter-cash {
+  margin-left: 7px;
+  margin-right: 7px;
+  font-size: 25px;
+}
+
+.filter-volume {
+  margin-left: 5px;
+  margin-right: 5px;
+  font-size: 25px;
+}
+
+input {
+  margin-top: 5px;
+}
+
+.searchbar {
+  width: 60%;
+}
+
+.search {
+  margin-top: 0;
+}
+
+.topbar {
+  display: flex;
+  width: 33%;
+  margin:auto;
+}
+
+.toptopbar {
+  padding-bottom: 10px;
+  border-bottom: 2px solid grey;
+  width: 90%;
+  margin: auto;
+}
+
+.sorting {
+  /* margin: auto; */
+  margin-left: 5px;
+  display: flex;
+}
+
+.sort-button {
+  margin-left: 5px;
+}
 /* .location,
 .noise,
 .price {
@@ -911,11 +1121,11 @@ li {
   font-size: 20px;
 } */
 
-#locationVal,
+/* #locationVal,
 .noiseVal {
   margin-top: 10px;
   margin-left: 3px;
-}
+} */
 
 /* .bookmark {
   float: right;
@@ -924,17 +1134,17 @@ li {
 
 @import url(https://fonts.googleapis.com/css?family=Open+Sans);
 
-body {
+/* body {
   background: #f2f2f2;
   font-family: "Open Sans", sans-serif;
-}
+} */
 
-.search {
+/* .search {
   width: 30%;
   margin: auto;
-}
+} */
 
-.searchTerm {
+/* .searchTerm {
   width: 100%;
   border: 3px solid #ed7a78;
   border-right: none;
@@ -947,16 +1157,16 @@ body {
 
 .searchTerm:focus {
   color: #ed7a78;
-}
+} */
 
 /*Resize the wrap to see the search bar change!*/
-.wrap {
+/* .wrap {
   width: 30%;
   position: relative;
   top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
+} */
 
 /* @media (min-width: 740px) and (max-width: 1412px) {
   .listings-list {
