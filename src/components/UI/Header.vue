@@ -8,6 +8,7 @@
           <li><router-link to="/listings">Listings</router-link></li>
           <li v-if="loggedIn"><router-link to="/bookings">Bookings</router-link></li>
           <li v-if="loggedIn"><router-link to="/favourites">Favourites</router-link></li>
+          <li v-if="loggedIn"><router-link to="/userChart">View Chart</router-link></li>
           <li v-if="loggedIn"><router-link to="/bizBookings">Biz Bookings</router-link></li>
           <li v-if="loggedIn"><router-link v-on:click.native="signOut" to="/">Logout</router-link></li>
           <li v-else><router-link to="/login">Login</router-link></li>
