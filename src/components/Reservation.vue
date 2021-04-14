@@ -180,6 +180,15 @@ export default {
       console.log(monthString)
       var someArr = []
       await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
+        if(querySnapshot.isEmpty) {
+            database.collection('listings').doc(this.$route.params.id).collection('monthlyData').add({
+            month: monthString,
+            bookings: 0,
+            clicks: 0,
+            revenue: 0,
+            ratings: 0,
+            }) 
+        }
         querySnapshot.docs.forEach((doc) => {
           console.log(doc.id, "=>", doc.data())
           let data = {...doc.data(), ['id']: doc.id}
@@ -194,20 +203,31 @@ export default {
       var locationID = this.$route.params.id;
       var currTData = []
       for (var i = 0; i < this.selected.length; i++) {
-            var time = this.selected[i];
-            await database
-              .collection("listings")
-              .doc(locationID)
-              .collection("timeslotsData")
-              .doc(time)
-              .get()
-              .then((snapshot) => {
-                const timeData = snapshot.data();
-                currTData.push({time: snapshot.id, currTBookings: Number(timeData.bookings), currTRevenue: Number(timeData.revenue)})
-                console.log("curr time bookigns", "=>", timeData.bookings)
+        var time = this.selected[i];
+        await database.collection("listings").doc(locationID).collection("timeslotsData").doc(time).get().then((snapshot) => {
+          console.log("dont have doc1")
+          if(!snapshot.exists) {
+            console.log("dont have doc")
+            database.collection('listings').doc(locationID).collection('timeslotsData').doc(time).set({
+              bookings: 0,
+              revenue: 0,
+            }) 
+          }
+        })
+      }
+
+      for (var i = 0; i < this.selected.length; i++) {
+        var time = this.selected[i];
+    
+
+            await database.collection("listings").doc(locationID).collection("timeslotsData").doc(time).get().then((snapshot) => {
+              const timeData = snapshot.data();
+              currTData.push({time: snapshot.id, currTBookings: Number(timeData.bookings), currTRevenue: Number(timeData.revenue)})
+              console.log("curr time bookings", "=>", timeData.bookings)
               //  this.currTBookings = timeData.bookings
               //  this.currTRevenue = timeData.revenue
-              })
+            })
+
       }
       console.log(currTData)
       return currTData

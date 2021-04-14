@@ -424,20 +424,51 @@ export default {
     },
 
     fetchClicks: async function() {
+      
       var currDate = new Date()
       let dateInString = currDate.toDateString()
       let monthString = dateInString.slice(4,7)
 
       var someArr = []
-      await database.collection('listings').doc(this.docid).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
-        querySnapshot.docs.forEach((doc) => {
-          console.log(doc.id, "=>", doc.data())
-          let data = {...doc.data(), ['id']: doc.id}
-          someArr.push(data)
+    //  try {
+        await database.collection('listings').doc(this.docid).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
+          if(querySnapshot.isEmpty) {
+            database.collection('listings').doc(this.docid).collection('monthlyData').add({
+            month: monthString,
+            bookings: 0,
+            clicks: 0,
+            revenue: 0,
+            ratings: 0,
+            }) 
+          } 
+          querySnapshot.docs.forEach((doc) => {
+            console.log(doc.id, "=>", doc.data())
+            let data = {...doc.data(), ['id']: doc.id}
+            someArr.push(data)
+          }) 
+    
         })
-      })
+        /*
+        }).catch(e) {
+          await database.collection('listings').doc(this.docid).collection('monthlyData').add({
+          month: monthString,
+          bookings: 0,
+          clicks: 0,
+          revenue: 0,
+          ratings: 0,
+        });
+        await database.collection('listings').doc(this.docid).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
+          querySnapshot.docs.forEach((doc) => {
+            console.log(doc.id, "=>", doc.data())
+            let data = {...doc.data(), ['id']: doc.id}
+            someArr.push(data)
+          })
+        })
+        */
+     
       console.log(someArr)
       return someArr;
+    
 
     },
 
