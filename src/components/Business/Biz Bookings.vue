@@ -49,10 +49,10 @@ export default {
 
         getDoc: async function() {
             // hardcode
-            // var userId = '5iBl58sV6uv7riUzCQzn'
+            var userId = '5iBl58sV6uv7riUzCQzn'
 
             // CurrentUSer.uid == listing doc ID
-            var userId = firebase.auth().currentUser.uid
+            // var userId = firebase.auth().currentUser.uid
             var arr = []
             await database.collection('listings').doc(userId).collection('timeslots').get().then(querySnapShot => {
                 let slot = {}
@@ -103,6 +103,7 @@ export default {
 
                     var customerinfos = []
                         await database.collection('bookings').where("date", ">=", startDate).where("date", "<", endDate).get().then((querySnapShot) => {
+                            console.log(startDate.toDate().toDateString())
                             querySnapShot.docs.forEach(async function(doc) {
 
                                 let data = doc.data()
