@@ -6,10 +6,10 @@
         <ul>
           <li><router-link to="/">Home</router-link></li>
           <li><router-link to="/listings">Listings</router-link></li>
-          <li v-if="loggedIn"><router-link to="/bookings">Bookings</router-link></li>
-          <li v-if="loggedIn"><router-link to="/favourites">Favourites</router-link></li>
-          <li v-if="loggedIn"><router-link to="/bizBookings">Biz Bookings</router-link></li>
-          <li v-if="loggedIn"><router-link v-on:click.native="signOut" to="/">Logout</router-link></li>
+          <li v-if="loggedIn == 'customer'"><router-link to="/bookings">Bookings</router-link></li>
+          <li v-if="loggedIn == 'customer'"><router-link to="/favourites">Favourites</router-link></li>
+          <li v-if="loggedIn == 'owner'"><router-link to="/bizBookings">Biz Bookings</router-link></li>
+          <li v-if="loggedIn != 'none'"><router-link v-on:click.native="signOut" to="/">Logout</router-link></li>
           <li v-else><router-link to="/login">Login</router-link></li>
         </ul>
       </nav>
@@ -20,24 +20,26 @@
 
 <script>
 import firebase from 'firebase';
+import database from '../../firebase.js';
 
 export default {
   
   data() {
     return {
-      loggedIn: false,
+      loggedIn: "none",
     };
   },
 
   methods: {
-    setupFirebase: function () {
-      firebase.auth().onAuthStateChanged(user => {
+    setupFirebase: async function () {
+      firebase.auth().onAuthStateChanged(async user => {
         if (user) {
-          console.log('loggedIn')
-          this.loggedIn = true;
+          await database.collection('users').doc(user.uid).get().then(doc => {
+            const data = doc.data()
+            this.loggedIn = data.usertype;
+          })
         } else {
-          console.log('not logged in')
-          this.loggedIn = false;
+          this.loggedIn = "none";
         }
       })
     },

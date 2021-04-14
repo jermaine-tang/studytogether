@@ -9,6 +9,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+
 Vue.config.productionTip = false
 Vue.use(VueRouter);
 Vue.use(BootstrapVue)
@@ -26,7 +27,7 @@ myRouter.beforeEach((to, from, next) => {
   } else {
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
-        next('login');
+        next('/login');
       } else {
         database.collection('users').doc(user.uid).get().then(snapshot => {
           const data = snapshot.data();

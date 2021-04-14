@@ -31,7 +31,12 @@
               {{ sortBy }}
             </template>
           </b-dropdown>
-          <b-button squared variant="outline-secondary" v-on:click="ascending = !ascending" class="sort-button">
+          <b-button
+            squared
+            variant="outline-secondary"
+            v-on:click="ascending = !ascending"
+            class="sort-button"
+          >
             <b-icon v-if="ascending" icon="sort-down"></b-icon>
             <b-icon v-else icon="sort-down-alt"></b-icon>
             <!-- <i v-if="ascending" class="fa fa-sort-up"></i>
@@ -91,14 +96,14 @@
             v-model="noise"
             :aria-describedby="ariaDescribedby"
           >
-            <b-form-checkbox value="1"
+            <b-form-checkbox :value="1"
               ><b-icon icon="volume-off" class="filter-volume"></b-icon
             ></b-form-checkbox>
-            <b-form-checkbox value="2"
+            <b-form-checkbox :value="2"
               ><b-icon icon="volume-off" class="filter-volume"></b-icon
               ><b-icon icon="volume-down" class="filter-volume"></b-icon
             ></b-form-checkbox>
-            <b-form-checkbox value="3"
+            <b-form-checkbox :value="3"
               ><b-icon icon="volume-off" class="filter-volume"></b-icon
               ><b-icon icon="volume-down" class="filter-volume"></b-icon
               ><b-icon icon="volume-up" class="filter-volume"></b-icon
@@ -466,7 +471,13 @@
     <div class="listings">
       <ul class="listings-list">
         <li v-for="listing in displayedList" :key="listing.id">
-          <img class="main-pic" v-bind:src="listing.photoURL1" height="30px" v-bind:id="listing.id" v-on:click="route($event)" />
+          <img
+            class="main-pic"
+            v-bind:src="listing.photoURL1"
+            height="30px"
+            v-bind:id="listing.id"
+            v-on:click="route($event)"
+          />
           <div class="title">
             <h5 class="name" v-bind:id="listing.id" v-on:click="route($event)">
               {{ listing.name }}
@@ -568,7 +579,7 @@
             <!-- <br /> -->
             <p v-if="listing.noise == 1" class="noise" style="font-size: 25px">
               <b-icon
-                icon="volume-up"
+                icon="volume-mute"
                 style="
                   margin-top: auto;
                   margin-bottom: auto;
@@ -580,7 +591,7 @@
 
             <p v-if="listing.noise == 2" class="noise" style="font-size: 25px">
               <b-icon
-                icon="volume-up"
+                icon="volume-down"
                 style="
                   margin-top: auto;
                   margin-bottom: auto;
@@ -783,16 +794,25 @@ export default {
     // modal: Modal,
   },
 
-  // watch: {
-  //   location: function () {
-  //     if (this.location.length != 0) {
-  //       this.list = this.list.filter(function (value) {
-  //         console.log(value);
-  //         return this.location.includes(value.location);
-  //       });
-  //     }
-  //   },
-  // },
+  watch: {
+    location: function () {
+      console.log(this.location)
+    },
+
+    searchString: function() {
+      console.log(this.searchString)
+    },
+    noise: function() {
+      console.log(typeof this.noise[0])
+    },
+    price: function() {
+      console.log(this.price)
+    },
+
+    sortBy: function() {
+      console.log(this.sortBy)
+    }
+  },
 
   computed: {
     //computed method to watch over search, filter and sort to update displayed list
@@ -814,7 +834,7 @@ export default {
       //filter method
       var location = ["North", "South", "East", "West", "Central"];
       var price = ["cheap", "medium", "expensive"];
-      var noise = ["1", "2", "3"];
+      var noise = [1, 2, 3];
       if (this.location.length != 0) {
         location = this.location;
       }
@@ -827,12 +847,16 @@ export default {
         noise = this.noise;
       }
 
+      console.log(tempList);
+
       tempList = tempList.filter(
         (x) =>
           location.includes(x["loc_filter"]) &&
           price.includes(x["price_filter"]) &&
           noise.includes(x["noise"])
       );
+
+      console.log(tempList);
 
       //sort method
       if (this.sortBy == "Name") {
@@ -881,14 +905,16 @@ export default {
           querySnapShot.docs.forEach((doc) => {
             item = { ...doc.data(), ["id"]: doc.id };
             console.log(item);
-            if (item["price"] <= 10) {
-              item["price_filter"] = "cheap";
-            } else if (item["price"] > 20) {
-              item["price_filter"] = "expensive";
-            } else {
-              item["price_filter"] = "medium";
+            if (item["published"] == true) {
+              if (item["price"] <= 10) {
+                item["price_filter"] = "cheap";
+              } else if (item["price"] > 20) {
+                item["price_filter"] = "expensive";
+              } else {
+                item["price_filter"] = "medium";
+              }
+              this.list.push(item);
             }
-            this.list.push(item);
           });
         });
 
@@ -917,8 +943,10 @@ export default {
 
     bookmark: async function (event) {
       //add the place to favourites
+      console.log('bookmark')
       let doc_id = event.currentTarget.getAttribute("id");
       let user = firebase.auth().currentUser;
+      console.log(user.uid)
       // var newFav = [];
       await database
         .collection("users")
@@ -1093,7 +1121,7 @@ input {
 .topbar {
   display: flex;
   width: 33%;
-  margin:auto;
+  margin: auto;
 }
 
 .toptopbar {
