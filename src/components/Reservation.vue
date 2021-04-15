@@ -24,7 +24,9 @@
             ></v-date-picker>
             <br />
             <br />
-            <button class="submit" type="submit" v-on:click="submit">Submit</button>
+            <button class="submit" type="submit" v-on:click="submit">
+              Submit
+            </button>
             <br />
             <br />
           </div>
@@ -37,12 +39,12 @@
             <br />
             <br />
             <div v-if="dateSelected && availableTime">
-            <label class="container" v-for="item in timeslot" :key="item"
-              >{{ item }}
-              <input type="checkbox" v-bind:value="item" v-model="selected" />
-              <span class="checkmark"></span>
-            </label>
-            <br/>
+              <label class="container" v-for="item in timeslot" :key="item"
+                >{{ item }}
+                <input type="checkbox" v-bind:value="item" v-model="selected" />
+                <span class="checkmark"></span>
+              </label>
+              <br />
             </div>
           </div>
         </div>
@@ -330,17 +332,17 @@ select {
 .float-left {
   float: left;
   align-items: left;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 20px;
   margin-left: 5px;
   box-shadow: 0px 0px 10px 10px lightgrey;
 }
 
 .float-right {
-    margin-left: 30px;
+  margin-left: 30px;
   float: right;
   align-items: left;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 20px;
   box-shadow: 0px 0px 10px 10px lightgrey;
 }
@@ -363,28 +365,28 @@ form {
   width: 100%;
 }
 
-.submit{
-    display:inline-block;
-    padding:0.5em 3em;
-    border:0.16em solid darkgray;
-    margin:0 0.3em 0.3em 0;
-    box-sizing: border-box;
-    text-decoration:none;
-    text-transform:uppercase;
-    font-family:'Roboto',sans-serif;
-    font-weight:400;
-    color:darkgray;
-    text-align:center;
-    transition: all 0.2s;
-    cursor: pointer;
+.submit {
+  display: inline-block;
+  padding: 0.5em 3em;
+  border: 0.16em solid darkgray;
+  margin: 0 0.3em 0.3em 0;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  color: darkgray;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
 }
 
-.submit:hover{
-    color:#DDDDDD;
-    border-color:#DDDDDD;
+.submit:hover {
+  color: #dddddd;
+  border-color: #dddddd;
 }
-.submit:active{
-    color:#BBBBBB;
-    border-color:#BBBBBB;
+.submit:active {
+  color: #bbbbbb;
+  border-color: #bbbbbb;
 }
 </style>

@@ -16,12 +16,12 @@
 
 <script>
     import Header from "../UI/Header.vue";
-    //import firebase from 'firebase';
+    import firebase from 'firebase';
 
     export default {
         data() {
             return {
-                bizID: '5iBl58sV6uv7riUzCQzn',
+                bizID: '',
             }
         },
         components: {
@@ -32,12 +32,12 @@
 
             fetchID: function () {
 
-                /*
+                
                 var user = firebase.auth().currentUser;
-                console.log(user);
+                console.log(user.uid);
                 var userID = user.uid;
                 this.bizID = userID;
-                */
+                
                 
                 
                 //update how to get listing ID after biz login is done
