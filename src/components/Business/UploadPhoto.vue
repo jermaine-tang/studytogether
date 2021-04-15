@@ -133,7 +133,7 @@ export default {
       this.uploadValue = 0;
       this.img1 = null;
       this.imageData1 = event.target.files[0];
-      console.log(this.imageData1);
+      console.log(event.target.files);
       this.onUpload1();
     },
 

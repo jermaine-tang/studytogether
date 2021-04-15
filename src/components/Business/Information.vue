@@ -86,17 +86,68 @@
         <div class="submit-button">
           <!-- <button v-if="!published" @click.prevent="save">Publish Listing</button>
         <button v-if="published" @click.prevent="save">Save Changes</button> -->
-          <b-button v-if="!published" variant="outline-secondary"
+          <b-button
+            v-if="!published"
+            @click.prevent="save"
+            variant="outline-secondary"
             >Publish Listing</b-button
           >
-          <b-button v-if="published" variant="outline-secondary"
+          <b-button
+            v-if="published"
+            @click.prevent="save"
+            variant="outline-secondary"
             >Save Changes</b-button
           >
         </div>
       </div>
 
       <div class="details2">
-        <div class="editPhotos">
+        <b-form-file
+          v-model="imgData"
+          @change="uploadPhotos"
+          ref="file-input"
+          class="mb-2"
+          multiple
+        ></b-form-file>
+
+        <!-- <b-button @click="photos = []">Reset</b-button> -->
+
+        <!-- <p class="mt-2">
+          Selected file: <b>{{ photos }}</b>
+        </p> -->
+
+        <vueper-slides
+          bullets-outside
+          class="photo-slides"
+          :bullets="false"
+          :arrows-outside="false"
+          :disableArrowsOnEdges="true"
+          :infinite="false"
+          fixed-height="200px;"
+          @next="photoIndex += 1"
+          @previous="photoIndex -= 1"
+        >
+          <vueper-slide
+            v-for="(url, index) in photos"
+            :image="url"
+            :key="index"
+          />
+        </vueper-slides>
+
+        <b-button @click="photos = []">Reset</b-button>
+
+        <b-button @click.prevent="deletePhoto" variant="outline-secondary"
+          >Delete Current Photo</b-button
+        >
+
+        <b-button @click.prevent="saveCover" variant="outline-secondary"
+          >Set as Cover Photo</b-button
+        >
+
+        <b-button @click.prevent="savePhotos" variant="outline-secondary"
+          >Save Photos</b-button
+        >
+        <!-- <div class="editPhotos">
           Current Photos:
           <br /><br />
           <img class="place" v-bind:src="this.photo1" />
@@ -108,11 +159,52 @@
           <label for="photos">Upload New Photos: </label>
           <br /><br />
           <upload></upload>
-        </div>
+        </div> -->
       </div>
 
       <div class="details3">
-        <multi
+        <b-form-file
+          v-model="imgData"
+          @change="uploadMenu"
+          ref="file-input"
+          class="mb-2"
+          multiple
+        ></b-form-file>
+
+        
+
+        <!-- <p class="mt-2">
+          Selected file: <b>{{ menu }}</b>
+        </p> -->
+
+        <vueper-slides
+          bullets-outside
+          class="photo-slides"
+          :bullets="false"
+          :arrows-outside="false"
+          :disableArrowsOnEdges="true"
+          :infinite="false"
+          fixed-height="200px;"
+          @next="menuIndex += 1"
+          @previous="menuIndex -= 1"
+        >
+          <vueper-slide
+            v-for="(url, index) in menu"
+            :image="url"
+            :key="index"
+          />
+        </vueper-slides>
+
+        <b-button @click="menu = []">Reset</b-button>
+
+        <b-button @click.prevent="deleteMenu" variant="outline-secondary"
+          >Delete Current Menu</b-button
+        >
+
+        <b-button @click.prevent="saveMenu" variant="outline-secondary"
+          >Save Menu</b-button
+        >
+        <!-- <multi
           @upload-success="uploadImageSuccess"
           @edit-image="editImage"
           @mark-is-primary="markIsPrimary"
@@ -131,7 +223,8 @@
           :show-delete="true"
           :show-add="true"
         >
-        </multi>
+        </multi> -->
+        <!-- <multi></multi> -->
         <!-- <div class="editMenu">
           Current Menu:
           <br /><br />
@@ -155,9 +248,13 @@ import database from "../../firebase.js";
 import firebase from "firebase";
 import { MultiSelect } from "@progress/kendo-vue-dropdowns";
 import "@progress/kendo-theme-default/dist/all.css";
-import Upload from "./UploadPhoto.vue";
-import VueUploadMultipleImage from "vue-upload-multiple-image";
+import { VueperSlides, VueperSlide } from "vueperslides";
+import "vueperslides/dist/vueperslides.css";
+// import Upload from "./UploadPhoto.vue";
+// import multi from './Multiupload.vue';
+// import VueUploadMultipleImage from "vue-upload-multiple-image";
 // import UploadMenu from "./UploadMenu.vue";
+
 export default {
   data() {
     return {
@@ -167,23 +264,36 @@ export default {
       exact_loc: "",
       region: "",
       neighbourhood: "",
-      photo1: "",
-      photo2: "",
-      photo3: "",
+      photos: [],
+      cover_photo: "",
+      // photo2: "",
+      // photo3: "",
       price: 0,
-      menu: "",
+      menu: [],
       amenities: [],
       options: ["Wifi", "Toilet", "Power Plug", "Airconditioning"],
       published: null,
+      photoData: [],
+      photoIndex: 0,
+      menuIndex: 0,
     };
   },
 
   components: {
     "app-header": Header,
     multiselect: MultiSelect,
-    upload: Upload,
-    multi: VueUploadMultipleImage,
+    "vueper-slides": VueperSlides,
+    "vueper-slide": VueperSlide,
+    // upload: Upload,
+    // multi: multi,
+    // multi: VueUploadMultipleImage,
     // uploadMenu: UploadMenu,
+  },
+
+  watch: {
+    photoIndex: function () {
+      console.log(this.photoIndex);
+    },
   },
 
   methods: {
@@ -209,9 +319,9 @@ export default {
           this.price = toAdd.price;
           this.amenities = toAdd.amenities;
           // check again
-          this.photo1 = toAdd.photoURL1;
-          this.photo2 = toAdd.photoURL2;
-          this.photo3 = toAdd.photoURL3;
+          this.photos = toAdd.photos;
+          // this.photo2 = toAdd.photoURL2;
+          // this.photo3 = toAdd.photoURL3;
           this.menu = toAdd.menu;
           this.published = toAdd.published;
           console.log(toAdd);
@@ -233,29 +343,104 @@ export default {
       window.location.reload();
     },
 
-    uploadImageSuccess(formData, index, fileList) {
-      console.log('data', formData, index, fileList)
-      // Upload image api
-      // axios.post('http://your-url-upload', formData).then(response => {
-      //   console.log(response)
-      // })
+    savePhotos: function () {
+      database.collection("listings").doc(this.bizID).update({
+        photos: this.photos,
+        cover_photo: this.cover_photo,
+      });
     },
-    beforeRemove(index, removeCallBack) {
-      console.log('index', index)
-      var r = confirm("remove image")
-      if (r == true) {
-        removeCallBack()
+
+    uploadPhotos: function (e) {
+      this.photoData = e.target.files;
+      console.log(e.target.files);
+
+      if (this.photoData.length > 0) {
+        for (var i = 0; i < this.photoData.length; i++) {
+          console.log("hello");
+          var imageData = this.photoData[i];
+          const storageRef = firebase
+            .storage()
+            .ref(`${imageData.name}`)
+            .put(imageData);
+          storageRef.on(
+            `state_changed`,
+            (snapshot) => {
+              this.uploadValue =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            },
+            (error) => {
+              console.log(error.message);
+            },
+            () => {
+              this.uploadValue = 100;
+              storageRef.snapshot.ref.getDownloadURL().then((url) => {
+                this.photos.push(url);
+                console.log(this.photos);
+                // this.img1 = url;
+                // console.log(this.img1);
+              });
+            }
+          );
+        }
+      }
+      console.log(this.img);
+    },
+
+    deletePhoto: function () {
+      if (this.photos.length > 0) {
+        this.photos.splice(this.photoIndex, 1);
       }
     },
-    editImage(formData, index, fileList) {
-      console.log('edit data', formData, index, fileList)
+
+    saveCover: function () {
+      this.cover_photo = this.photos[this.photoIndex];
     },
-    markIsPrimary(index, fileList){
-      console.log('markIsPrimary data', index, fileList)
+
+    uploadMenu: function (e) {
+      this.photoData = e.target.files;
+      console.log(e.target.files);
+
+      if (this.photoData.length > 0) {
+        for (var i = 0; i < this.photoData.length; i++) {
+          console.log("hello");
+          var imageData = this.photoData[i];
+          const storageRef = firebase
+            .storage()
+            .ref(`${imageData.name}`)
+            .put(imageData);
+          storageRef.on(
+            `state_changed`,
+            (snapshot) => {
+              this.uploadValue =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            },
+            (error) => {
+              console.log(error.message);
+            },
+            () => {
+              this.uploadValue = 100;
+              storageRef.snapshot.ref.getDownloadURL().then((url) => {
+                this.menu.push(url);
+                console.log(this.menu);
+                // this.img1 = url;
+                // console.log(this.img1);
+              });
+            }
+          );
+        }
+      }
+      console.log(this.img);
     },
-    limitExceeded(amount){
-      console.log('limitExceeded data', amount)
-    }
+    deleteMenu: function () {
+      if (this.menu.length > 0) {
+        this.menu.splice(this.menuIndex, 1);
+      }
+    },
+    saveMenu: function () {
+      database.collection("listings").doc(this.bizID).update({
+        menu: this.menu,
+      });
+    },
   },
 
   created: function () {

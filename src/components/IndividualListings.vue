@@ -11,11 +11,7 @@
         fixed-height="300px"
         autoplay
       >
-        <vueper-slide :image="listingDetails.photoURL1" />
-        <vueper-slide :image="listingDetails.photoURL2" />
-        <vueper-slide :image="listingDetails.photoURL3" />
-        <vueper-slide :image="listingDetails.photoURL1" />
-        <vueper-slide :image="listingDetails.photoURL2" />
+        <vueper-slide v-for="(photo, index) in listingDetails.photos" :image="photo" :key="index"/>
 
         <!-- <img class="place" v-bind:src = "listingDetails.photoURL1">
                 <img class="place" v-bind:src = "listingDetails.photoURL2">
@@ -124,9 +120,7 @@
           :arrows-outside="true"
           fixed-height="450px"
         >
-          <vueper-slide :image="listingDetails.menu" />
-          <vueper-slide :image="listingDetails.menu" />
-          <vueper-slide :image="listingDetails.menu" />
+          <vueper-slide v-for="(menu, index) in listingDetails.menu" :image="menu" :key="index"/>
 
           <!-- <img class="place" v-bind:src = "listingDetails.photoURL1">
                 <img class="place" v-bind:src = "listingDetails.photoURL2">
@@ -140,14 +134,14 @@
           No reviews yet. Make a booking and be the first to leave a review!
         </div>
         <div v-if="reviews.length != 0">
-          <ul>
+          <ul class="review-list">
             <li v-for="commentIndex in commentsToShow" :key="commentIndex">
-              <div class="indiv-review" v-if="commentIndex < reviews.length">
+              <div class="indiv-review" v-if="commentIndex <= reviews.length">
                 <div class="review-title">
-                  <h5>{{ reviews[commentIndex].title }}</h5>
+                  <h5>{{ reviews[commentIndex - 1].title }}</h5>
                   <div class="review-ratings">
                     <b-icon
-                      v-if="reviews[commentIndex].noise > 2"
+                      v-if="reviews[commentIndex - 1].noise > 2"
                       icon="volume-up"
                       style="
                         margin-top: auto;
@@ -156,7 +150,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-else-if="reviews[commentIndex].noise > 1"
+                      v-else-if="reviews[commentIndex - 1].noise > 1"
                       icon="volume-down"
                       style="
                         margin-top: auto;
@@ -174,7 +168,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-if="reviews[commentIndex].rating >= 1"
+                      v-if="reviews[commentIndex - 1].rating >= 1"
                       icon="star-fill"
                       style="
                         margin-top: auto;
@@ -184,7 +178,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-else-if="reviews[commentIndex].rating >= 0.5"
+                      v-else-if="reviews[commentIndex - 1].rating >= 0.5"
                       icon="star-half"
                       style="
                         margin-top: auto;
@@ -194,7 +188,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-if="reviews[commentIndex].rating >= 2"
+                      v-if="reviews[commentIndex - 1].rating >= 2"
                       icon="star-fill"
                       style="
                         margin-top: auto;
@@ -204,7 +198,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-else-if="reviews[commentIndex].rating >= 1.5"
+                      v-else-if="reviews[commentIndex - 1].rating >= 1.5"
                       icon="star-half"
                       style="
                         margin-top: auto;
@@ -214,7 +208,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-if="reviews[commentIndex].rating >= 3"
+                      v-if="reviews[commentIndex - 1].rating >= 3"
                       icon="star-fill"
                       style="
                         margin-top: auto;
@@ -224,7 +218,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-else-if="reviews[commentIndex].rating >= 2.5"
+                      v-else-if="reviews[commentIndex - 1].rating >= 2.5"
                       icon="star-half"
                       style="
                         margin-top: auto;
@@ -234,7 +228,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-if="reviews[commentIndex].rating >= 4"
+                      v-if="reviews[commentIndex - 1].rating >= 4"
                       icon="star-fill"
                       style="
                         margin-top: auto;
@@ -244,7 +238,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-else-if="reviews[commentIndex].rating >= 3.5"
+                      v-else-if="reviews[commentIndex - 1].rating >= 3.5"
                       icon="star-half"
                       style="
                         margin-top: auto;
@@ -254,7 +248,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-if="reviews[commentIndex].rating >= 5"
+                      v-if="reviews[commentIndex - 1].rating >= 5"
                       icon="star-fill"
                       style="
                         margin-top: auto;
@@ -264,7 +258,7 @@
                       "
                     ></b-icon>
                     <b-icon
-                      v-else-if="reviews[commentIndex].rating >= 4.5"
+                      v-else-if="reviews[commentIndex - 1].rating >= 4.5"
                       icon="star-half"
                       style="
                         margin-top: auto;
@@ -277,11 +271,11 @@
                 </div>
                 <div class="review-comment">
                     <p>
-                  {{ reviews[commentIndex].comments }}
+                  {{ reviews[commentIndex - 1].comments }}
                   </p>
                 </div>
                 <div class="review-author">
-                    - {{ reviews[commentIndex].user }}
+                    - {{ reviews[commentIndex - 1].user }}
                 </div>
                 <!-- <div class="noiseLvl">
                   Noise:
@@ -374,8 +368,8 @@ export default {
     };
   },
   methods: {
-    fetchItems: function () {
-      database
+    fetchItems: async function () {
+      await database
         .collection("listings")
         .doc(this.$route.params.id)
         .get()
@@ -383,7 +377,7 @@ export default {
           const toAdd = snapshot.data();
           this.listingDetails = toAdd;
         });
-      database
+      await database
         .collection("listings")
         .doc(this.$route.params.id)
         .collection("reviews")
@@ -392,9 +386,11 @@ export default {
           snapshot.docs.forEach((doc) => {
             const add = doc.data();
             this.reviews.push(add);
-            console.log(this.reviews);
+            console.log(this.reviews[0]);
           });
         });
+
+        console.log(this.listingDetails.photos)
     },
 
     bookPage: function () {
@@ -581,6 +577,10 @@ li {
   border-radius: 10px;
   margin-bottom: 10px;
   background-color: whitesmoke
+}
+
+.review-list {
+  padding-left: 0px;
 }
 
 .review-title h5 {

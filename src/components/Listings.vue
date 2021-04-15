@@ -473,7 +473,7 @@
         <li v-for="listing in displayedList" :key="listing.id">
           <img
             class="main-pic"
-            v-bind:src="listing.photoURL1"
+            v-bind:src="listing.cover_photo"
             height="30px"
             v-bind:id="listing.id"
             v-on:click="route($event)"

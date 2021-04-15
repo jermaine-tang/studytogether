@@ -36,7 +36,7 @@ myRouter.beforeEach((to, from, next) => {
             next();
           } else {
             alert('Not authorized!');
-            next(from);
+            next('/');
           }
         })
       }
