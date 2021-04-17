@@ -1,27 +1,45 @@
 <template>
 	<div class="chart">
         <app-header></app-header>
-		<h1>Bar Chart</h1>
-        <form>
+		<h1>Business Statistics</h1>
+        <button v-on:click.prevent ="show()">Show My Statistics</button>
+        <br><br>
+        <form v-show="isLoaded">
+            Select Duration:
+            <select @change="changeDuration" v-model="selectedDuration">
+                <option v-bind:key="item" v-for="item in selectDuration"> {{item}}</option> 
+            </select>
+        </form>
+        <br>
+        <form v-show="isLoaded && duration=='Monthly'">
+            Select metric to track:
+            
             <select @change="changeHandlerMonth" v-model="selectedMonthly">
                 <option v-bind:key="item" v-for="item in selectArrMonthly"> {{item}} </option> 
             </select>
+            <br><br>
+            Select type of chart:
             <select v-model="selectedTypeMonthly">
                 <option v-bind:key="item" v-for="item in selectTypeArrMonthly"> {{item}} </option> 
             </select>
         </form>
-		<bar-chart-month :chart-data="dataColMonthly" v-if="selectedTypeMonthly=='Bar'"></bar-chart-month>
-        <line-chart-month :chart-data="dataColMonthly" v-if="selectedTypeMonthly=='Line'"></line-chart-month>
-        <form>
+        <br>
+		<bar-chart-month :chart-data="dataColMonthly" v-if="selectedTypeMonthly=='Bar' && isLoaded && duration=='Monthly'"></bar-chart-month>
+        <line-chart-month :chart-data="dataColMonthly" v-if="selectedTypeMonthly=='Line' && isLoaded && duration=='Monthly'"></line-chart-month>
+        <form v-show="isLoaded && duration=='Timeslots'">
+            Select metric to track:
             <select @change="changeHandlerTime" v-model="selectedTime">
                 <option v-bind:key="item" v-for="item in selectArrTime"> {{item}} </option> 
             </select>
+            <br><br>
+            Select type of chart:
             <select v-model="selectedTypeTime">
                 <option v-bind:key="item" v-for="item in selectTypeArrTime"> {{item}} </option> 
             </select>
         </form>
-		<bar-chart-time :chart-data="dataColTime" v-if="selectedTypeTime=='Bar'"></bar-chart-time>
-        <line-chart-time :chart-data="dataColTime" v-if="selectedTypeTime=='Line'"></line-chart-time>
+        <br>
+		<bar-chart-time :chart-data="dataColTime" v-if="selectedTypeTime=='Bar' && isLoaded && duration=='Timeslots'"></bar-chart-time>
+        <line-chart-time :chart-data="dataColTime" v-if="selectedTypeTime=='Line' && isLoaded && duration=='Timeslots'"></line-chart-time>
 
 	</div>
 </template>
@@ -49,7 +67,11 @@ export default {
 
     data() {
         return {
-            totalMonthlySpendings: {},
+            isLoaded: false,
+            type: '',
+            selectedDuration: '',
+            selectDuration: ['Timeslots', 'Monthly'],
+            duration: '',
 
             totalMonthlyRevenue: {},
             totalMonthlyBookings: {},
@@ -59,7 +81,7 @@ export default {
             totalTimeRevenue: {},
             totalTimeBookings: {},
 
-            bizID: 'sg1N9oyI6BWH8HZAOFHe94voAn33',
+            bizID: '',
             timeBookings: {},
             timeRevenue: {},
             monthly: [],
@@ -72,14 +94,14 @@ export default {
             trData: {},
             tbData: {},
 
-            selectedMonthly: 'Select a Metric',
-            selectArrMonthly: ['Select a Metric','Bookings', 'Revenue', 'Ratings', 'Clicks'],
+            selectedMonthly: '',
+            selectArrMonthly: ['Bookings', 'Revenue', 'Ratings', 'Clicks'],
             dataColMonthly: {},
             selectedTypeMonthly: 'Bar',
             selectTypeArrMonthly: ['Bar', 'Line'],
 
-            selectedTime: 'Select a Metric',
-            selectArrTime: ['Select a Metric','Bookings', 'Revenue'],
+            selectedTime: '',
+            selectArrTime: ['Bookings', 'Revenue'],
             dataColTime: {},
             selectedTypeTime: 'Bar',
             selectTypeArrTime: ['Bar', 'Line'],
@@ -95,6 +117,14 @@ export default {
     },    
 
     methods: {
+        show() {
+            this.isLoaded = true
+        },
+
+        changeDuration() {
+            this.duration = this.selectedDuration;
+        },
+
         changeHandlerMonth() {
             let selected = this.selectedMonthly;
             if (selected == 'Revenue') {
@@ -290,7 +320,7 @@ export default {
             this.mrtgData = {
                 labels: Object.keys(this.totalMonthlyRatings),
                 datasets: [{
-                    label: 'Total Monthly Ratings',
+                    label: 'Average Monthly Ratings',
                     backgroundColor: '#f87979',
                     data: Object.values(this.totalMonthlyRatings)
                 }]

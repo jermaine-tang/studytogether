@@ -73,7 +73,6 @@ export default {
       currMRevenue: 0,
       monthID: '',
       timeIDs: [],
-    //  currTData: []
     };
   },
   components: {
@@ -216,11 +215,9 @@ export default {
         })
       }
 
-      for (var i = 0; i < this.selected.length; i++) {
-        var time = this.selected[i];
-    
-
-            await database.collection("listings").doc(locationID).collection("timeslotsData").doc(time).get().then((snapshot) => {
+      for (var j = 0; j < this.selected.length; j++) {
+        var time1 = this.selected[j];
+            await database.collection("listings").doc(locationID).collection("timeslotsData").doc(time1).get().then((snapshot) => {
               const timeData = snapshot.data();
               currTData.push({time: snapshot.id, currTBookings: Number(timeData.bookings), currTRevenue: Number(timeData.revenue)})
               console.log("curr time bookings", "=>", timeData.bookings)

@@ -11,7 +11,7 @@ export default {
             legend: { display: false },
             title: {
               display: true,
-              text: 'Total Monthly Spendings on Bookings (Time)'
+              text: ''
             },
             responsive: true,
             maintainAspectRatio: false,
