@@ -277,7 +277,7 @@ export default {
                   .get()
                   .then((doc) => {
                     let listingData = doc.data();
-                    locationData.push(listingData["photoURL1"]);
+                    locationData.push(listingData["cover_photo"]);
                     locationData.push(listingData["name"]);
                   });
                 return locationData;

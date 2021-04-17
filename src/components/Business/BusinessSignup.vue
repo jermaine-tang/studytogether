@@ -158,6 +158,7 @@ export default {
       await user.updateProfile({
         displayName: this.signup.name,
       });
+      
       console.log(user);
 
       await user.sendEmailVerification();
