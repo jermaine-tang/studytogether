@@ -15,12 +15,17 @@
                 <div>
                     <ul class="customers">
                         <li id="customer" v-for="customer in booking[2]" :key="customer.index">
-                            <!-- duration -->
-                            <span>{{customer[0]}}:      </span>
-                            <!-- name of customer who booked-->
-                            <span>{{customer[1]}} </span>
-                            <!-- pax -->
-                            <span>({{customer[2]}})</span>
+                            <!-- customer name and pax -->
+                            <div id="customerName">{{customer[0]}}  (pax: {{customer[1]}})  </div>
+                            <!-- customer[2] refers to duration which is an array -->
+                            <!-- E.g ['0700 - 1000', '1100 - 1200', '1300 - 1500'] -->
+                            <br>
+                            <ul>
+                                <li v-for="interval in customer[2]" :key="interval.index">
+                                    <!-- E.g '0700 - 1000' -->
+                                    {{interval}}
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -76,6 +81,33 @@ export default {
                 }
             }
 
+            function sortByTiming(a, b) {
+                if (Number(a.slice(0,2)) == Number(b.slice(0,2))) {
+                    return 0;
+                } else {
+                    return (Number(a.slice(0,2)) < Number(b.slice(0,2))) ? -1 : 1;
+                }
+            }
+
+            function segmentToIntervals(arr) {
+                var intervals = []
+                var currTime = arr[0].slice(0,4)
+
+                for (var i = 0; i < arr.length; i++) {
+                    if (i == arr.length - 1) {
+                        currTime = currTime + ' - ' + arr[i].slice(-4)
+                        intervals.push(currTime)
+                    } else if (arr[i].slice(-4) != arr[i + 1].slice(0,4)) {
+                        currTime = currTime + ' - ' + arr[i].slice(-4)
+                        intervals.push(currTime)
+                        currTime = arr[i + 1].slice(0,4)
+                    } else {
+                        continue
+                    }
+                }
+                return intervals
+            }
+
             this.timeslots.forEach(async function(slot) {
                 let timeslot = slot['id']
                 let day = timeslot.slice(0,2) // 17
@@ -109,11 +141,12 @@ export default {
                                 let data = doc.data()
                                 let customerName = data['name']
                                 let time = data['time']
-                                let start = time[0].slice(0,4)
-                                let end = time.pop().slice(-4)
-                                let duration = start + ' - ' + end
+                                // let start = time[0].slice(0,4)
+                                // let end = time.pop().slice(-4)
+                                time = time.sort(sortByTiming)
+                                let duration = segmentToIntervals(time)
                                 let pax = data['pax']
-                                let customer = [duration, customerName, pax]
+                                let customer = [customerName, pax, duration]
                                 customerinfos.push(customer)
                             })
                         })
@@ -201,4 +234,7 @@ export default {
     background-color: #ebebeb;
 }
 
+#customerName {
+    font-size: 22px;
+}
 </style>
