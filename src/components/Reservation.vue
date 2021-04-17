@@ -71,8 +71,6 @@ export default {
       timeSelected: false,
       availableTime: false,
       price: 0,
-      currMBookings: 0,
-      currMRevenue: 0,
       monthID: '',
       timeIDs: [],
     };
@@ -176,28 +174,35 @@ export default {
 
 
     updateMData: async function () {
+      var locationID = this.$route.params.id;
       var dateString = this.date.toDateString()
       let monthString = dateString.slice(4,7)
       console.log(monthString)
       var someArr = []
-      await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
-        if(querySnapshot.isEmpty) {
-            database.collection('listings').doc(this.$route.params.id).collection('monthlyData').add({
-            month: monthString,
-            bookings: 0,
-            clicks: 0,
-            revenue: 0,
-            ratings: 0,
-            }) 
+ 
+      console.log("check if empty")
+      console.log("check this id", locationID)
+      await database.collection('listings').doc(locationID).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+        console.log("checking...")
+        if(!querySnapshot.exists) {
+          console.log("its empty")
+          database.collection('listings').doc(locationID).collection('monthlyData').doc(monthString).set({
+          month: monthString,
+          bookings: 0,
+          clicks: 0,
+          revenue: 0,
+          ratings: 0,
+          }) 
         }
-        querySnapshot.docs.forEach((doc) => {
-          console.log(doc.id, "=>", doc.data())
-          let data = {...doc.data(), ['id']: doc.id}
-          someArr.push(data)
-        })
       })
-      console.log(someArr)
-      return someArr
+      await database.collection('listings').doc(locationID).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+        console.log(querySnapshot.id, "=>", querySnapshot.data())
+        let data = {...querySnapshot.data(), ['id']: querySnapshot.id}
+        someArr.push(data)
+      })
+    
+        console.log(someArr)
+        return someArr
     },
 
     updateTData: async function() {
@@ -316,31 +321,35 @@ export default {
       let monthString = dateString.slice(4,7)
       console.log(monthString)
       
+      var currMBookings = 0
+      var currMRevenue = 0
       var result = await this.updateMData()
       console.log(result)
       result.forEach(doc => {
-        this.currMBookings += doc.bookings
-        this.currMRevenue += doc.revenue
+        currMBookings += Number(doc.bookings)
+        currMRevenue += Number(doc.revenue)
         this.monthID += doc.id
         console.log(doc.id)
       })
   
 
-      console.log("currBookings", this.currMBookings)
-      console.log("currRevenue", this.currMRevenue)
+      console.log("currBookings", currMBookings)
+      console.log("currRevenue", currMRevenue)
       console.log("what's the issue1")
 
       console.log(locationID)
-      var newMBookings = this.currMBookings + Number(this.pax)
+      var newMBookings = Number(Number(currMBookings) + Number(this.pax)*Number(this.selected.length))
       console.log(this.selected.length)
       console.log(this.pax)
       console.log(this.price)
-      var newMRevenue = this.currMRevenue + (this.pax*this.price*this.selected.length)
+      var newMRevenue = Number(Number(currMRevenue) + Number((this.pax*this.price*this.selected.length)))
 
         // update monthlyData
+      console.log("month to add data in", this.monthID)
+      console.log("new revenue", this.newMRevenue)
       await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
-        bookings: newMBookings,
-        revenue: newMRevenue
+        bookings: Number(newMBookings),
+        revenue: Number(newMRevenue)
       })
       //.then(() => {console.log("help")});
       console.log("what's the issue2")

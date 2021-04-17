@@ -6,22 +6,23 @@
         <h1>Bookings</h1>
       <ul>
         <!-- <h3><b>Upcoming</b></h3> -->
+        <h1>Upcoming</h1>
         <li class="segment" v-for="booking in newBookings" :key="booking.index">
           <!-- picture -->
           <!-- <div class="picture"> -->
-          <img :src="booking[5]" alt="picture" class="main-pic" />
+          <img :src="booking[6]" alt="picture" class="main-pic" />
           <!-- </div> -->
           <!-- button -->
           <div class="info">
             <div class="title">
               <h3 class="name">
-                {{ booking[6] }}
+                {{ booking[7] }}
               </h3>
 
               <b-button
                 class="button"
                 variant="outline-danger"
-                v-bind:id="booking[7]"
+                v-bind:id="booking[8]"
                 v-on:click="
                   cancel(booking.index);
                   del($event);
@@ -95,19 +96,20 @@
         <li class="segment" v-for="booking in pastBookings" :key="booking.index">
           <!-- picture -->
           <!-- <div class="picture"> -->
-          <img :src="booking[5]" alt="picture" class="main-pic" />
+          <img :src="booking[6]" alt="picture" class="main-pic" />
           <!-- </div> -->
           <!-- button -->
           <div class="info">
             <div class="title">
               <h3 class="name">
-                {{ booking[6] }}
+                {{ booking[7] }}
               </h3>
 
               <b-button
                 class="button"
                 variant="outline-success"
-                v-bind:id="booking[7]"
+                v-bind:id ="booking[2]" 
+                v-bind:date="booking[5]"
                 v-on:click="route($event)"
                 >Leave Review</b-button
               >
@@ -194,10 +196,7 @@ export default {
       docArr: [],
     };
   },
-  methods: {
-    sendReview: function () {
-      this.$router.push({ path: "reviews" });
-    },
+
     methods: {
         sendReview: function() {
             this.$router.push({path:'reviews'})
@@ -213,25 +212,33 @@ export default {
             this.$router.push({path: `reviews/${doc_id}`, query: {id: doc_id, date: dateBooked}})
         },
 
-        del: function(event) {
-            let id = event.target.getAttribute("id")
-            database.collection('bookings').doc(id).delete().then(() => console.log('delete success'))
+        del: function (event) {
+          let id = event.target.getAttribute("id");
+          database
+            .collection("bookings")
+            .doc(id)
+            .delete()
+            .then(() => console.log("delete success"));
         },
 
         cancel: function(idx) {
             this.newBookings.splice(idx,1)
         },
         
-        getDoc: async function() {
-            var arr = []
-            await database.collection('bookings').get().then(querySnapShot => {
-                let item = {}
-                querySnapShot.docs.forEach(doc => {
-                    item = {...doc.data(), ['id']: doc.id}
-                    arr.push(item)
-                })
-            })
-            return arr
+        
+        getDoc: async function () {
+          var arr = [];
+          await database
+            .collection("bookings")
+            .get()
+            .then((querySnapShot) => {
+              let item = {};
+              querySnapShot.docs.forEach((doc) => {
+                item = { ...doc.data(), ["id"]: doc.id };
+                arr.push(item);
+              });
+            });
+          return arr;
         },
 
         fetchItems: async function() {
@@ -250,142 +257,53 @@ export default {
             }
 
             function sortByDatePast(a, b) {
-                if (new Date(a[3]) == new Date(b[3])) {
-                    return 0;
-                } else {
-                    return (new Date(a[3]) > new Date(b[3])) ? -1 : 1;
-                }
+              if (new Date(a[3]) == new Date(b[3])) {
+                  return 0;
+              } else {
+                  return (new Date(a[3]) > new Date(b[3])) ? -1 : 1;
+              }
             }
 
-            this.docArr.forEach(async function(doc) {
-                let id = [doc['id']]
-                let userid = doc['userid']
-                let location = doc['location']
-                let pax = doc['pax']
-                async function retrieve(locationId) {     
-                    var locationData = []
-                        await database.collection('listings').doc(locationId).get().then(doc => {
-                            let listingData = doc.data()
-                            locationData.push(listingData['photoURL1'])
-                            locationData.push(listingData['name'])
-                        })
-                    return locationData
-                }
-                let locationAndName = await retrieve(location)                
-                let date = doc['date'].toDate().toString()
-                let dateOfVisit = date.slice(4,15)
-                let month = dateOfVisit.slice(0,3)
-                let time = doc['time']
-                let start = time[0].slice(0,4)
-                let end = time.pop().slice(-4)
-                let duration = start + ' - ' + end
-                let booking = [userid, pax, location, dateOfVisit, duration, month]
-                let combined = [...booking, ...locationAndName,...id]
-    
-                if(new Date() < new Date(combined[3]) && combined[0] == currentUser) {
-                    upcoming.push(combined)
-                    upcoming.sort(sortByDateUpcoming)
-                } else if(combined[0] == currentUser) {
-                    past.push(combined)
-                    past.sort(sortByDatePast)
-                }
-            })
-            this.newBookings = upcoming
-            this.pastBookings = past
-        },
-    },
-
-    del: function (event) {
-      let id = event.target.getAttribute("id");
-      database
-        .collection("bookings")
-        .doc(id)
-        .delete()
-        .then(() => console.log("delete success"));
-    },
-
-    cancel: function (idx) {
-      this.newBookings.splice(idx, 1);
-    },
-
-    getDoc: async function () {
-      var arr = [];
-      await database
-        .collection("bookings")
-        .get()
-        .then((querySnapShot) => {
-          let item = {};
-          querySnapShot.docs.forEach((doc) => {
-            item = { ...doc.data(), ["id"]: doc.id };
-            arr.push(item);
-          });
-        });
-      return arr;
-    },
-
-    fetchItems: async function () {
-      this.docArr = await this.getDoc();
-      var currentUser = firebase.auth().currentUser.uid;
-      // console.log(currentUser)
-      let upcoming = [];
-      let past = [];
-
-      function sortByDateUpcoming(a, b) {
-        if (new Date(a[3]) == new Date(b[3])) {
-          return 0;
-        } else {
-          return new Date(a[3]) < new Date(b[3]) ? -1 : 1;
-        }
-      }
-
-      function sortByDatePast(a, b) {
-        if (new Date(a[3]) == new Date(b[3])) {
-          return 0;
-        } else {
-          return new Date(a[3]) > new Date(b[3]) ? -1 : 1;
-        }
-      }
-
-      this.docArr.forEach(async function (doc) {
-        let id = [doc["id"]];
-        let userid = doc["userid"];
-        let location = doc["location"];
-        let pax = doc["pax"];
-        async function retrieve(locationId) {
-          var locationData = [];
-          await database
-            .collection("listings")
-            .doc(locationId)
-            .get()
-            .then((doc) => {
-              let listingData = doc.data();
-              locationData.push(listingData["photoURL1"]);
-              locationData.push(listingData["name"]);
+            this.docArr.forEach(async function (doc) {
+              let id = [doc["id"]];
+              let userid = doc["userid"];
+              let location = doc["location"];
+              let pax = doc["pax"];
+              async function retrieve(locationId) {
+                var locationData = [];
+                await database
+                  .collection("listings")
+                  .doc(locationId)
+                  .get()
+                  .then((doc) => {
+                    let listingData = doc.data();
+                    locationData.push(listingData["photoURL1"]);
+                    locationData.push(listingData["name"]);
+                  });
+                return locationData;
+              }
+              let locationAndName = await retrieve(location);
+              let date = doc["date"].toDate().toString();
+              let dateOfVisit = date.slice(4, 15);
+              let month = dateOfVisit.slice(0,3);
+              let time = doc["time"];
+              let start = time[0].slice(0, 4);
+              let end = time.pop().slice(-4);
+              let duration = start + " - " + end;
+              let booking = [userid, pax, location, dateOfVisit, duration, month];
+              let combined = [...booking, ...locationAndName, ...id];
+              if (new Date() < new Date(combined[3]) && combined[0] == currentUser) {
+                upcoming.push(combined);
+                upcoming.sort(sortByDateUpcoming);
+              } else if (combined[0] == currentUser) {
+                past.push(combined);
+                past.sort(sortByDatePast);
+              }
             });
-          return locationData;
-        }
-        let locationAndName = await retrieve(location);
-        let date = doc["date"].toDate().toString();
-        let dateOfVisit = date.slice(4, 15);
-        let time = doc["time"];
-        let start = time[0].slice(0, 4);
-        let end = time.pop().slice(-4);
-        let duration = start + " - " + end;
-        let booking = [userid, pax, location, dateOfVisit, duration];
-        let combined = [...booking, ...locationAndName, ...id];
-
-        if (new Date() < new Date(combined[3]) && combined[0] == currentUser) {
-          upcoming.push(combined);
-          upcoming.sort(sortByDateUpcoming);
-        } else if (combined[0] == currentUser) {
-          past.push(combined);
-          past.sort(sortByDatePast);
-        }
-      });
-      this.newBookings = upcoming;
-      this.pastBookings = past;
+            this.newBookings = upcoming;
+            this.pastBookings = past;
+          },
     },
-  },
 
   components: {
     "app-header": Header,

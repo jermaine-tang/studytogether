@@ -202,13 +202,23 @@ export default {
 			var monthString = this.$route.query.date;
 			console.log(monthString)
 			var someArr = []
-			await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
-				querySnapshot.docs.forEach((doc) => {
-					console.log(doc.id, "=>", doc.data())
-					let data = {...doc.data(), ['id']: doc.id}
-					someArr.push(data)
-				})
+			await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+				console.log("checking...")
+				if(!querySnapshot.exists) {
+				console.log("its empty")
+				database.collection('listings').doc(locationID).collection('monthlyData').doc(monthString).set({
+				month: monthString,
+				bookings: 0,
+				clicks: 0,
+				revenue: 0,
+				ratings: 0,
+				}) 
+				}
+				console.log(querySnapshot.id, "=>", querySnapshot.data())
+				let data = {...querySnapshot.data(), ['id']: querySnapshot.id}
+				someArr.push(data)
 			})
+			
 			console.log(someArr)
 			return someArr
 		},
@@ -242,29 +252,44 @@ export default {
 				
 			var result = await this.updateData()
 			console.log(result)
+
+			var currNumRatings = 0
+			var currTotalRatings = 0
+			var currRatings = 0
+
 			result.forEach(doc => {
-				this.monthID += doc.id
-				console.log(doc.id)
-			})
+        		currNumRatings += Number(doc.numRatings)
+        		currTotalRatings += Number(doc.totalRatings)
+				currRatings += Number(doc.ratings)
+        		this.monthID += doc.id
+        		console.log(doc.id)
+      		})
 			
 			var locationID = this.$route.params.id;
 			console.log(locationID)
 			console.log("month", this.monthID)
 
+			var newNumRatings = Number(Number(currNumRatings) + 1);
+			console.log()
+			var newRatingTotal = Number(Number(currTotalRatings) + Number(this.rating));
+			var newAvgRating = Number(Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2);
+			console.log("new rating", newAvgRating)
+			/*
 			await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).get().then(snapshot => {
+			
 				const toUpdate = snapshot.data();
 				var newNumRatings = Number(Number(toUpdate.numRatings) + 1);
 				console.log()
 				var newRatingTotal = Number(Number(toUpdate.totalRatings) + Number(this.rating));
 				var newAvgRating = Number(Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2);
+			*/
 				
-				database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
-					ratings: newAvgRating,
-					numRatings: newNumRatings,
-					totalRatings: newRatingTotal
-				})
+			await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
+					ratings: Number(newAvgRating),
+					numRatings: Number(newNumRatings),
+					totalRatings: Number(newRatingTotal)
 			})
-
+			
             await database.collection('listings').doc(locationID).get().then(snapshot => {
                 const toUpdate = snapshot.data();
                 var newNumRatings = Number(Number(toUpdate.numRatings) + 1);

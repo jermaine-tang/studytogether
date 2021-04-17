@@ -22,6 +22,9 @@
     <div class="name">
       <h1>{{ listingDetails.name }}</h1>
     </div>
+    <div class="description">
+        {{ listingDetails.description }}
+    </div>
     <div class="details">
       <div class="float-container">
         <div class="float-left">
@@ -92,6 +95,10 @@
             <span class="noiseVal" v-show="listingDetails.noise == 3">
               Some Noise
             </span> -->
+          </div>
+          <div class="phoneNum">
+            <b-icon class="detail-icon" icon="telephone"></b-icon>
+            {{ listingDetails.phoneNum }}
           </div>
         </div>
         <div class="float-right">
@@ -490,14 +497,24 @@ li {
   vertical-align: middle;
 }
 
+
+.description {
+  border-bottom: 2px solid grey;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.description,
 .price,
 .location,
-.noise {
+.noise,
+.phoneNum {
   font-size: 25px;
 }
 
 .location,
-.noise {
+.noise,
+.phoneNum {
   padding-top: 8px;
 }
 

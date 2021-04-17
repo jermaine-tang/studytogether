@@ -110,6 +110,7 @@ export default {
     },
 
     created() {
+        this.fetchID(),
         this.fetchMonth(),
         this.fetchTime(),
         this.changeHandlerMonth(),

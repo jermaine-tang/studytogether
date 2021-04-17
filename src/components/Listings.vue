@@ -785,7 +785,7 @@ export default {
       ],
       sortBy: "Sort By",
       ascending: true,
-      docid: ''
+      docid: '',
       favourites: [],
     };
   },
@@ -941,19 +941,23 @@ export default {
       console.log(monthString)
 
       var result = await this.fetchClicks()
-
+      console.log(result)
       var monthClicks = 0;
       var monthID = '';
 
       result.forEach(doc => {
-        monthClicks += doc.clicks
+        monthClicks += Number(doc.clicks)
+        console.log("clicks1", doc.clicks)
+        console.log("clicks2", monthClicks)
         monthID += doc.id
         console.log(doc.id)
       })
-
+      console.log("clicks3", monthClicks)
       await database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthID).update({
         clicks: Number(monthClicks + 1)
       })
+
+      console.log(this.docid);
       // database.collection("listings").doc(doc_id).collection("monthlyData")
       this.$router.push({name:"indiv", params: {id:this.docid}});
     },
@@ -966,42 +970,30 @@ export default {
 
       var someArr = []
     //  try {
-        await database.collection('listings').doc(this.docid).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
-          if(querySnapshot.isEmpty) {
-            database.collection('listings').doc(this.docid).collection('monthlyData').add({
-            month: monthString,
-            bookings: 0,
-            clicks: 0,
-            revenue: 0,
-            ratings: 0,
+        console.log("check if empty")
+        console.log("check this id", this.docid)
+        await database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+          console.log("checking...")
+          if(!querySnapshot.exists) {
+            console.log("its empty")
+            database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthString).set({
+              month: monthString,
+              bookings: Number(0),
+              clicks: Number(0),
+              revenue: Number(0),
+              ratings: Number(0),
             }) 
-          } 
-          querySnapshot.docs.forEach((doc) => {
-            console.log(doc.id, "=>", doc.data())
-            let data = {...doc.data(), ['id']: doc.id}
+          }
+        })
+        await database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+        //  querySnapshot.docs.forEach((doc) => {
+            console.log(querySnapshot.id, "=>", querySnapshot.data())
+            let data = {...querySnapshot.data(), ['id']: querySnapshot.id}
             someArr.push(data)
           }) 
     
-        })
-        /*
-        }).catch(e) {
-          await database.collection('listings').doc(this.docid).collection('monthlyData').add({
-          month: monthString,
-          bookings: 0,
-          clicks: 0,
-          revenue: 0,
-          ratings: 0,
-        });
-        await database.collection('listings').doc(this.docid).collection('monthlyData').where('month', '==', monthString).get().then(querySnapshot => {
-          querySnapshot.docs.forEach((doc) => {
-            console.log(doc.id, "=>", doc.data())
-            let data = {...doc.data(), ['id']: doc.id}
-            someArr.push(data)
-          })
-        })
-        */
-     
-      console.log(someArr)
+  
+      console.log("check", someArr)
       return someArr;
     
 

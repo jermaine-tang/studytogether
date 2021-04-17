@@ -10,6 +10,8 @@
         <div class="booking-timings">
         Edit Booking Timings
         <!-- Xie Ran's part -->
+        <button v-on:click="edit()">Edit Timeslots</button>
+        <br><br>
         </div>
     </div>
 </template>
