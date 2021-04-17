@@ -2,7 +2,7 @@
   <div>
     <app-header></app-header>
     <div class="box">
-      <p class="title">Register</p>
+      <p class="title">Register for Owners</p>
       <div id="error-container"></div>
       <form class="form">
         <input
@@ -47,9 +47,9 @@
 </template>
 
 <script>
-import Header from "./UI/Header.vue";
+import Header from "../UI/Header.vue";
 import firebase from "firebase";
-import database from "../firebase.js";
+import database from "../../firebase.js";
 
 export default {
   data() {
@@ -92,7 +92,7 @@ export default {
         return;
       }
 
-      // try {
+      
       await firebase
         .auth()
         .createUserWithEmailAndPassword(this.signup.email, this.signup.password)
@@ -128,13 +128,30 @@ export default {
         name: this.signup.name,
         email: this.signup.email,
         number: this.signup.number,
-        favourites: new Array(),
-        usertype: 'customer'
+        usertype: 'owner'
       };
 
       var user = firebase.auth().currentUser;
 
       database.collection("users").doc(user.uid).set(data);
+
+      database.collection('listings').doc(user.uid).set({
+        amenities: new Array(),
+        exact_loc: "",
+        loc_filter: "",
+        loc_neighbourhood: "",
+        name: "",
+        noise: "2",
+        numRatings: 0,
+        photoURL1: "",
+        photoURL2: "",
+        photoURL3: "",
+        price: 0,
+        rating: 0,
+        totalNoise: 0,
+        totalRating: 0,
+        published: false
+      })
 
       await user.updateProfile({
         displayName: this.signup.name,
@@ -150,25 +167,7 @@ export default {
       );
 
       this.$router.push({ path: "/login" });
-      // } catch (err) {
-      //   console.log(err);
-      //   if (err.code == "auth/invalid-email") {
-      //     document.getElementById("error-container").innerHTML = "Invalid Email Format"
-      //   }
-      //   document.getElementById("error-container").innerHTML =
-      //     "Email is already in use";
-      //   document.getElementById("error-container").style.backgroundColor =
-      //     "rgb(255, 168, 168)";
-      //   document.getElementById("error-container").style.borderRadius = "20px";
-      //   document.getElementById("error-container").style.width = "72.5%";
-      //   document.getElementById("error-container").style.margin = "auto";
-      //   document.getElementById("error-container").style.padding = "3px";
-      //   document.getElementById("error-container").style.marginBottom = "5px";
-      //   document.getElementById("error-container").style.fontFamily =
-      //     '"Ubuntu", sans-serif';
-      //   document.getElementById("error-container").style.fontWeight = "500";
-      //   document.getElementsByClassName("title")[0].style.marginBottom = "8px";
-      // }
+      
     },
   },
 };

@@ -256,7 +256,8 @@ export default {
 				var newNumRatings = Number(Number(toUpdate.numRatings) + 1);
 				console.log()
 				var newRatingTotal = Number(Number(toUpdate.totalRatings) + Number(this.rating));
-				var newAvgRating = Number(Math.round(Number(newRatingTotal) / Number(newNumRatings)));
+				var newAvgRating = Number(Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2);
+				
 				database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
 					ratings: newAvgRating,
 					numRatings: newNumRatings,
@@ -268,7 +269,7 @@ export default {
                 const toUpdate = snapshot.data();
                 var newNumRatings = Number(Number(toUpdate.numRatings) + 1);
                 var newRatingTotal = Number(Number(toUpdate.totalRating) + Number(this.rating));
-                var newAvgRating = Number(Math.round(Number(newRatingTotal) / Number(newNumRatings)));
+                var newAvgRating = Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2;
                 var newNoiseTotal = Number(Number(toUpdate.totalNoise) + Number(this.noise));
                 var newAvgNoise = Number(Math.round(Number(newNoiseTotal) / Number(newNumRatings)));
 				console.log(newNoiseTotal)

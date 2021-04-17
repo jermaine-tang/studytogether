@@ -15,35 +15,46 @@
 </template>
 
 <script>
-import Header from "../UI/Header.vue";
+    import Header from "../UI/Header.vue";
+    import firebase from 'firebase';
 
-
-export default {
-    data() {
-        return {
-        //    bizID: ''
-        }
-    },
-    components: {
-        "app-header": Header
-    },
-    methods: {
- /*   fetchID: function () {
-        var user = firebase.auth().currentUser;
-        console.log(user);
-        var userID = user.uid;
-        this.bizID = userID;
-    }, */
-    
-        route: function() {
-            this.$router.push({name:"info"})
+    export default {
+        data() {
+            return {
+                bizID: '',
+            }
+        },
+        components: {
+            "app-header": Header
         },
 
-/*    created: function () {
-        this.fetchID();
-    } */
-    }
-}
+        methods: {
+
+            fetchID: function () {
+
+                
+                var user = firebase.auth().currentUser;
+                console.log(user.uid);
+                var userID = user.uid;
+                this.bizID = userID;
+                
+                
+                
+                //update how to get listing ID after biz login is done
+
+            },
+            
+            route: function() {
+                this.$router.push({name:"info", params: {id:this.bizID}});
+            },
+
+            edit: function() {
+                this.$router.push({name:"edit", params: {id:this.bizID}});
+            }
+        }
+        }
+
+
 
 </script>
 
