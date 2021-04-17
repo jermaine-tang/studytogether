@@ -44,9 +44,9 @@
 									v-model="noise"
 									required
 								>
-									<option value="quiet">1 - Quiet</option>
-									<option value="tolerable">2 - Tolerable</option>
-									<option value="whiteNoise">3 - Perfect</option>
+									<option value=1>1 - Quiet</option>
+									<option value=2>2 - Tolerable</option>
+									<option value=3>3 - Perfect</option>
 								</select>
 							</div>
 						</div>
@@ -57,11 +57,11 @@
 							</div>
 							<div class="col-75">
 								<select id="rating" name="rating" v-model="rating" required>
-									<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>
-									<option value="5">5</option>
+									<option value=1>1</option>
+									<option value=2>2</option>
+									<option value=3>3</option>
+									<option value=4>4</option>
+									<option value=5>5</option>
 								</select>
 							</div>
 						</div>
@@ -85,14 +85,8 @@
 						<br />
 						<div id="send">
 							<div class="row">
-								<input
-									type="submit"
-									value="submit"
-									v-on:click="
-										send();
-										route();
-									"
-								/>
+								<button v-on:click.prevent="send()">Submit
+								</button>
 							</div>
 						</div>
 					</form>
@@ -183,6 +177,8 @@ export default {
             comment: '',
             noise: 0,
             rating: 0,
+			monthID: '',
+			
         }
     },
 
@@ -197,46 +193,119 @@ export default {
                 this.listingDetail = toAdd;
                 console.log(toAdd);
                 console.log(this.listingDetail);
+				console.log(this.$route.params.id)
+				console.log(this.$route.query.date)
                 })     
             },
 
-            send: async function() {
-                const locationId = this.$route.params.id
-                const userId = firebase.auth().currentUser.uid
-                async function retrieveUser(idOfUser) {
-                    var username = ''
-                        await database.collection('users').doc(idOfUser).get().then(doc => {
-                            let data = doc.data()
-                            username = data['name']
-                        })
-                    return username;
-                }
-                let username = await retrieveUser(userId)
+		updateData: async function () {
+			var monthString = this.$route.query.date;
+			console.log(monthString)
+			var someArr = []
+			await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+				console.log("checking...")
+				if(!querySnapshot.exists) {
+				console.log("its empty")
+				database.collection('listings').doc(locationID).collection('monthlyData').doc(monthString).set({
+				month: monthString,
+				bookings: 0,
+				clicks: 0,
+				revenue: 0,
+				ratings: 0,
+				}) 
+				}
+				console.log(querySnapshot.id, "=>", querySnapshot.data())
+				let data = {...querySnapshot.data(), ['id']: querySnapshot.id}
+				someArr.push(data)
+			})
+			
+			console.log(someArr)
+			return someArr
+		},
 
-
-                database.collection('listings').doc(locationId).collection('reviews').add({
-                    title: this.title,
-                    comments: this.comment,
-                    noise: this.noise,
-                    rating: Number(this.rating),
-                    userid: userId,
-                    user: username
-                })
-
-                database.collection('listings').doc(this.$route.params.id).get().then(snapshot => {
-                    const toUpdate = snapshot.data();
-                    var newNumRatings = toUpdate.numRatings + 1;
-                    var newRatingTotal = Number(toUpdate.totalRating) + Number(this.rating);
-                    var newAvgRating = Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2;
-                    var newNoiseTotal = Number(toUpdate.totalNoise) + Number(this.noise);
-                    var newAvgNoise = Math.round(Number(newNoiseTotal) / Number(newNumRatings));
-                    database.collection('listings').doc(this.$route.params.id).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
-                    this.$router.push({path: "/bookings"}));
-                
-                })  
-
-                
+        send: async function() {
+			const locationId = this.$route.params.id
+            const userId = firebase.auth().currentUser.uid
+            async function retrieveUser(idOfUser) {
+                var username = ''
+                    await database.collection('users').doc(idOfUser).get().then(doc => {
+                        let data = doc.data()
+                        username = data['name']
+                    })
+                return username;
             }
+            let username = await retrieveUser(userId)
+
+
+            database.collection('listings').doc(locationId).collection('reviews').add({
+                title: this.title,
+                comments: this.comment,
+                noise: Number(this.noise),
+                rating: Number(this.rating),
+                userid: userId,
+                user: username
+            })
+
+			// get month doc id and currbookings and currrevenue
+			var monthString = this.$route.query.date
+			console.log(monthString)
+				
+			var result = await this.updateData()
+			console.log(result)
+
+			var currNumRatings = 0
+			var currTotalRatings = 0
+			var currRatings = 0
+
+			result.forEach(doc => {
+        		currNumRatings += Number(doc.numRatings)
+        		currTotalRatings += Number(doc.totalRatings)
+				currRatings += Number(doc.ratings)
+        		this.monthID += doc.id
+        		console.log(doc.id)
+      		})
+			
+			var locationID = this.$route.params.id;
+			console.log(locationID)
+			console.log("month", this.monthID)
+
+			var newNumRatings = Number(Number(currNumRatings) + 1);
+			console.log()
+			var newRatingTotal = Number(Number(currTotalRatings) + Number(this.rating));
+			var newAvgRating = Number(Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2);
+			console.log("new rating", newAvgRating)
+			/*
+			await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).get().then(snapshot => {
+			
+				const toUpdate = snapshot.data();
+				var newNumRatings = Number(Number(toUpdate.numRatings) + 1);
+				console.log()
+				var newRatingTotal = Number(Number(toUpdate.totalRatings) + Number(this.rating));
+				var newAvgRating = Number(Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2);
+			*/
+				
+			await database.collection('listings').doc(locationID).collection('monthlyData').doc(this.monthID).update({
+					ratings: Number(newAvgRating),
+					numRatings: Number(newNumRatings),
+					totalRatings: Number(newRatingTotal)
+			})
+			
+            await database.collection('listings').doc(locationID).get().then(snapshot => {
+                const toUpdate = snapshot.data();
+                var newNumRatings = Number(Number(toUpdate.numRatings) + 1);
+                var newRatingTotal = Number(Number(toUpdate.totalRating) + Number(this.rating));
+                var newAvgRating = Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2;
+                var newNoiseTotal = Number(Number(toUpdate.totalNoise) + Number(this.noise));
+                var newAvgNoise = Number(Math.round(Number(newNoiseTotal) / Number(newNumRatings)));
+				console.log(newNoiseTotal)
+				console.log(newAvgNoise)
+                database.collection('listings').doc(locationID).update({rating: newAvgRating, totalRating: newRatingTotal, numRatings: newNumRatings, noise: newAvgNoise, totalNoise: newNoiseTotal}).then(
+                this.$router.push({path: "/bookings"}));
+                
+            })  
+
+                
+        }
     },
 
     created: function() {
@@ -331,7 +400,7 @@ label {
 	display: inline-block;
 }
 
-input[type="submit"] {
+button {
 	background-color: #4caf50;
 	color: white;
 	padding: 12px 20px;

@@ -19,6 +19,16 @@
             required
           ></b-form-input>
         </div>
+        <div class="description">
+          <h6>Description:</h6>
+          <b-form-textarea
+            v-model="description"
+            aria-describedby="input-live-help input-live-feedback"
+            placeholder="Enter description"
+            trim
+            required
+          ></b-form-textarea>
+        </div>
         <!-- <hr /> -->
         <div class="editAmenities">
           <div id="changeAmenities">
@@ -45,13 +55,13 @@
         <!-- <hr /> -->
         <div class="editLocation">
           <h6>Location Address:</h6>
-          <b-form-input
+          <b-form-textarea
             v-model="exact_loc"
             aria-describedby="input-live-help input-live-feedback"
             placeholder="Enter Location of Business"
             trim
             required
-          ></b-form-input>
+          ></b-form-textarea>
           <!-- <textarea v-model="exact_loc" row="20" cols="50"> </textarea> -->
         </div>
         <!-- <hr /> -->
@@ -83,6 +93,18 @@
           /> -->
           </div>
         </div>
+        <div class="phoneNum">
+          <h6>Business Phone Number:</h6>
+          <b-form-input
+            v-model="phoneNum"
+            aria-describedby="input-live-help input-live-feedback"
+            placeholder="Enter Business Phone Number"
+            trim
+            required
+          ></b-form-input>
+        </div>
+        
+
         <div class="submit-button">
           <!-- <button v-if="!published" @click.prevent="save">Publish Listing</button>
         <button v-if="published" @click.prevent="save">Save Changes</button> -->
@@ -103,7 +125,6 @@
 
       <div class="details2">
         <b-form-file
-          v-model="imgData"
           @change="uploadPhotos"
           ref="file-input"
           class="mb-2"
@@ -164,7 +185,7 @@
 
       <div class="details3">
         <b-form-file
-          v-model="imgData"
+
           @change="uploadMenu"
           ref="file-input"
           class="mb-2"
@@ -261,9 +282,11 @@ export default {
       listingDetail: {},
       bizID: "",
       name: "",
+      description: "",
       exact_loc: "",
       region: "",
       neighbourhood: "",
+      phoneNum: "",
       photos: [],
       cover_photo: "",
       // photo2: "",
@@ -313,6 +336,8 @@ export default {
           const toAdd = snapshot.data();
           this.listingDetail = toAdd;
           this.region = toAdd.loc_filter;
+          this.description = toAdd.description;
+          this.phoneNum = toAdd.phoneNum
           this.neighbourhood = toAdd.loc_neighbourhood;
           this.exact_loc = toAdd.exact_loc;
           this.name = toAdd.name;
@@ -330,6 +355,7 @@ export default {
     },
 
     save: async function () {
+      console.log("name", this.name)
       database.collection("listings").doc(this.bizID).update({
         loc_filter: this.region,
         loc_neighbourhood: this.neighbourhood,
@@ -337,10 +363,14 @@ export default {
         name: this.name,
         price: this.price,
         amenities: this.amenities,
+        description: this.description,
+        phoneNum: this.phoneNum,
         published: true,
       });
+      console.log("bizid", this.bizID)
       console.log(this.name);
-      window.location.reload();
+      console.log(this.exact_loc)
+      alert("Information sucessfully updated!");
     },
 
     savePhotos: function () {
@@ -348,6 +378,7 @@ export default {
         photos: this.photos,
         cover_photo: this.cover_photo,
       });
+      alert("Photos successfully updated!");
     },
 
     uploadPhotos: function (e) {
@@ -384,6 +415,7 @@ export default {
         }
       }
       console.log(this.img);
+      
     },
 
     deletePhoto: function () {
@@ -394,6 +426,7 @@ export default {
 
     saveCover: function () {
       this.cover_photo = this.photos[this.photoIndex];
+      alert("Cover photo selected!");
     },
 
     uploadMenu: function (e) {
@@ -430,6 +463,7 @@ export default {
         }
       }
       console.log(this.img);
+      
     },
     deleteMenu: function () {
       if (this.menu.length > 0) {
@@ -440,6 +474,7 @@ export default {
       database.collection("listings").doc(this.bizID).update({
         menu: this.menu,
       });
+      alert("Menu sucessfully updated!");
     },
   },
 
@@ -475,7 +510,7 @@ export default {
   margin: auto;
 }
 
-.name {
+.name, .description, .phoneNum {
   text-align: left;
 }
 
@@ -524,10 +559,12 @@ export default {
 }
 
 .name,
+.description,
 .editAmenities,
 .editPrice,
 .editLocation,
-.region-neighbourhood {
+.region-neighbourhood,
+.phoneNum {
   padding-bottom: 5px;
   border-bottom: 2px solid grey;
 }

@@ -785,6 +785,7 @@ export default {
       ],
       sortBy: "Sort By",
       ascending: true,
+      docid: '',
       favourites: [],
     };
   },
@@ -880,11 +881,6 @@ export default {
 
       return tempList;
     },
-
-    test: function () {
-      console.log(this.searchString);
-      return this.searchString;
-    },
   },
 
   methods: {
@@ -936,9 +932,71 @@ export default {
       console.log(this.favourites);
     },
 
-    route: function (event) {
-      let doc_id = event.target.getAttribute("id");
-      this.$router.push({ name: "indiv", params: { id: doc_id } });
+    route: async function(event) {
+      this.docid = event.target.getAttribute("id");
+      console.log(this.docid)
+      var currDate = new Date()
+      let dateInString = currDate.toDateString()
+      let monthString = dateInString.slice(4,7)
+      console.log(monthString)
+
+      var result = await this.fetchClicks()
+      console.log(result)
+      var monthClicks = 0;
+      var monthID = '';
+
+      result.forEach(doc => {
+        monthClicks += Number(doc.clicks)
+        console.log("clicks1", doc.clicks)
+        console.log("clicks2", monthClicks)
+        monthID += doc.id
+        console.log(doc.id)
+      })
+      console.log("clicks3", monthClicks)
+      await database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthID).update({
+        clicks: Number(monthClicks + 1)
+      })
+
+      console.log(this.docid);
+      // database.collection("listings").doc(doc_id).collection("monthlyData")
+      this.$router.push({name:"indiv", params: {id:this.docid}});
+    },
+
+    fetchClicks: async function() {
+      
+      var currDate = new Date()
+      let dateInString = currDate.toDateString()
+      let monthString = dateInString.slice(4,7)
+
+      var someArr = []
+    //  try {
+        console.log("check if empty")
+        console.log("check this id", this.docid)
+        await database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+          console.log("checking...")
+          if(!querySnapshot.exists) {
+            console.log("its empty")
+            database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthString).set({
+              month: monthString,
+              bookings: Number(0),
+              clicks: Number(0),
+              revenue: Number(0),
+              ratings: Number(0),
+            }) 
+          }
+        })
+        await database.collection('listings').doc(this.docid).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
+        //  querySnapshot.docs.forEach((doc) => {
+            console.log(querySnapshot.id, "=>", querySnapshot.data())
+            let data = {...querySnapshot.data(), ['id']: querySnapshot.id}
+            someArr.push(data)
+          }) 
+    
+  
+      console.log("check", someArr)
+      return someArr;
+    
+
     },
 
     bookmark: async function (event) {
@@ -990,7 +1048,7 @@ export default {
           //   .collection("users")
           //   .doc(user.uid)
           //   .update({ favourites: newFav });
-          console.log("bookmarked");
+          // console.log("bookmark");
         });
     },
 
@@ -1022,6 +1080,7 @@ export default {
 
   created: function () {
     this.fetchItems();
+    this.displayList = this.list;
   },
 };
 </script>
