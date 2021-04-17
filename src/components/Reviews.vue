@@ -221,6 +221,7 @@ export default {
     },
 
     updateData: async function () {
+      const locationID = this.$route.params.id;
       var monthString = this.$route.query.date;
       console.log(monthString);
       var someArr = [];
@@ -256,7 +257,7 @@ export default {
       return someArr;
     },
 
-    send: async function () {
+    send: async function (e) {
       e.preventDefault();
       if (
         this.title == "" ||
@@ -304,12 +305,12 @@ export default {
 
       var currNumRatings = 0;
       var currTotalRatings = 0;
-      var currRatings = 0;
+      // var currRatings = 0;
 
       result.forEach((doc) => {
         currNumRatings += Number(doc.numRatings);
         currTotalRatings += Number(doc.totalRatings);
-        currRatings += Number(doc.ratings);
+        // currRatings += Number(doc.ratings);
         this.monthID += doc.id;
         console.log(doc.id);
       });
