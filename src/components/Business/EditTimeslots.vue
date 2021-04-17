@@ -462,7 +462,6 @@ export default {
   user-select: none;
   width: 50%;
 }
-
 /* Hide the browser's default checkbox */
 .timing-listing input {
   position: absolute;
@@ -471,7 +470,6 @@ export default {
   height: 0;
   width: 0;
 }
-
 /* Create a custom checkbox */
 .checkmark {
   position: absolute;
@@ -481,29 +479,24 @@ export default {
   width: 25px;
   background-color: #eee;
 }
-
 /* On mouse-over, add a grey background color */
 .timing-listing:hover input ~ .checkmark {
   background-color: #ccc;
 }
-
 /* When the checkbox is checked, add a blue background */
 .timing-listing input:checked ~ .checkmark {
   background-color: #2196f3;
 }
-
 /* Create the checkmark/indicator (hidden when not checked) */
 .checkmark:after {
   content: "";
   position: absolute;
   display: none;
 }
-
 /* Show the checkmark when checked */
 .timing-listing input:checked ~ .checkmark:after {
   display: block;
 }
-
 /* Style the checkmark/indicator */
 .timing-listing .checkmark:after {
   left: 9px;
@@ -516,7 +509,6 @@ export default {
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
-
 select {
   height: 25px;
   width: 40%;
@@ -527,7 +519,6 @@ select {
   align-items: center;
   margin: auto;
 }
-
 .float-left,
 .float-right {
   flex: 1;
@@ -535,21 +526,18 @@ select {
   width: 50%;
   overflow: auto;
 }
-
 .float-left {
   width: 50%;
   float: left;
   padding: 20px;
   border: 2px;
 }
-
 .float-right {
   width: 50%;
   float: right;
   padding: 20px;
   border: 2px;
 }
-
 .timeslot {
   width: 100%;
   margin: auto;

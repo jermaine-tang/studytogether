@@ -141,6 +141,8 @@ export default {
         loc_filter: "",
         loc_neighbourhood: "",
         name: "",
+        description: "",
+        phoneNum: "",
         noise: 2,
         numRatings: 0,
         cover_photo: "",

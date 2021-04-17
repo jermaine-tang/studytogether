@@ -13,6 +13,7 @@ import BusinessSignup from './components/Business/BusinessSignup.vue';
 import BizBookings from './components/Business/Biz Bookings.vue';
 import Information from './components/Business/Information.vue';
 import EditTimeslots from './components/Business/EditTimeslots.vue';
+import BizDashboard from './components/Business/Dashboard/BizDashboard.vue'
 
 
 // import firebase from 'firebase'
@@ -104,6 +105,11 @@ export default [
         name: 'edit', 
         component: EditTimeslots, 
         props: true,
+        meta: { auth: 'owner' }
+    },
+    {   
+        path: '/bizdashboard', 
+        component: BizDashboard,
         meta: { auth: 'owner' }
     }
 ]
