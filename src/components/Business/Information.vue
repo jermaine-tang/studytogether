@@ -63,6 +63,7 @@
               <option>South</option>
               <option>East</option>
               <option>West</option>
+              <option>Central</option>
             </select>
           </div>
           <div class="editNeighbourhood">

@@ -107,7 +107,7 @@
               <b-button
                 class="button"
                 variant="outline-success"
-                v-bind:id="booking[7]"
+                v-bind:id="booking[2]"
                 v-on:click="route($event)"
                 >Leave Review</b-button
               >
@@ -218,7 +218,9 @@ export default {
     },
 
     cancel: function (idx) {
-      this.newBookings.splice(idx, 1);
+      var booking = this.newBookings[idx]
+      console.log(booking);
+      // this.newBookings.splice(idx, 1);
     },
 
     getDoc: async function () {
@@ -272,7 +274,7 @@ export default {
             .get()
             .then((doc) => {
               let listingData = doc.data();
-              locationData.push(listingData["photoURL1"]);
+              locationData.push(listingData["cover_photo"]);
               locationData.push(listingData["name"]);
             });
           return locationData;
@@ -297,6 +299,9 @@ export default {
       });
       this.newBookings = upcoming;
       this.pastBookings = past;
+
+      console.log(this.newBookings)
+      console.log(this.newBookings[0])
     },
   },
 

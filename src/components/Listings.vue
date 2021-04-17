@@ -598,7 +598,7 @@
                   margin-right: 50px;
                 "
               ></b-icon>
-              Tolerable
+              Normal
             </p>
 
             <p v-if="listing.noise == 3" class="noise" style="font-size: 25px">
@@ -877,6 +877,8 @@ export default {
       if (!this.ascending) {
         tempList.reverse();
       }
+
+      console.log(tempList)
 
       return tempList;
     },

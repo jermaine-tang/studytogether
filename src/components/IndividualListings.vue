@@ -64,7 +64,7 @@
               width="34px"
             /> -->
             <b-icon class="detail-icon" icon="volume-up"></b-icon>
-            Tolerable
+            Normal
             <!-- <span class="noiseVal" v-show="listingDetails.noise == 1">
               Quiet
             </span>
@@ -377,6 +377,9 @@ export default {
           const toAdd = snapshot.data();
           this.listingDetails = toAdd;
         });
+
+      console.log(this.$route.params.id)
+
       await database
         .collection("listings")
         .doc(this.$route.params.id)
@@ -390,7 +393,7 @@ export default {
           });
         });
 
-        console.log(this.listingDetails.photos)
+        console.log(this.reviews)
     },
 
     bookPage: function () {
