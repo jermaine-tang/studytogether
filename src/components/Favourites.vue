@@ -3,20 +3,38 @@
     <app-header></app-header>
     <h1>Favourites</h1>
     <ul class="favourites-list">
-      <li v-for="(listing, index) in list" :key="index">
-        <!-- picture of cafe -->
-        <img id="main-pic" v-bind:src="listing.photoURL1" />
-        <div id="name">
+      <li class="segment" v-for="(listing, index) in list" :key="index">
+        <img :src="listing.cover_photo" alt="picture" class="main-pic" />
+        <div class="info">
+          <div class="title">
+            <h3 class="name">
+              {{ listing.name }}
+            </h3>
+
+            <b-button
+              class="button"
+              variant="outline-danger"
+              v-bind:index="index"
+              v-on:click="remove($event)"
+              >Remove</b-button
+            >
+          </div>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique saepe reprehenderit, iure animi necessitatibus reiciendis 
+          </p>
+        </div>
+        <!-- <div id="name">
           <b> {{ listing.name }} </b>
         </div>
-        <!-- Button to cancel bookmark -->
-        <button
+        <button class="button" v-bind:index="index" v-on:click="remove($event)">
+        Button to cancel bookmark -->
+        <!-- <button
           class="button"
-          v-bind:id="listing.id"
+          v-bind:index="index"
           v-on:click="remove($event)"
         >
           Remove
-        </button>
+        </button> -->
       </li>
     </ul>
   </div>
@@ -69,7 +87,7 @@ export default {
           let item = {};
           querySnapShot.docs.forEach((doc) => {
             item = { ...doc.data(), ["id"]: doc.id };
-            
+
             // console.log(item)
             arr.push(item);
           });
@@ -78,30 +96,65 @@ export default {
     },
 
     fetchItems: async function () {
+      // await setTimeout(() => {}, 1000)
       var listArr = await this.getListing();
+      // var userArr = await this.getUser()
+      console.log("get listings" + listArr);
 
       var user = firebase.auth().currentUser;
+
+      console.log(user);
 
         await database.collection('users').doc(user.uid).get().then(snapshot => {
             const data = snapshot.data();
             this.idList = data.favourites;
-
+            //this.list = new Array(this.idList.length)
+            console.log(this.idList)
         })
+    
+    //   for (var i = 0; i < userArr.length; i++) {
+    //     if (userArr[i].id == user.id) {
+    //       this.idList = userArr[i].favourites;
+    //     }
+    //   }
 
       for (var j = 0; j < listArr.length; j++) {
-
+          console.log(this.idList)
+          console.log(listArr[j].id)
+            console.log(this.idList.includes(listArr[j].id))
         if (this.idList.includes(listArr[j].id)) {
+            //this.list[this.idList.indexOf(listArr[j].id)] = listArr[j]
             this.list.push(listArr[j]);
         }
       }
 
       console.log(this.list);
 
- 
+      //   if (!this.idList.empty) {
+      //     await database
+      //       .collection("listings")
+      //       .get()
+      //       .then((snapshot) => {
+      //         let item = {};
+      //         snapshot.docs.forEach((doc) => {
+      //           if (this.idList.includes(doc.id)) {
+      //             item = { ...doc.data(), ["id"]: doc.id };
+      //             this.list.push(item); //push the list of favourites into list
+      //           }
+      //         });
+      //       });
+      //   }
     },
 
     remove: function (event) {
-      let doc_id = event.target.getAttribute("id");
+      /**
+      let doc_index = event.target.getAttribute("index");
+
+      console.log(event.target);
+      //console.log(doc_id);
+      this.idList.splice(doc_index, 1);
+      **/
+      let doc_id = event.target.getAttribute("index");
       console.log(doc_id);
       var newList = [];
       for (var k = 0; k < this.idList.length; k++) {
@@ -114,11 +167,44 @@ export default {
       this.idList = newList;
 
       let user = firebase.auth().currentUser;
+      // var fav = [];
+      // var newFav = [];
       database
         .collection("users")
         .doc(user.uid)
         .update({ favourites: this.idList })
         .then(() => {location.reload()});
+        //.get()
+        //.then((snapshot) => {
+          //const data = snapshot.data();
+
+          //var fav = data.favourites;
+
+          //const indexOf = fav.indexOf(doc_id);
+
+          //fav.splice(indexOf, 1);
+
+         // database
+         //   .collection("users")
+         //   .doc(user.uid)
+         //   .update({ favourites: fav });
+
+          // snapshot.docs.forEach(doc => {
+          // if (doc.id == user.uid) {//get the user
+          //     fav = doc.data().favourites;
+          //     console.log(fav);
+          //     for (let i = 0; i < fav.length; i++) {
+          //         if (fav[i] != doc_id) {
+          //             newFav.push(fav[i]);
+          //             console.log(newFav[i] + "added");
+          //         }
+          //     }
+          //     database.collection('users').doc(user.uid).update({"favourites": newFav});
+          //     console.log(newFav);
+          //     console.log("remove");
+          // }
+          // })
+        //})
     },
   },
 };
@@ -129,37 +215,96 @@ ul {
   display: flex;
   flex-wrap: wrap;
   list-style-type: none;
-  padding: 30%;
-  padding-top: 3%;
   margin: auto;
+  padding-left: 0;
 }
 
 li {
   display: flex;
-  flex-wrap: wrap;
-  width: 1000px;
-  position: relative;
-  /*  flex-basis: 300px; */
+  width: 60%;
+  height: 200px;
+  /* height: 80%; */
+  /* position: relative; */
   text-align: center;
-  padding: 10px;
-  border: 3px solid #ed7a78;
-  margin: 10px;
-  margin-top: 5px;
-  border-radius: 25px;
+  /* padding: 10px; */
+  /* border: 3px solid #ED7A78; */
+  /* margin: 10px; */
+  /* margin-top: 5px; */
+  /* margin-bottom: 0px; */
+  /* padding-bottom: 1px; */
+  /* border-radius: 25px; */
   font-family: "Ubuntu", sans-serif;
-  margin: 0 0 10 0;
+  margin: auto;
+  /* margin: 0 0 10 0; */
+}
+
+.title {
+  padding-bottom: 12px;
+  border-bottom: 2px solid grey;
+  display: flex;
+  font-size: 35px;
+  margin-bottom: 15px;
 }
 
 .button {
-  position: relative;
-  left: 90px;
-  height: 50px;
-  width: 90px;
+  font-size: 20px;
+  margin-top: 0px;
+  float: right;
+  margin-left: auto;
 }
 
-#main-pic {
+.name {
+  font-size: 35px;
+  text-align: left;
+  float: left;
+  margin-bottom: 0px;
+}
+
+
+h1 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 40px;
+  margin-bottom: 15px;
+  width: 30%;
+  margin: auto;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: 2px solid grey;
+}
+
+.segment {
+  margin-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 50px;
+  padding-right: 50px;
+  border-bottom: 2px solid wheat;
+}
+
+.main-pic {
+  float: left;
+  border-radius: 15px;
+  margin-right: 10px;
+}
+
+.info {
+  width: 100%;
+  float: right;
+  margin: auto;
+  padding-left: 20px;
+}
+
+.main-pic {
+  /* position: relative; */
+  float: left;
+  /* right:20%; */
+  border-radius: 15px;
+  width: 40%;
+  height: 100%;
+}
+
+/* #main-pic {
   position: relative;
-  /* left: 1px; */
+  left: 1px;
   border-radius: 15px;
   width: 200px;
   height: 150px;
@@ -172,5 +317,5 @@ li {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: 30px;
   font-weight: 1000;
-}
+} */
 </style>

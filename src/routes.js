@@ -1,19 +1,21 @@
-import Homepage from "./components/Homepage.vue";
-import Loginpage from "./components/Loginpage.vue";
-import Listings from "./components/Listings.vue";
-import SignupPage from "./components/SignupPage.vue";
-import IndividualListings from "./components/IndividualListings.vue";
-import Bookings from "./components/Bookings.vue";
-import Reviews from "./components/Reviews.vue";
-import ForgotPassword from "./components/ForgotPassword.vue";
-import Favourites from "./components/Favourites.vue";
-import Reservation from "./components/Reservation.vue";
+import Homepage from './components/Homepage.vue';
+import Loginpage from './components/Loginpage.vue';
+import Listings from './components/Listings.vue';
+import SignupPage from './components/SignupPage.vue';
+import IndividualListings from './components/IndividualListings.vue';
+import Bookings from './components/Bookings.vue';
+import Reviews from './components/Reviews.vue';
+import ForgotPassword from './components/ForgotPassword.vue';
+import Favourites from './components/Favourites.vue';
 import userChart from "./components/userCharts.vue";
-import MyBusiness from "./components/Business/MyBusiness.vue";
-import BusinessSignup from "./components/Business/BusinessSignup.vue";
-import BizBookings from "./components/Business/Biz Bookings.vue";
-import Information from "./components/Business/Information.vue";
-import EditTimeslots from "./components/Business/EditTimeslots.vue";
+import Reservation from './components/Reservation.vue';
+import MyBusiness from './components/Business/MyBusiness.vue';
+import BusinessSignup from './components/Business/BusinessSignup.vue';
+import BizBookings from './components/Business/Biz Bookings.vue';
+import Information from './components/Business/Information.vue';
+import EditTimeslots from './components/Business/EditTimeslots.vue';
+import BizDashboard from './components/Business/Dashboard/BizDashboard.vue'
+
 
 // import firebase from 'firebase'
 
@@ -110,4 +112,9 @@ export default [
 		props: true,
 		meta: { auth: "owner" },
 	},
+    {   
+        path: '/bizdashboard', 
+        component: BizDashboard,
+        meta: { auth: 'owner' }
+    }
 ];

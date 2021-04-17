@@ -5,12 +5,15 @@
         <strong><h1>Study Together</h1></strong>
         <ul>
           <li><router-link to="/">Home</router-link></li>
-          <li><router-link to="/listings">Listings</router-link></li>
-          <li v-if="loggedIn"><router-link to="/bookings">Bookings</router-link></li>
-          <li v-if="loggedIn"><router-link to="/favourites">Favourites</router-link></li>
-          <li v-if="loggedIn"><router-link to="/userChart">View Chart</router-link></li>
-          <li v-if="loggedIn"><router-link to="/bizBookings">Biz Bookings</router-link></li>
-          <li v-if="loggedIn"><router-link v-on:click.native="signOut" to="/">Logout</router-link></li>
+          <li><router-link to="/listings" v-if="loggedIn != 'owner'">Listings</router-link></li>
+          <li v-if="loggedIn == 'customer'"><router-link to="/bookings">Bookings</router-link></li>
+          <li v-if="loggedIn == 'customer'"><router-link to="/favourites">Favourites</router-link></li>
+          <li v-if="loggedIn == 'customer'"><router-link to="/userChart">View Chart</router-link></li>
+          <li v-if="loggedIn == 'owner'"><router-link to ="/bizdashboard">Business Dashboard</router-link></li>
+          <li v-if="loggedIn == 'owner'"><router-link :to="{path: '/listings/' + this.userID }">My Listings</router-link></li>
+          <li v-if="loggedIn == 'owner'"><router-link to="/mybiz">My Biz</router-link></li>
+          <!-- <li v-if="loggedIn == 'owner'"><router-link to="/bizBookings">Biz Bookings</router-link></li> -->
+          <li v-if="loggedIn != 'none'"><router-link v-on:click.native="signOut" to="/">Logout</router-link></li>
           <li v-else><router-link to="/login">Login</router-link></li>
         </ul>
       </nav>
@@ -21,34 +24,42 @@
 
 <script>
 import firebase from 'firebase';
+import database from '../../firebase.js';
 
 export default {
   
   data() {
     return {
-      loggedIn: false,
+      loggedIn: "none",
+      userID: "",
     };
   },
 
   methods: {
-    setupFirebase: function () {
-      firebase.auth().onAuthStateChanged(user => {
+    setupFirebase: async function () {
+      firebase.auth().onAuthStateChanged(async user => {
         if (user) {
-          console.log('loggedIn')
-          this.loggedIn = true;
+          this.userID = user.uid
+          console.log(this.userID)
+          await database.collection('users').doc(user.uid).get().then(doc => {
+            const data = doc.data()
+            this.loggedIn = data.usertype;
+          })
         } else {
-          console.log('not logged in')
-          this.loggedIn = false;
+          this.loggedIn = "none";
+          this.userID = "";
         }
       })
     },
 
     signOut: function() {
+      this.loggedIn = 'none';
+      this.userID = "";
       firebase.auth().signOut().catch(err => console.log(err))
     }
   },
   
-  mounted() {
+  created() {
     this.setupFirebase();
   }
 };
@@ -80,6 +91,7 @@ nav {
 nav ul {
   list-style: none;
   text-align: center;
+  padding-left: 0px;
 }
 nav ul li {
   display: inline-block;

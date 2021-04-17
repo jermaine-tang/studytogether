@@ -5,23 +5,25 @@
             Information
             <br><br>
             <button v-on:click="route()">Edit General Information</button>
+        </div>
         <br><br>
+        <div class="booking-timings">
+        Edit Booking Timings
         <!-- Xie Ran's part -->
         <button v-on:click="edit()">Edit Timeslots</button>
         <br><br>
         </div>
-                    
     </div>
 </template>
 
 <script>
     import Header from "../UI/Header.vue";
-    //import firebase from 'firebase';
+    import firebase from 'firebase';
 
     export default {
         data() {
             return {
-                bizID: '5iBl58sV6uv7riUzCQzn',
+                bizID: '',
             }
         },
         components: {
@@ -32,12 +34,12 @@
 
             fetchID: function () {
 
-                /*
+                
                 var user = firebase.auth().currentUser;
-                console.log(user);
+                console.log(user.uid);
                 var userID = user.uid;
                 this.bizID = userID;
-                */
+                
                 
                 
                 //update how to get listing ID after biz login is done
@@ -51,43 +53,14 @@
             edit: function() {
                 this.$router.push({name:"edit", params: {id:this.bizID}});
             }
-
-        },
-
-        created: function () {
-            this.fetchID();
         }
-    }
+        }
+
+
 
 </script>
 
 <style scoped>
-ul {
-  display: flex;
-  flex-wrap: wrap;
-  list-style-type: none;
-  padding: 30%;
-  padding-top: 3%;
-  margin: auto;
-}
-
-li {
-  display: flex;
-  flex-wrap: wrap;
-  width: 1000px;
-  position: relative;
-  /*  flex-basis: 300px; */
-  text-align: center;
-  padding: 10px;
-  border: 3px solid #ed7a78;
-  margin: 10px;
-  margin-top: 5px;
-  border-radius: 25px;
-  font-family: "Ubuntu", sans-serif;
-  margin: 0 0 10 0;
-}
-
-
 
 .info,.booking-timings, button {
     font-size: 30px;
@@ -112,25 +85,6 @@ li {
 .info button:hover {
   border-color: white;
   background-color: #e33c39;
-}
-
-.booking-timings{
-    border: 3px solid #fff;
-    padding: 20px;
-}
-
-.float-left {
-    width: 50%;
-    float: left;
-    padding: 20px;
-    border: 2px ;
-}
-
-.float-right {
-    width: 50%;
-    float: right;
-    padding: 20px;
-    border: 2px ;
 }
 
 </style>

@@ -141,11 +141,13 @@ export default {
         loc_filter: "",
         loc_neighbourhood: "",
         name: "",
-        noise: 0,
-        numRatings: "",
-        photoURL1: "",
-        photoURL2: "",
-        photoURL3: "",
+        description: "",
+        phoneNum: "",
+        noise: 2,
+        numRatings: 0,
+        cover_photo: "",
+        photos: [],
+        menu: [],
         price: 0,
         rating: 0,
         totalNoise: 0,
@@ -156,6 +158,7 @@ export default {
       await user.updateProfile({
         displayName: this.signup.name,
       });
+      
       console.log(user);
 
       await user.sendEmailVerification();
