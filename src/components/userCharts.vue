@@ -2,7 +2,9 @@
 	<div class="chart">
         <app-header></app-header>
 		<h1>My Statistics</h1>
-        <form>
+        <button v-on:click.prevent ="show()">Show My Statistics</button>
+        <br><br>
+        <form v-show="isLoaded">
             <select @change="changeMetric" v-model="selectedMetric">
                 <option v-bind:key="item" v-for="item in metricTypeArr">{{item}}</option>
             </select>
@@ -11,8 +13,8 @@
                 <option v-bind:key="item" v-for="item in typeChart">{{item}}</option>
             </select>
         </form>
-		<bar-chart v-if="selectedChartType == 'Bar Chart'" :chart-data="datacollection"></bar-chart>
-        <line-chart v-if="selectedChartType == 'Line Chart'" :chart-data="datacollection"></line-chart>
+        <bar-chart v-if="selectedChartType == 'Bar Chart' && isLoaded" :chart-data="datacollection"></bar-chart>
+        <line-chart v-if="selectedChartType == 'Line Chart' && isLoaded" :chart-data="datacollection"></line-chart>
         <br><br>
 	</div>
 </template>
@@ -41,7 +43,7 @@ export default {
             metricTypeArr: ['Total Monthly Spendings','Total Monthly Hours'],
             selectedMetric: 'Total Monthly Spendings',
             typeChart: ['Bar Chart', 'Line Chart'],
-            selectedChartType: 'Bar Chart'
+            selectedChartType:'Bar Chart'
         }
     },
 
@@ -65,6 +67,10 @@ export default {
             return b
         },
 
+        show() {
+            this.isLoaded = true
+        },
+
         changeMetric: function() {
             let selected = this.selectedMetric
             if (selected == 'Total Monthly Spendings') {
@@ -73,6 +79,8 @@ export default {
                 this.datacollection = this.monthlySpendings
             }
         },
+
+        
 
         fetchItems: async function() {
             // wait to get all my bookings and store to local variable
