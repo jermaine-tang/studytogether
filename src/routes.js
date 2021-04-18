@@ -17,8 +17,6 @@ import EditTimeslots from './components/Business/EditTimeslots.vue';
 import BizDashboard from './components/Business/Dashboard/BizDashboard.vue'
 
 
-// import firebase from 'firebase'
-
 export default [
 	{
 		path: "/",
