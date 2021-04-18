@@ -3,11 +3,13 @@
     <app-header></app-header>
     
     <div class="table" v-if="newBookings.length > 0">
-        <h1>Bookings</h1>
+        <!-- <h1>Bookings</h1> -->
+        <!-- <br><br> -->
       <ul>
         <!-- <h3><b>Upcoming</b></h3> -->
-        <h1>Upcoming</h1>
-        <li class="segment" v-for="booking in newBookings" :key="booking.index">
+        <h1>Upcoming Bookings</h1>
+        <br>
+        <li class="segment" v-for="(booking, index) in newBookings" :key="index">
           <!-- picture -->
           <!-- <div class="picture"> -->
           <img :src="booking[6]" alt="picture" class="main-pic" />
@@ -22,9 +24,9 @@
               <b-button
                 class="button"
                 variant="outline-danger"
-                v-bind:id="booking[8]"
+                v-bind:val="booking[8]"
                 v-on:click="
-                  cancel(booking.index);
+                  cancel(index);
                   del($event);
                 "
                 >Cancel Booking</b-button
@@ -108,8 +110,9 @@
               <b-button
                 class="button"
                 variant="outline-success"
-                v-bind:id ="booking[2]" 
+                v-bind:locId ="booking[2]" 
                 v-bind:date="booking[5]"
+                v-bind:id ="booking[8][0]"
                 v-on:click="route($event)"
                 >Leave Review</b-button
               >
@@ -203,11 +206,12 @@ export default {
         },
 
         route: function(event) {
-            let doc_id = event.target.getAttribute("id");
+            let doc_id = event.target.getAttribute("id")
+            let loc_id = event.target.getAttribute("locId");
             let dateBooked = event.target.getAttribute("date");
-            // console.log(doc_id)
+            // console.log(loc_id)
             // console.log(this.pastBookings)
-            this.$router.push({path: `reviews/${doc_id}`, query: {id: doc_id, date: dateBooked}})
+            this.$router.push({path: `reviews/${loc_id}`, query: {loc_id: loc_id, date: dateBooked, doc_id: doc_id}})
         },
 
         visitDateToString: function(dateOfVisit) {
@@ -326,6 +330,18 @@ export default {
                   return (new Date(a[3]) > new Date(b[3])) ? -1 : 1;
               }
             }
+
+            // function convertUTCDateToLocalDate(date) {
+            //     var newDate = new Date(date.getTime()+date.getTimezoneOffset()*60*1000);
+
+            //     var offset = date.getTimezoneOffset() / 60;
+            //     var hours = date.getHours();
+
+            //     newDate.setHours(hours - offset);
+
+            //     return newDate;   
+            // }
+
             // sorts the timings in the 'time' array in firestore. 
             // if the array is ['0900 - 1000', '0800 - 0900', '1400 - 1500','1300 - 1400'],
             // it returns ['0800 - 0900', '0900 - 1000', '1300 - 1400','1400 - 1500']
@@ -380,6 +396,12 @@ export default {
                 let time = doc['time']
                 // sort the array
                 let sortedTimings = time.sort(sortByTiming)
+
+                let startTiming = Number(sortedTimings[0].slice(0,2))
+                let currentDate = new Date().toDateString()
+                let currentHour = new Date().getHours()
+
+                let currentDateWithoutDayOfWeek = currentDate.substr(currentDate.indexOf(' ') + 1)
                 // get all the intervals booked by the user and store into an array called 'duration'
                 let duration = segmentToIntervals(sortedTimings)
                 // v-bind values
@@ -391,7 +413,15 @@ export default {
                 if(new Date() < new Date(combined[3]) && combined[0] == currentUser) {
                     upcoming.push(combined)
                     upcoming.sort(sortByDateUpcoming)
-                } else if(combined[0] == currentUser) {
+                } else if((currentDateWithoutDayOfWeek == dateOfVisit) && combined[0] == currentUser) {
+                    if (currentHour < startTiming) {
+                        upcoming.push(combined)
+                        upcoming.sort(sortByDateUpcoming)
+                    } else {
+                        past.push(combined)
+                        past.sort(sortByDatePast)
+                    }
+                } else if (combined[0] == currentUser) {
                     past.push(combined)
                     past.sort(sortByDatePast)
                 }
