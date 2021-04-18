@@ -259,7 +259,7 @@ export default {
 			return someArr
 		},
 
-        send: async function() {
+        send: async function(e) {
 			e.preventDefault();
 			if (
 				this.title == "" ||
@@ -281,9 +281,6 @@ export default {
             }
             let username = await retrieveUser(userId)
 
-			if (!this.title) {
-				alert("Please enter a title!")
-			}
             database.collection('listings').doc(locationId).collection('reviews').add({
                 title: this.title,
                 comments: this.comment,
