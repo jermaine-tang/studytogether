@@ -199,20 +199,23 @@ export default {
             },
 
 		updateData: async function () {
+			const locationID = this.$route.params.id
 			var monthString = this.$route.query.date;
 			console.log(monthString)
 			var someArr = []
 			await database.collection('listings').doc(this.$route.params.id).collection('monthlyData').doc(monthString).get().then(querySnapshot => {
 				console.log("checking...")
 				if(!querySnapshot.exists) {
-				console.log("its empty")
-				database.collection('listings').doc(locationID).collection('monthlyData').doc(monthString).set({
-				month: monthString,
-				bookings: 0,
-				clicks: 0,
-				revenue: 0,
-				ratings: 0,
-				}) 
+					console.log("its empty")
+					database.collection('listings').doc(locationID).collection('monthlyData').doc(monthString).set({
+					month: monthString,
+					bookings: Number(0),
+					clicks: Number(0),
+					revenue: Number(0),
+					ratings: Number(0),
+					totalRatings: Number(0),
+          			numRatings: Number(0)
+					}) 
 				}
 				console.log(querySnapshot.id, "=>", querySnapshot.data())
 				let data = {...querySnapshot.data(), ['id']: querySnapshot.id}
@@ -243,7 +246,8 @@ export default {
                 noise: Number(this.noise),
                 rating: Number(this.rating),
                 userid: userId,
-                user: username
+                user: username,
+				date: new Date()
             })
 
 			// get month doc id and currbookings and currrevenue
@@ -253,9 +257,9 @@ export default {
 			var result = await this.updateData()
 			console.log(result)
 
-			var currNumRatings = 0
-			var currTotalRatings = 0
-			var currRatings = 0
+			var currNumRatings = Number(0)
+			var currTotalRatings = Number(0)
+			var currRatings = Number(0)
 
 			result.forEach(doc => {
         		currNumRatings += Number(doc.numRatings)
@@ -265,12 +269,13 @@ export default {
         		console.log(doc.id)
       		})
 			
+			console.log("currentRatings", currRatings)
 			var locationID = this.$route.params.id;
 			console.log(locationID)
 			console.log("month", this.monthID)
 
 			var newNumRatings = Number(Number(currNumRatings) + 1);
-			console.log()
+
 			var newRatingTotal = Number(Number(currTotalRatings) + Number(this.rating));
 			var newAvgRating = Number(Math.round((Number(newRatingTotal) / Number(newNumRatings))*2) / 2);
 			console.log("new rating", newAvgRating)
