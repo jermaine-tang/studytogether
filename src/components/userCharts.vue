@@ -1,7 +1,6 @@
 <template>
 	<div class="chart">
         <app-header></app-header>
-		<h1>My Statistics</h1>
         <button v-on:click.prevent ="show()">Show My Statistics</button>
         <br><br>
         <form v-show="isLoaded">
