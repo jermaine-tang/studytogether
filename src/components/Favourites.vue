@@ -4,7 +4,7 @@
     <h1>Favourites</h1>
     <ul class="favourites-list">
       <li class="segment" v-for="(listing, index) in list" :key="index">
-        <img :src="listing.photoURL1" alt="picture" class="main-pic" />
+        <img :src="listing.cover_photo" alt="picture" class="main-pic" />
         <div class="info">
           <div class="title">
             <h3 class="name">

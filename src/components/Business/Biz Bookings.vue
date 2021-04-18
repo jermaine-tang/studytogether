@@ -16,7 +16,7 @@
                     <ul class="customers">
                         <li id="customer" v-for="customer in booking[2]" :key="customer.index">
                             <!-- duration -->
-                            <span>{{customer[0]}}:      </span>
+                            <span>{{customer[0]}}: </span>
                             <!-- name of customer who booked-->
                             <span>{{customer[1]}} </span>
                             <!-- pax -->
